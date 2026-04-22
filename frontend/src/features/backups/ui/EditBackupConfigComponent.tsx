@@ -358,7 +358,7 @@ export const EditBackupConfigComponent = ({
           {backupInterval?.interval === IntervalType.CRON && (
             <>
               <div className="mb-1 flex w-full flex-col items-start sm:flex-row sm:items-center">
-                <div className="mb-1 min-w-[150px] sm:mb-0">Cron expression (UTC)</div>
+                <div className="mb-1 min-w-[150px] sm:mb-0">Cron expression</div>
                 <div className="flex items-center">
                   <Input
                     value={backupInterval?.cronExpression || ''}
@@ -372,13 +372,13 @@ export const EditBackupConfigComponent = ({
                     title={
                       <div>
                         <div className="font-bold">
-                          Cron format: minute hour day month weekday (UTC)
+                          Cron format: minute hour day month weekday
                         </div>
                         <div className="mt-1">Examples:</div>
-                        <div>• 0 2 * * * - Daily at 2:00 AM UTC</div>
+                        <div>• 0 2 * * * - Daily at 2:00 AM</div>
                         <div>• 0 */6 * * * - Every 6 hours</div>
-                        <div>• 0 3 * * 1 - Every Monday at 3:00 AM UTC</div>
-                        <div>• 30 4 1,15 * * - 1st and 15th at 4:30 AM UTC</div>
+                        <div>• 0 3 * * 1 - Every Monday at 3:00 AM</div>
+                        <div>• 30 4 1,15 * * - 1st and 15th at 4:30 AM</div>
                       </div>
                     }
                   >
@@ -389,9 +389,7 @@ export const EditBackupConfigComponent = ({
               {backupInterval?.cronExpression &&
                 (() => {
                   try {
-                    const interval = CronExpressionParser.parse(backupInterval.cronExpression, {
-                      tz: 'UTC',
-                    });
+                    const interval = CronExpressionParser.parse(backupInterval.cronExpression, {});
                     const nextRun = interval.next().toDate();
                     return (
                       <div className="mb-1 flex w-full flex-col items-start text-xs text-gray-600 sm:flex-row sm:items-center dark:text-gray-400">
