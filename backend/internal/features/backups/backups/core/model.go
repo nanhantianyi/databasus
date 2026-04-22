@@ -48,7 +48,7 @@ type Backup struct {
 }
 
 func (b *Backup) GenerateFilename(dbName string) {
-	timestamp := time.Now().UTC()
+	timestamp := time.Now()
 
 	b.FileName = fmt.Sprintf(
 		"%s-%s-%s",
