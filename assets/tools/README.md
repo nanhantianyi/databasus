@@ -28,7 +28,7 @@ assets/tools/<arch>/
 Notes:
 - MySQL `5.7` is amd64-only — `arm/mysql/mysql-5.7/` is intentionally absent.
 - MariaDB ships two client versions: legacy `10.6` (for MariaDB servers 5.5 / 10.1) and modern `12.1` (for 10.2+). The mapping lives in `tools/mariadb.go`.
-- MongoDB Database Tools are version 100.16.1 across all arches and are backward-compatible with all supported server versions (4.0 – 8.2).
+- MongoDB Database Tools are version 100.16.1 across all arches and are backward-compatible with all supported server versions (4.2 – 8.2). MongoDB 4.0 is not supported (wire version 7, requires older mongodump).
 
 To refresh a tool set, drop the corresponding `bin/` contents in place
 and commit. There are no install scripts in this directory; binaries

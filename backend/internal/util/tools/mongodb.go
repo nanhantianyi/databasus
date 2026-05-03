@@ -30,7 +30,7 @@ const (
 
 // GetMongodbExecutable returns the absolute path to a MongoDB Database Tools
 // binary. The tools are version-agnostic — a single client supports all
-// supported server versions (4.0 – 8.x).
+// supported server versions (4.2 – 8.x).
 func GetMongodbExecutable(executable MongodbExecutable) string {
 	return filepath.Join(getMongodbBinDir(), withExeOnWindows(string(executable)))
 }
