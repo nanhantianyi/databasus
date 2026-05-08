@@ -22,7 +22,7 @@ RUN pnpm build
 
 # ========= BUILD BACKEND =========
 # Backend build stage
-FROM --platform=$BUILDPLATFORM golang:1.26.1 AS backend-build
+FROM --platform=$BUILDPLATFORM golang:1.26.2 AS backend-build
 
 # Make TARGET args available early so tools built here match the final image arch
 ARG TARGETOS
@@ -81,7 +81,7 @@ RUN CGO_ENABLED=0 \
 # so the agent runs on any Linux distro (Alpine, Debian, Ubuntu, RHEL, etc.).
 # APP_VERSION is baked into the binary via -ldflags so the agent can
 # compare its version against the server and auto-update when needed.
-FROM --platform=$BUILDPLATFORM golang:1.26.1 AS agent-build
+FROM --platform=$BUILDPLATFORM golang:1.26.2 AS agent-build
 
 ARG APP_VERSION=dev
 
@@ -158,6 +158,9 @@ RUN groupadd -g 999 postgres || true && \
   useradd -m -s /bin/bash -u 999 -g 999 postgres || true && \
   mkdir -p /databasus-data/pgdata && \
   chown -R postgres:postgres /databasus-data/pgdata
+
+# Create non-root user for the main application process
+RUN useradd -r -s /usr/sbin/nologin -u 65532 databasus
 
 WORKDIR /app
 
@@ -293,7 +296,12 @@ echo "Setting up data directory permissions..."
 mkdir -p /databasus-data/pgdata
 mkdir -p /databasus-data/temp
 mkdir -p /databasus-data/backups
-chown -R postgres:postgres /databasus-data
+chown databasus:databasus /databasus-data
+chown -R postgres:postgres /databasus-data/pgdata
+chown -R databasus:databasus /databasus-data/temp /databasus-data/backups
+# Upgrade path: secret.key and instance.json may be owned by root or postgres
+# from older images. Re-own them so the non-root main process can read/write.
+chown databasus:databasus /databasus-data/secret.key /databasus-data/instance.json 2>/dev/null || true
 chmod 700 /databasus-data/temp
 
 # ========= Start Valkey (internal cache) =========
@@ -442,7 +450,7 @@ if [ -n "\${DANGEROUS_VALKEY_HOST:-}" ]; then
     echo ""
 fi
 
-exec ./main
+exec gosu databasus ./main
 EOF
 
 LABEL org.opencontainers.image.source="https://github.com/databasus/databasus"
