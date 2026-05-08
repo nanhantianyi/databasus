@@ -102,7 +102,7 @@ export const StoragesComponent = ({
           >
             {storages.length >= 5 && isCanManageStorages && addStorageButton}
 
-            {!IS_CLOUD && (
+            {IS_CLOUD && (
               <div className="mb-3 rounded bg-yellow-50 p-3 shadow dark:bg-yellow-900/30">
                 <div className="mb-1 flex items-center gap-1.5 text-sm font-bold text-yellow-700 dark:text-yellow-400">
                   <ExclamationCircleOutlined />
