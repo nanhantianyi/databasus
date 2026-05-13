@@ -7,12 +7,15 @@ on:
     branches: ["**"]
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   lint-backend:
     if: github.ref != 'refs/heads/develop'
     runs-on: self-hosted
     container:
-      image: golang:1.26.2
+      image: golang:1.26.3
       volumes:
         - /runner-cache/go-pkg:/go/pkg/mod
         - /runner-cache/go-build:/root/.cache/go-build
@@ -105,12 +108,12 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
-          go-version: "1.26.2"
-          cache-dependency-path: agent/go.sum
+          go-version: "1.26.3"
+          cache-dependency-path: agent/backup/go.sum
 
       - name: Download Go modules
         run: |
-          cd agent
+          cd agent/backup
           go mod download
 
       - name: Install golangci-lint
@@ -120,14 +123,35 @@ jobs:
 
       - name: Run golangci-lint
         run: |
-          cd agent
+          cd agent/backup
           golangci-lint run
 
       - name: Verify go mod tidy
         run: |
-          cd agent
+          cd agent/backup
           go mod tidy
           git diff --exit-code go.mod go.sum || (echo "go mod tidy made changes, please run 'go mod tidy' and commit the changes" && exit 1)
+
+  dockerfile-scan:
+    if: github.ref != 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out code
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https gnupg
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --batch --no-tty --yes --dearmor -o /usr/share/keyrings/trivy.gpg
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install -y trivy
+
+      - name: Trivy Dockerfile misconfiguration scan
+        run: trivy config --severity HIGH,CRITICAL --exit-code 1 Dockerfile
 
   test-frontend:
     if: github.ref != 'refs/heads/develop'
@@ -170,17 +194,17 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@40f1582b2485089dde7abd97c1529aa768e1baff # v5.6.0
         with:
-          go-version: "1.26.2"
-          cache-dependency-path: agent/go.sum
+          go-version: "1.26.3"
+          cache-dependency-path: agent/backup/go.sum
 
       - name: Download Go modules
         run: |
-          cd agent
+          cd agent/backup
           go mod download
 
       - name: Run Go tests
         run: |
-          cd agent
+          cd agent/backup
           go test -count=1 -failfast ./internal/...
 
   e2e-agent:
@@ -193,13 +217,13 @@ jobs:
 
       - name: Run e2e tests
         run: |
-          cd agent
+          cd agent/backup
           make e2e
 
       - name: Cleanup
         if: always()
         run: |
-          cd agent/e2e
+          cd agent/backup/e2e
           docker compose down -v --rmi local || true
           rm -rf artifacts || true
 
@@ -217,13 +241,13 @@ jobs:
 
       - name: Run backup-restore e2e (PG ${{ matrix.pg_version }})
         run: |
-          cd agent
+          cd agent/backup
           make e2e-backup-restore PG_VERSION=${{ matrix.pg_version }}
 
       - name: Cleanup
         if: always()
         run: |
-          cd agent/e2e
+          cd agent/backup/e2e
           docker compose -f docker-compose.backup-restore.yml down -v --rmi local || true
           rm -rf artifacts || true
 
@@ -234,7 +258,7 @@ jobs:
     runs-on: self-hosted
     needs: [lint-backend]
     container:
-      image: golang:1.26.2
+      image: golang:1.26.3
       options: --privileged -v /var/run/docker.sock:/var/run/docker.sock --add-host=host.docker.internal:host-gateway
       volumes:
         - /runner-cache/go-pkg:/go/pkg/mod
@@ -389,7 +413,7 @@ jobs:
       - name: Run database migrations
         run: |
           cd backend
-          go install github.com/pressly/goose/v3/cmd/goose@v3.24.3
+          go install github.com/pressly/goose/v3/cmd/goose@v3.27.1
           set -a && . ../.env && set +a
           GOOSE_DBSTRING="$GOOSE_TEST_DBSTRING" goose -dir ./migrations up
 
@@ -479,6 +503,22 @@ jobs:
           fi
           echo "index.html OK"
 
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https gnupg
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --batch --no-tty --yes --dearmor -o /usr/share/keyrings/trivy.gpg
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install -y trivy
+
+      - name: Trivy scan dev image (CRITICAL, blocking)
+        run: trivy image --severity CRITICAL --ignore-unfixed --pkg-types os,library --scanners vuln --exit-code 1 databasus-dev:smoke-${{ github.sha }}
+
+      - name: Trivy scan dev image (HIGH, advisory)
+        if: always()
+        run: trivy image --severity HIGH --ignore-unfixed --pkg-types os,library --scanners vuln --exit-code 0 databasus-dev:smoke-${{ github.sha }}
+
       - name: Cleanup smoke container
         if: always()
         run: |
@@ -527,7 +567,7 @@ jobs:
   build-image:
     if: github.ref != 'refs/heads/develop'
     runs-on: ubuntu-latest
-    needs: [lint-backend, lint-frontend, lint-agent]
+    needs: [lint-backend, lint-frontend, lint-agent, dockerfile-scan]
     steps:
       - name: Clean workspace
         run: |
@@ -586,6 +626,22 @@ jobs:
             exit 1
           fi
           echo "index.html OK"
+
+      - name: Install Trivy
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y wget apt-transport-https gnupg
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo gpg --batch --no-tty --yes --dearmor -o /usr/share/keyrings/trivy.gpg
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install -y trivy
+
+      - name: Trivy scan release image (CRITICAL, blocking)
+        run: trivy image --severity CRITICAL --ignore-unfixed --pkg-types os,library --scanners vuln --exit-code 1 databasus:smoke-${{ github.sha }}
+
+      - name: Trivy scan release image (HIGH, advisory)
+        if: always()
+        run: trivy image --severity HIGH --ignore-unfixed --pkg-types os,library --scanners vuln --exit-code 0 databasus:smoke-${{ github.sha }}
 
       - name: Cleanup smoke container
         if: always()
