@@ -14,7 +14,10 @@ import (
 	users_services "databasus-backend/internal/features/users/services"
 	cache_utils "databasus-backend/internal/util/cache"
 	cloudflare_turnstile "databasus-backend/internal/util/cloudflare_turnstile"
+	"databasus-backend/internal/util/logger"
 )
+
+var log = logger.GetLogger()
 
 type UserController struct {
 	userService *users_services.UserService
@@ -150,6 +153,7 @@ func (c *UserController) SignIn(ctx *gin.Context) {
 
 	response, err := c.userService.SignIn(&request)
 	if err != nil {
+		log.Warn("Failed to sign in", "error", err.Error(), "ip", ctx.ClientIP())
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
