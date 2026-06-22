@@ -161,7 +161,7 @@ export const ShowLogicalBackupConfigComponent = ({ database }: Props) => {
           {backupInterval?.type === IntervalType.CRON && (
             <>
               <div className="mb-1 flex w-full items-center">
-                <div className="min-w-[150px]">Cron expression (UTC)</div>
+                <div className="min-w-[150px]">Cron expression</div>
                 <code className="rounded bg-gray-100 px-2 py-0.5 text-sm dark:bg-gray-700">
                   {backupInterval?.cronExpression || ''}
                 </code>
@@ -169,9 +169,7 @@ export const ShowLogicalBackupConfigComponent = ({ database }: Props) => {
               {backupInterval?.cronExpression &&
                 (() => {
                   try {
-                    const interval = CronExpressionParser.parse(backupInterval.cronExpression, {
-                      tz: 'UTC',
-                    });
+                    const interval = CronExpressionParser.parse(backupInterval.cronExpression, {});
                     const nextRun = interval.next().toDate();
                     return (
                       <div className="mb-1 flex w-full items-center text-xs text-gray-600 dark:text-gray-400">
