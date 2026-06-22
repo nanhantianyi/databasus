@@ -42,7 +42,7 @@ type LogicalBackup struct {
 }
 
 func (b *LogicalBackup) GenerateFilename(dbName string) {
-	timestamp := time.Now().UTC()
+	timestamp := time.Now()
 
 	b.FileName = fmt.Sprintf(
 		"%s-%s-%s",
