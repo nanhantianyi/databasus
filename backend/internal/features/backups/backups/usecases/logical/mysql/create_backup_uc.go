@@ -56,6 +56,13 @@ type writeResult struct {
 	writeErr     error
 }
 
+type compressedCopySpec struct {
+	Destination            io.Writer
+	Source                 io.Reader
+	CompressedBytesCounter *io_utils.CountingWriter
+	ProgressListener       func(completedMBs float64)
+}
+
 func (uc *CreateMysqlBackupUsecase) Execute(
 	ctx context.Context,
 	backup *backups_core_logical.LogicalBackup,
@@ -141,8 +148,6 @@ func (uc *CreateMysqlBackupUsecase) buildMysqldumpArgs(my *mysqltypes.MysqlDatab
 		}
 	}
 
-	args = append(args, uc.getNetworkCompressionArgs(my)...)
-
 	args = append(args, "--max-allowed-packet=1G")
 
 	if my.IsHttps {
@@ -156,28 +161,6 @@ func (uc *CreateMysqlBackupUsecase) buildMysqldumpArgs(my *mysqltypes.MysqlDatab
 	}
 
 	return args
-}
-
-func (uc *CreateMysqlBackupUsecase) getNetworkCompressionArgs(
-	my *mysqltypes.MysqlDatabase,
-) []string {
-	const zstdCompressionLevel = 5
-
-	switch my.Version {
-	case tools.MysqlVersion80, tools.MysqlVersion84, tools.MysqlVersion9:
-		if my.IsZstdSupported {
-			return []string{
-				"--compression-algorithms=zstd",
-				fmt.Sprintf("--zstd-compression-level=%d", zstdCompressionLevel),
-			}
-		}
-
-		return []string{"--compress"}
-	case tools.MysqlVersion57:
-		return []string{"--compress"}
-	default:
-		return []string{"--compress"}
-	}
 }
 
 func (uc *CreateMysqlBackupUsecase) streamToStorage(
@@ -202,7 +185,15 @@ func (uc *CreateMysqlBackupUsecase) streamToStorage(
 	}
 	defer func() { _ = os.RemoveAll(filepath.Dir(myCnfFile)) }()
 
-	fullArgs := append([]string{"--defaults-file=" + myCnfFile}, args...)
+	compressionArgs := uc.probeNetworkCompressionArgs(ctx, CompressionProbeSpec{
+		MysqldumpBin: mysqlBin,
+		MyCnfFile:    myCnfFile,
+		DatabaseName: *myConfig.Database,
+		DatabaseID:   backup.DatabaseID,
+	}, myConfig.Version)
+
+	fullArgs := append([]string{"--defaults-file=" + myCnfFile}, compressionArgs...)
+	fullArgs = append(fullArgs, args...)
 
 	cmd := exec.CommandContext(ctx, mysqlBin, fullArgs...)
 	uc.logger.Info("Executing MySQL backup command", "command", cmd.String())
@@ -241,12 +232,13 @@ func (uc *CreateMysqlBackupUsecase) streamToStorage(
 		return nil, err
 	}
 
-	zstdWriter, err := zstd.NewWriter(finalWriter,
+	compressedBytesCounter := io_utils.NewCountingWriter(finalWriter)
+
+	zstdWriter, err := zstd.NewWriter(compressedBytesCounter,
 		zstd.WithEncoderLevel(zstd.EncoderLevelFromZstd(zstdStorageCompressionLevel)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to create zstd writer: %w", err)
 	}
-	countingWriter := io_utils.NewCountingWriter(zstdWriter)
 
 	saveErrCh := make(chan error, 1)
 	go func() {
@@ -269,20 +261,16 @@ func (uc *CreateMysqlBackupUsecase) streamToStorage(
 	}
 
 	copyResultCh := make(chan error, 1)
-	bytesWrittenCh := make(chan int64, 1)
 	go func() {
-		bytesWritten, err := uc.copyWithShutdownCheck(
-			ctx,
-			countingWriter,
-			pgStdout,
-			backupProgressListener,
-		)
-		bytesWrittenCh <- bytesWritten
-		copyResultCh <- err
+		copyResultCh <- uc.copyWithShutdownCheck(ctx, compressedCopySpec{
+			Destination:            zstdWriter,
+			Source:                 pgStdout,
+			CompressedBytesCounter: compressedBytesCounter,
+			ProgressListener:       backupProgressListener,
+		})
 	}()
 
 	copyErr := <-copyResultCh
-	bytesWritten := <-bytesWrittenCh
 	waitErr := cmd.Wait()
 
 	select {
@@ -315,8 +303,8 @@ func (uc *CreateMysqlBackupUsecase) streamToStorage(
 	stderrOutput := <-stderrCh
 
 	if waitErr == nil && copyErr == nil && saveErr == nil && backupProgressListener != nil {
-		sizeMB := float64(bytesWritten) / (1024 * 1024)
-		backupProgressListener(sizeMB)
+		compressedSizeMB := float64(compressedBytesCounter.GetBytesWritten()) / (1024 * 1024)
+		backupProgressListener(compressedSizeMB)
 	}
 
 	switch {
@@ -373,30 +361,27 @@ port=%d
 
 func (uc *CreateMysqlBackupUsecase) copyWithShutdownCheck(
 	ctx context.Context,
-	dst io.Writer,
-	src io.Reader,
-	backupProgressListener func(completedMBs float64),
-) (int64, error) {
+	copySpec compressedCopySpec,
+) error {
 	buf := make([]byte, copyBufferSize)
-	var totalBytesWritten int64
 	var lastReportedMB float64
 
 	for {
 		select {
 		case <-ctx.Done():
-			return totalBytesWritten, fmt.Errorf("copy cancelled: %w", ctx.Err())
+			return fmt.Errorf("copy cancelled: %w", ctx.Err())
 		default:
 		}
 
 		if config.IsShouldShutdown() {
-			return totalBytesWritten, fmt.Errorf("copy cancelled due to shutdown")
+			return fmt.Errorf("copy cancelled due to shutdown")
 		}
 
-		bytesRead, readErr := src.Read(buf)
+		bytesRead, readErr := copySpec.Source.Read(buf)
 		if bytesRead > 0 {
 			writeResultCh := make(chan writeResult, 1)
 			go func() {
-				bytesWritten, writeErr := dst.Write(buf[0:bytesRead])
+				bytesWritten, writeErr := copySpec.Destination.Write(buf[0:bytesRead])
 				writeResultCh <- writeResult{bytesWritten, writeErr}
 			}()
 
@@ -405,7 +390,7 @@ func (uc *CreateMysqlBackupUsecase) copyWithShutdownCheck(
 
 			select {
 			case <-ctx.Done():
-				return totalBytesWritten, fmt.Errorf("copy cancelled during write: %w", ctx.Err())
+				return fmt.Errorf("copy cancelled during write: %w", ctx.Err())
 			case result := <-writeResultCh:
 				bytesWritten = result.bytesWritten
 				writeErr = result.writeErr
@@ -419,33 +404,33 @@ func (uc *CreateMysqlBackupUsecase) copyWithShutdownCheck(
 			}
 
 			if writeErr != nil {
-				return totalBytesWritten, writeErr
+				return writeErr
 			}
 
 			if bytesRead != bytesWritten {
-				return totalBytesWritten, io.ErrShortWrite
+				return io.ErrShortWrite
 			}
 
-			totalBytesWritten += int64(bytesWritten)
-
-			if backupProgressListener != nil {
-				currentSizeMB := float64(totalBytesWritten) / (1024 * 1024)
-				if currentSizeMB >= lastReportedMB+progressReportIntervalMB {
-					backupProgressListener(currentSizeMB)
-					lastReportedMB = currentSizeMB
+			if copySpec.ProgressListener != nil {
+				compressedSizeMB := float64(
+					copySpec.CompressedBytesCounter.GetBytesWritten(),
+				) / (1024 * 1024)
+				if compressedSizeMB >= lastReportedMB+progressReportIntervalMB {
+					copySpec.ProgressListener(compressedSizeMB)
+					lastReportedMB = compressedSizeMB
 				}
 			}
 		}
 
 		if readErr != nil {
 			if readErr != io.EOF {
-				return totalBytesWritten, readErr
+				return readErr
 			}
 			break
 		}
 	}
 
-	return totalBytesWritten, nil
+	return nil
 }
 
 func (uc *CreateMysqlBackupUsecase) createBackupContext(
@@ -641,11 +626,11 @@ func (uc *CreateMysqlBackupUsecase) handleConnectionErrors(stderrStr string) err
 		)
 	}
 
-	if containsIgnoreCase(stderrStr, "compression algorithm") ||
-		containsIgnoreCase(stderrStr, "2066") {
+	if isCompressionRejection(stderrStr) {
 		return fmt.Errorf(
-			"MySQL connection failed due to unsupported compression algorithm. "+
-				"Try re-saving the database connection to re-detect compression support. stderr: %s",
+			"MySQL rejected the network compression algorithm that had just passed the "+
+				"pre-flight handshake probe. Compression is re-probed on every run, so retry "+
+				"the backup. stderr: %s",
 			stderrStr,
 		)
 	}
