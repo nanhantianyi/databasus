@@ -45,7 +45,7 @@ func CreateTestPhysicalBackuper(notificationSender NotificationSender) *Physical
 		backups_config_physical.GetBackupConfigService(),
 		storages.GetStorageService(),
 		sender,
-		tasks_cancellation.GetTaskCancelManager(),
+		tasks_cancellation.GetRegistry(),
 		encryption_secrets.GetSecretKeyService(),
 		logger.GetLogger(),
 		postgresql_executor.NewCreateFullBackupUsecase(),
@@ -62,7 +62,7 @@ func CreateTestPhysicalScheduler() *PhysicalBackupsScheduler {
 		physical_repositories.GetInFlightBackupRepository(),
 		backups_config_physical.GetBackupConfigService(),
 		chain_view.GetChainViewService(),
-		tasks_cancellation.GetTaskCancelManager(),
+		tasks_cancellation.GetRequester(),
 		CreateTestPhysicalBackuper(nil),
 		atomicTime{},
 		logger.GetLogger(),
@@ -97,7 +97,7 @@ func CreateTestWalStreamSupervisor(spec WalStreamSupervisorTestSpec) *PhysicalWa
 		physical_repositories.GetWalHistoryRepository(),
 		physical_repositories.GetWalStreamerRepository(),
 		spec.NotificationSender,
-		tasks_cancellation.GetTaskCancelManager(),
+		tasks_cancellation.GetRegistry(),
 		encryption_secrets.GetSecretKeyService(),
 		encryption.GetFieldEncryptor(),
 		logger.GetLogger(),
@@ -210,4 +210,16 @@ func StartPhysicalWalStreamSupervisorForTest(t *testing.T) context.CancelFunc {
 	t.Fatalf("physical wal stream supervisor failed to start within timeout")
 
 	return nil
+}
+
+// RunOrphanWalCleanupForTest sweeps one database, not every enabled one: the test
+// suite shares a metadata database across parallel packages, so a global pass
+// would reclaim WAL belonging to another package's fixtures. Run cannot serve
+// either — it is an infinite ticker that panics when called a second time in a
+// process, and waiting out its tick would tie the assertion to timing rather than
+// to sequence.
+func RunOrphanWalCleanupForTest(t *testing.T, databaseID uuid.UUID) {
+	t.Helper()
+
+	CreateTestPhysicalCleaner().cleanOrphanWalForDatabase(t.Context(), logger.GetLogger(), databaseID)
 }
