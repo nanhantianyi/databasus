@@ -94,6 +94,7 @@ Databasus ejecuta una restauración real para confirmar que las copias sirven, e
 - **Almacenamiento de confianza cero**: las copias están cifradas y resultan inútiles para un atacante, así que puede guardarlas sin riesgo en almacenamientos compartidos como S3, Azure Blob Storage, etc.
 - **Cifrado de los secretos**: todo dato sensible se cifra y nunca se expone, ni siquiera en los registros o en los mensajes de error
 - **Usuario de solo lectura**: Databasus usa por defecto un usuario de solo lectura para los respaldos y nunca guarda nada que pueda modificar sus datos
+- **Autenticación de dos factores**: el inicio de sesión con contraseña puede exigir un código de seis dígitos enviado al correo de la cuenta. Entrar con Google o GitHub sigue apoyándose en las comprobaciones de esos proveedores
 
 ### 👥 **Adecuado para equipos** <a href="https://databasus.com/es/access-management/">(documentación)</a>
 
@@ -112,8 +113,8 @@ Databasus ejecuta una restauración real para confirmar que las copias sirven, e
 ### 💾 **Bases de datos compatibles**
 
 - **PostgreSQL**: 14, 15, 16, 17 y 18 (física y lógica)
-- **MySQL**: 5.7, 8.0, 8.4 y 9 (solo lógica)
-- **MariaDB**: 10, 11 y 12 (solo lógica)
+- **MySQL**: 5.7, 8.0, 8.4, 9 y 26 (solo lógica)
+- **MariaDB**: 5.5, 10, 11, 12 y 13 (solo lógica)
 - **MongoDB**: 4.2+, 5, 6, 7 y 8 (solo lógica)
 
 ### 🐳 **Autoalojado y seguro**
@@ -249,7 +250,7 @@ Para más opciones (NodePort, TLS, HTTPRoute para Gateway API), consulte el [REA
 
 ## 🚀 Uso
 
-1. **Entre en el panel**: abra `http://localhost:4005`
+1. **Cree la primera cuenta**: abra `http://localhost:4005` y regístrese. La primera cuenta creada en una instancia es la que la administra
 2. **Añada su primera base de datos para respaldar**: pulse "New Database" y siga el asistente
 3. **Configure la programación**: elija entre intervalos horarios, diarios, semanales, mensuales o cron
 4. **Indique la conexión a la base de datos**: introduzca sus credenciales y los datos de conexión
@@ -263,10 +264,18 @@ Para más opciones (NodePort, TLS, HTTPRoute para Gateway API), consulte el [REA
 Si necesita restablecer la contraseña, use el comando integrado:
 
 ```bash
-docker exec -it databasus ./main --new-password="YourNewSecurePassword123" --email="admin"
+docker exec -it databasus ./main --new-password="YourNewSecurePassword123" --email="owner@example.com"
 ```
 
-Sustituya `admin` por la dirección de correo real del usuario cuya contraseña quiere restablecer.
+Sustituya `owner@example.com` por la dirección de correo real de la cuenta cuya contraseña quiere restablecer.
+
+Si no recuerda qué dirección administra la instancia, liste las cuentas de administrador:
+
+```bash
+docker exec -it databasus ./main --list-admins
+```
+
+La salida nombra cada cuenta de administrador con su correo electrónico, nombre visible, fecha de creación y estado de actividad, y marca la que la instancia reconoce como su administrador. No imprime ninguna contraseña ni su hash.
 
 ### 💾 Respaldar el propio Databasus
 
