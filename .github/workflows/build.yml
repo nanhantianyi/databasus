@@ -1,0 +1,37 @@
+name: Build and Export Docker Image
+on:
+  workflow_dispatch:
+    inputs:
+      app_version:
+        description: 'App Version'
+        required: true
+        default: ''
+jobs:
+  build-and-export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build image from Dockerfile
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          file: ./Dockerfile
+          tags: databasus:latest
+          build-args: |
+            APP_VERSION=${{ github.event.inputs.app_version }}
+          load: true
+
+      - name: Export image to tar.gz
+        run: |
+          docker save databasus:latest | gzip > databasus-offline.tar.gz
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: databasus-offline
+          path: databasus-offline.tar.gz
