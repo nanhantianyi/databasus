@@ -1,27 +1,24 @@
 // The source of truth for the set of keys. Every other dictionary is typed `typeof en`.
-// Keep it one object literal: see frontend/AGENTS.md - Interface languages (i18n).
+// Keep it one object literal: see docs/frontend-localization.md - Dictionaries.
 export const en = {
   language: {
     nativeName: 'English',
   },
   common: {
     actions: {
-      add: 'Add',
       back: 'Back',
       cancel: 'Cancel',
       close: 'Close',
-      confirm: 'Confirm',
       continue: 'Continue',
       copy: 'Copy',
       create: 'Create',
       delete: 'Delete',
-      download: 'Download',
       edit: 'Edit',
       ok: 'OK',
-      refresh: 'Refresh',
       remove: 'Remove',
       retry: 'Retry',
       save: 'Save',
+      transfer: 'Transfer',
     },
     answers: {
       no: 'No',
@@ -37,15 +34,16 @@ export const en = {
       username: 'Username',
     },
     states: {
-      disabled: 'Disabled',
       enabled: 'Enabled',
       loading: 'Loading...',
     },
     messages: {
       copiedToClipboard: 'Copied to clipboard',
+      addressChangedEnterSecretAgain: 'The address changed. Enter this value again.',
     },
     // Joins translated words into one list (Chinese uses 、)
     listSeparator: ', ',
+    websiteLink: 'Databasus website',
     confirmation: {
       title: 'Confirmation',
     },
@@ -62,6 +60,7 @@ export const en = {
       system: 'System',
     },
     navigation: {
+      menu: 'Navigation menu',
       databases: 'Databases',
       storages: 'Storages',
       notifiers: 'Notifiers',
@@ -77,21 +76,12 @@ export const en = {
     diskUsage: {
       title: 'Disk Usage',
       hint: 'To make backups locally and restore them, you need to have enough space on your disk. For restore, you need to have same amount of space that the backup size.',
-      compactSummary: '{{used}} of {{total}} GB<lineBreak/>ROM used ({{percent}}%)',
       summary: '{{used}} of {{total}} GB used ({{percent}}%)',
     },
     workspaceSelection: {
-      createShort: 'Create',
       create: 'Create workspace',
       selected: 'Selected workspace',
-      placeholder: 'Select a workspace',
-      search: 'Search workspaces...',
-      notFound: 'No workspaces found',
       createNew: '+ Create new workspace',
-    },
-    sponsorship: {
-      link: 'Sponsorship',
-      hint: 'Databasus saved your data? You can support Databasus as well to keep it free, maintained and independent',
     },
     starButton: {
       label: 'Star on GitHub',
@@ -103,29 +93,40 @@ export const en = {
       description: 'Automatic clipboard access is not available. Please paste your content below.',
       placeholder: 'Paste your connection string here...',
     },
-    auth: {
-      accountsCheckFailed: 'Failed to check whether the instance has any account: {{error}}',
-    },
     oauthCallback: {
       failedTitle: 'Authentication Failed',
-      codeNotFound: 'Authorization code not found',
-      stateMissing: 'OAuth state parameter missing',
-      invalidProvider: 'Invalid OAuth provider',
+      notCompleted: 'Sign-in did not finish. Please start again.',
       returnToSignIn: 'Return to sign in',
       completing: 'Completing authentication...',
     },
     oauthStorage: {
-      configNotFound: 'Google Drive storage configuration not found',
-      exchangeFailed: 'Failed to exchange OAuth code',
-      unsupportedType: 'Unsupported storage type for OAuth',
-      invalidState: 'OAuth state parameter is invalid',
-      paramNotFound: 'OAuth param not found. Ensure the redirect URL is configured correctly.',
-      addStorageTitle: 'Add storage',
-      storageDescription:
-        'Storage - is a place where backups will be stored (local disk, S3, etc.)',
+      waiting: 'Completing storage authorization...',
+      complete: 'Authorization received. Return to the storage editor.',
+      restart:
+        'Authorization could not reach the original editor. Close this window and start authorization again from that editor.',
     },
   },
   errors: {
+    cleanupPending:
+      'File cleanup is still running. Wait for it to finish, or delete the affected storages individually and acknowledge that any remaining files must be removed manually.',
+    alreadyMember: 'This user is already a member of the workspace.',
+    cannotChangeOwnRole: 'You cannot change your own role in the workspace.',
+    ownerRequiresTransfer:
+      'The owner cannot be changed or removed. Transfer the ownership to another member first.',
+    workspaceNotEmpty:
+      'The workspace still has databases. Delete them first, then delete the workspace.',
+    databaseConnectionFailed: 'Could not connect to the database: {{detail}}',
+    inUse:
+      'It is still in use by a database or by a running backup or restore. Try again once nothing uses it.',
+    backupNotCompleted: 'Only a completed backup can be verified.',
+    alreadyRunning: 'This is already running. Wait for it to finish and try again.',
+    noExtendableChain: 'Run a full backup before starting an incremental backup.',
+    noRestorableBackup: 'There is no completed backup that can be restored.',
+    targetTimeUnreachable:
+      'The requested time cannot be reached with the available backups and WAL.',
+    notRunning: 'It is no longer running, so there is nothing to cancel.',
+    instanceUnhealthy: 'The instance is unhealthy.',
+    insufficientDiskSpace: 'The Databasus server does not have enough free disk space: {{detail}}',
     unknown: 'Something went wrong. Please try again.',
     networkUnreachable: 'Cannot reach the Databasus server. Check your connection and try again.',
     requestFailed:
@@ -138,16 +139,30 @@ export const en = {
       'Too many sign-in codes were requested for this account in the last hour. Try again later.',
     signInCodeResentTooSoon:
       'A code was sent less than a minute ago. Wait a minute before requesting another.',
-    rateLimitExceeded: 'Too many attempts. Wait a little and try again.',
+    rateLimited: 'Too many attempts. Wait a little and try again.',
     emailNotConfigured: 'The instance has no mail server configured.',
     adminEmailMissing: 'Your account has no valid email address to send a test email to.',
+    invalidRequest: 'The server rejected the request as invalid. Reload the page and try again.',
+    notFound: 'The requested item was not found. It may have been deleted.',
+    internal: 'An internal server error occurred. Please try again later.',
+    unauthenticated: 'Your session has ended. Sign in again.',
+    permissionDenied: 'You do not have permission to do this.',
+    humanVerificationFailed: 'The human verification failed. Complete the check and try again.',
+    invalidCredentials: 'The email or password is incorrect.',
+    userDeactivated: 'This account is deactivated. Ask an administrator to activate it.',
+    registrationClosed:
+      'Registration is closed on this instance. Ask an administrator for an invitation.',
+    emailTaken: 'This email address is already in use.',
+    invalidResetCode: 'The reset code is incorrect or has expired. Request a new one.',
+    oauthNotConfigured: 'Sign-in with this provider is not configured on this instance.',
+    oauthFailed:
+      'The sign-in provider did not confirm your account. Make sure your email address there is verified and try again.',
   },
   status: {
     logicalBackup: {
       inProgress: 'In progress',
       completed: 'Successful',
       failed: 'Failed',
-      deleted: 'Deleted',
       canceled: 'Canceled',
     },
     physicalBackup: {
@@ -185,7 +200,7 @@ export const en = {
       offline: 'Offline',
     },
   },
-  intervals: {
+  schedules: {
     types: {
       hourly: 'Hourly',
       daily: 'Daily',
@@ -202,18 +217,19 @@ export const en = {
       sat: 'Sat',
       sun: 'Sun',
     },
-    periods: {
-      day: '1 day',
-      week: '1 week',
-      month: '1 month',
-      threeMonths: '3 months',
-      sixMonths: '6 months',
-      year: '1 year',
-      twoYears: '2 years',
-      threeYears: '3 years',
-      fourYears: '4 years',
-      fiveYears: '5 years',
-      forever: 'Forever',
+    weekday: 'Weekday',
+    dayOfMonth: 'Day of month',
+    cronExpression: 'Cron expression (UTC)',
+    timeOfDay: 'Time of day',
+    nextRun: 'Next run {{time}}',
+    invalidCron: 'Invalid cron expression',
+    cronHelp: {
+      format: 'Cron format: minute hour day month weekday (UTC)',
+      examples: 'Examples:',
+      dailyAt2am: 'Daily at 2:00 AM UTC',
+      every6Hours: 'Every 6 hours',
+      mondaysAt3am: 'Every Monday at 3:00 AM UTC',
+      twiceAMonth: '1st and 15th at 4:30 AM UTC',
     },
   },
   auditLogs: {
@@ -225,10 +241,9 @@ export const en = {
       created: 'Created',
     },
     systemUser: 'System',
-    loadedOfTotal: 'Loaded: {{loaded}} of {{total}}',
     empty: 'No audit logs found.',
     loadingMore: 'Loading more logs...',
-    allLoaded: 'All logs loaded ({{count}} total)',
+    allLoaded: 'All logs loaded',
   },
   settings: {
     title: 'Databasus settings',
@@ -267,6 +282,8 @@ export const en = {
       docs: 'See <docsLink>the SMTP documentation</docsLink> for how to connect a mail server.',
       sendTestEmail: 'Send test email',
       testEmailSent: 'Test email sent to {{email}}',
+      testEmailNotDelivered:
+        'The mail server did not accept the test email to <email/>: <failureDetail/>',
     },
     healthcheck: {
       title: 'Health-check',
@@ -309,11 +326,15 @@ export const en = {
       config: 'Config',
       backups: 'Backups',
       verifications: 'Verifications',
+      monitoring: 'Monitoring',
     },
     create: {
       title: 'Add database for backup',
       namePlaceholder: 'My favourite DB',
       creating: 'Creating database...',
+      finishing: 'Finishing database setup...',
+      createdButNotFinished:
+        'The database was created, but its setup did not finish. Reason: {{reason}}',
       complete: 'Complete',
       backupType: {
         title: 'Choose backup type',
@@ -334,10 +355,7 @@ export const en = {
       lastBackupError: {
         title: 'Last backup error',
         errorLabel: 'The error:',
-        clearHint: 'To clean this error (choose any):',
-        clearByTestingConnection:
-          '- test connection via button below (even if you updated settings);',
-        clearByNextBackup: '- wait until the next backup is done without errors;',
+        clearedByNextBackup: 'The error clears after the next successful backup.',
       },
       sections: {
         database: 'Database settings',
@@ -364,7 +382,6 @@ export const en = {
       replace: 'Replace',
     },
     fields: {
-      databaseType: 'Database type',
       version: '{{engine}} version',
       databaseName: 'DB name',
       sslMode: 'SSL mode',
@@ -376,6 +393,8 @@ export const en = {
       serverCaCertificate: 'Server CA certificate',
       includeSchemas: 'Include schemas',
       excludeTables: 'Exclude tables',
+      excludeWholeTables: 'Exclude whole tables',
+      excludeTableData: 'Exclude table data',
       skipUserMappings: 'Skip user mappings',
       excludeExtensions: 'Exclude extensions',
       restoreOwnership: 'Restore ownership',
@@ -394,6 +413,7 @@ export const en = {
       connectionStringParsed: 'Connection string parsed successfully',
       connectionStringParsedWithoutPassword:
         'Connection string parsed successfully. Please enter the password manually.',
+      connectionTestFailed: 'The database could not be reached: {{error}}',
       connectionTestPassed: {
         title: 'Connection test passed',
         description: 'You can continue with the next step',
@@ -423,7 +443,10 @@ export const en = {
           'Please <docsLink>read this document</docsLink> to study how to backup Supabase database',
         includeSchemasPlaceholder: 'All schemas (default)',
         excludeTablesTooltip:
-          "Tables to exclude from the backup. Use 'tablename' or 'schema.tablename'. Glob patterns are supported (e.g. 'logs_*'). You can paste a list separated by commas or new lines.",
+          "Tables left out of the backup completely: after a restore they will be missing. Use 'tablename' or 'schema.tablename'. A name without a schema matches only tables on the default search path, usually 'public'; use '*.tablename' to match it in every schema. Glob patterns are supported (e.g. 'logs_*'). You can paste a list separated by commas or new lines.",
+        excludeTableDataTooltip:
+          "Tables backed up without their rows: after a restore they exist with their structure, indexes and constraints, but empty. Use 'tablename' or 'schema.tablename'. A name without a schema matches only tables on the default search path, usually 'public'; use '*.tablename' to match it in every schema. Glob patterns are supported (e.g. 'logs_*'). A table listed in both fields is excluded entirely. Partitions of a partitioned table need their own names or a pattern such as 'events_*'. If another backed-up table has a foreign key to rows of an emptied table, the restore fails to recreate that foreign key. You can paste a list separated by commas or new lines.",
+        excludeTableDataPlaceholder: 'No table data excluded',
         skipUserMappingsTooltip:
           'Skip restoring user mappings (CREATE USER MAPPING statements). Enable this when the backup role cannot read the mapping credentials - otherwise they are dumped without options and break restore for FDWs like oracle_fdw.',
         excludeExtensionsTooltip:
@@ -553,8 +576,7 @@ export const en = {
         title: 'Storage',
         transferExisting: 'Transfer with existing storage',
         selectFromTarget: 'Select storage from target workspace',
-        blocked:
-          'Databases using this storage: {{count}}. Transfer is blocked because other databases depend on it.',
+        blocked: 'Other databases back up into this storage, so it cannot move with this database.',
         canTransfer: 'Storage can be transferred',
         selectPlaceholder: 'Select storage',
         createNew: 'Create new storage',
@@ -740,13 +762,13 @@ export const en = {
       notifyWhenUnavailable: 'Notify when unavailable',
       checkIntervalMinutes: 'Check interval (minutes)',
       attemptsBeforeDown: 'Attempts before down',
-      storeAttemptsDays: 'Store attempts (days)',
+      attemptRetentionDays: 'Store attempts (days)',
       tooltips: {
         enable: 'Enable or disable healthcheck monitoring for this database',
         notifyWhenUnavailable: 'Send notifications when database becomes unavailable',
         checkIntervalMinutes: 'How often to check database health (in minutes)',
         attemptsBeforeDown: 'Number of failed attempts before marking database as down',
-        storeAttemptsDays: 'How many days to store health check attempt history',
+        attemptRetentionDays: 'How many days to store health check attempt history',
       },
     },
   },
@@ -831,6 +853,7 @@ export const en = {
         description:
           'The user is not present in the system yet, but has been invited to the workspace. After the user signs up via specified email, they will automatically become a member of the workspace.',
       },
+      invitedMark: 'Invited',
       roleChanged: 'Member role updated successfully',
       remove: {
         tooltip: 'Remove member',
@@ -872,6 +895,7 @@ export const en = {
       newPassword: 'New Password',
     },
     validation: {
+      emailInvalid: 'Enter a valid email address',
       nameRequired: 'Name is required',
       emailRequired: 'Email is required',
       passwordTooShort: 'Password must be at least {{minLength}} characters long',
@@ -944,12 +968,12 @@ export const en = {
         passwordsDoNotMatch: 'New passwords do not match',
         changing: 'Changing password...',
         submit: 'Change password',
-        signedInWithNewPassword: 'Successfully signed in with new password',
+        signInRequired: 'Password changed. Sign in again with your new password.',
       },
     },
     list: {
       title: 'Databasus users',
-      loadedOfTotal: 'Users: {{loaded}} of {{total}}',
+      loaded: 'Users loaded: {{count}}',
       searchPlaceholder: 'Search by email or name...',
       empty: 'No users found.',
       allLoaded: 'All users loaded ({{count}} total)',
@@ -973,6 +997,7 @@ export const en = {
   },
   verification: {
     triggers: {
+      afterBackup: 'After backup',
       manual: 'Manual',
       scheduled: 'Scheduled',
     },
@@ -988,18 +1013,6 @@ export const en = {
       afterBackup: 'After backup',
       afterBackupHint:
         'Runs automatically after each successful backup. If there are pending in the queue, they are canceled to not cause infinite queue when backups are faster than verifications.',
-      weekday: 'Verification weekday',
-      dayOfMonth: 'Verification day of month',
-      timeOfDay: 'Verification time of day',
-      cron: {
-        expression: 'Cron expression (UTC)',
-        format: 'Cron format: minute hour day month weekday (UTC)',
-        examples: 'Examples:',
-        exampleEverySunday: '- {{expression}} - Every Sunday at 4:00 AM UTC',
-        exampleEverySixHours: '- {{expression}} - Every 6 hours',
-        nextRun: 'Next run {{dateTime}}<lineBreak/>({{relativeTime}})',
-        invalid: 'Invalid cron expression',
-      },
       notifications: 'Notifications',
       noNotifications: 'None',
     },
@@ -1026,7 +1039,6 @@ export const en = {
       },
       details: {
         title: 'Restore check details',
-        loadFailed: 'Could not load restore check details.',
         cancellationReason: 'Cancellation reason',
         failure: 'Failure',
         sections: {
@@ -1065,7 +1077,7 @@ export const en = {
       },
       capacity: {
         cpu: '{{count}} CPU',
-        ram: '{{count}} GB RAM',
+        ram: '{{size}} RAM',
         disk: '{{count}} GB disk',
         jobs: 'jobs: {{count}}',
         notReported: 'not yet reported',
@@ -1157,7 +1169,6 @@ export const en = {
       hasSendError: 'Has send error',
     },
     create: {
-      title: 'Add notifier',
       namePlaceholder: 'Chat with me',
     },
     config: {
@@ -1173,11 +1184,11 @@ export const en = {
       },
       removeConfirmation:
         'Are you sure you want to remove this notifier? This action cannot be undone.',
-      removeBlockedByDatabases:
-        'Notifier is used by some databases. Please remove the notifier from databases first.',
     },
+    secretKeptPlaceholder: 'Saved - leave empty to keep',
     testNotification: {
       send: 'Send test notification',
+      notDelivered: 'The test message was not delivered: {{error}}',
       sent: {
         title: 'Test notification sent!',
         description: 'Test notification sent successfully',
@@ -1201,6 +1212,11 @@ export const en = {
       skipTls: 'Skip TLS',
     },
     email: {
+      validation: {
+        targetEmail: 'Enter a valid email address',
+        smtpHost: 'Enter an SMTP host',
+        smtpPort: 'Enter a port from 1 to 65535',
+      },
       targetEmail: 'Target email',
       targetEmailTooltip: 'The email where you want to receive the message',
       smtpHost: 'SMTP host',
@@ -1266,9 +1282,11 @@ export const en = {
       customHeaders: 'Custom headers',
       customHeadersTooltip:
         'Add custom HTTP headers to the webhook request (e.g., Authorization, X-API-Key)',
-      savedHeadersHidden: '*Saved headers hidden for security reasons',
+      savedHeadersHidden: '*Saved header values are hidden. Leave a value empty to keep it',
       headers: 'Headers',
       headerNamePlaceholder: 'Header name',
+      headerNameInvalid:
+        "Use only Latin letters, digits and the characters !#$%&'*+-.^_`|~. Spaces are not allowed.",
       headerValuePlaceholder: 'Header value',
       addHeader: 'Add header',
       hiddenHeaderValue: '(hidden)',
@@ -1307,8 +1325,6 @@ export const en = {
       powerAutomateUrlLabel: 'Power Automate URL:',
       powerAutomateUrlTooltip:
         'HTTP endpoint from your Power Automate flow (When an HTTP request is received)',
-      showFullUrl: 'Show',
-      hideFullUrl: 'Hide',
     },
     mattermost: {
       howToConnect: 'How to connect Mattermost?',
@@ -1346,6 +1362,16 @@ export const en = {
     },
   },
   backups: {
+    cleanup: {
+      pending: 'Deleting old files. Files remaining: {{count}}.',
+      retrying: 'Deletion will be retried for files: {{count}}.',
+      retryStatus: 'Retry status',
+    },
+    storageSwitch: {
+      warning:
+        'Switching storage immediately removes the old backup history and activates the new storage. Old files are deleted in the background. Unreachable storage delays cleanup. Explicitly deleting the old storage stops automatic cleanup; any remaining files must be removed manually. New physical backups start with a FULL.',
+      confirm: 'Switch storage and remove history',
+    },
     encryption: {
       none: 'None',
       encrypted: 'Enabled',
@@ -1376,6 +1402,7 @@ export const en = {
       },
     },
     filters: {
+      toggle: 'Filters',
       allTypes: 'All types',
       allStatuses: 'All statuses',
       before: 'Before',
@@ -1388,28 +1415,9 @@ export const en = {
       addStorageTitle: 'Add storage',
       storageDescription:
         'Storage - is a place where backups will be stored (local disk, S3, Google Drive, etc.)',
-      storageChangeWarning:
-        'If you change the storage, all backups in this storage will be deleted.',
-      storageChangeAcknowledge: 'I understand',
       encryption: 'Encryption',
       notifications: 'Notifications',
       noNotifications: 'None',
-      schedule: {
-        weekday: 'Weekday',
-        dayOfMonth: 'Day of month',
-        cronExpression: 'Cron expression (UTC)',
-        timeOfDay: 'Time of day',
-        nextRun: 'Next run {{time}}',
-        invalidCron: 'Invalid cron expression',
-        cronHelp: {
-          format: 'Cron format: minute hour day month weekday (UTC)',
-          examples: 'Examples:',
-          dailyAt2am: 'Daily at 2:00 AM UTC',
-          every6Hours: 'Every 6 hours',
-          mondaysAt3am: 'Every Monday at 3:00 AM UTC',
-          twiceAMonth: '1st and 15th at 4:30 AM UTC',
-        },
-      },
       gfs: {
         hourly: 'Hourly: {{count}}',
         daily: 'Daily: {{count}}',
@@ -1420,6 +1428,19 @@ export const en = {
       },
     },
     logical: {
+      retentionPeriods: {
+        day: '1 day',
+        week: '1 week',
+        month: '1 month',
+        threeMonths: '3 months',
+        sixMonths: '6 months',
+        year: '1 year',
+        twoYears: '2 years',
+        threeYears: '3 years',
+        fourYears: '4 years',
+        fiveYears: '5 years',
+        forever: 'Forever',
+      },
       retentionPolicyTypes: {
         gfs: 'GFS (keep last N hourly, daily, weekly, monthly and yearly backups)',
         timePeriod: 'Time period (last N days)',
@@ -1463,9 +1484,6 @@ export const en = {
       },
       config: {
         interval: 'Backup interval',
-        weekday: 'Backup weekday',
-        dayOfMonth: 'Backup day of month',
-        timeOfDay: 'Backup time of day',
         encryptionTooltip:
           "If backup is encrypted, backup files in your storage (S3, local, etc.) cannot be used directly. You can restore backups through Databasus or download them unencrypted via the 'Download' button.",
         retentionPolicy: 'Retention policy',
@@ -1524,6 +1542,8 @@ export const en = {
       list: {
         totalUsage: 'Total usage: {{size}}',
         backUpNow: 'Back up now',
+        startRequirement:
+          'To start a backup, turn on backups and choose a storage in the backup configuration.',
         fullBackup: 'Full backup',
         incrementalBackup: 'Incremental backup',
         restore: 'Restore',
@@ -1584,7 +1604,8 @@ export const en = {
       restore: {
         errorHints: {
           downloadInProgress:
-            'A restore download is already in progress for this database. Wait for it to finish, then try again.',
+            'You already have a backup download or restore stream running. Wait for it to finish, then try again.',
+          noRestorableBackup: 'Run a full backup, wait for it to complete, then try again.',
           targetTimeUnreachable:
             'The requested target time cannot be reached - there is a WAL gap or the time is out of the available range. Pick a different time or restore the latest available point.',
         },
@@ -1599,6 +1620,7 @@ export const en = {
           'The download link is single-use and expires in 15 minutes. If a command fails with a 401, reopen this dialog to mint a fresh one.',
         copied: 'Copied',
         methods: {
+          label: 'Restore method',
           script: 'Via script',
           manual: 'Manual',
         },
@@ -1662,9 +1684,291 @@ export const en = {
             'A base backup copies only the data directory. If your source PostgreSQL keeps its configuration outside it - the Debian/Ubuntu layout, <configDir/> - then <code>postgresql.conf</code>, <code>pg_hba.conf</code> and <code>pg_ident.conf</code> are not in the backup and the server will not start. Ask the source for their real paths with <code>psql -Atc "SHOW config_file"</code>, copy all three in, then comment out <code>data_directory</code>, <code>hba_file</code>, <code>ident_file</code>, <code>external_pid_file</code> and the <code>ssl</code> / <code>ssl_*</code> lines, create <code>conf.d</code>, and set <code>listen_addresses = \'*\'</code> for a container. If those files are present and you still get the same error, it is the mounted directory that is wrong, not the configuration.',
         },
       },
+      monitoring: {
+        periods: {
+          hour: 'Last hour',
+          day: 'Last day',
+          week: 'Last week',
+        },
+        levels: {
+          notStreaming: 'Continuous saving of changes is off',
+          collectingData: 'Collecting data',
+          broken: 'Something is broken',
+          needsAttention: 'Something needs attention',
+          healthy: 'Everything is in order',
+        },
+        reasonLevels: {
+          broken: 'Broken',
+          needsAttention: 'Needs attention',
+          info: 'For your information',
+        },
+        banner: {
+          collectingDataDescription: 'Streaming started; the first numbers appear within a minute.',
+          notStreamingDescription:
+            'Backups are disabled or no storage is selected. <configLink>Open the configuration</configLink> to turn it on.',
+          cannotConfirm: 'Cannot confirm the current state',
+          cannotConfirmDescription: 'Last known state: {{level}}, {{duration}} ago.',
+          measuredAgo: 'Measured {{duration}} ago',
+          healthyHeadline: 'All changes are being saved',
+          restoreUpTo: 'You can restore the database to any moment up to {{moment}} ({{age}} ago).',
+          restoreOnlyUpTo:
+            'Until a new full backup finishes, you can restore the database only up to {{moment}} ({{age}} ago).',
+          restoreFromUpTo:
+            'You can restore the database to any moment from {{from}} up to {{moment}} ({{age}} ago).',
+          restoreFromUpToWithoutAge:
+            'You can restore the database to any moment from {{from}} up to {{moment}}.',
+          restoreUpToWithoutAge: 'You can restore the database to any moment up to {{moment}}.',
+          restoreOnlyUpToWithoutAge:
+            'Until a new full backup finishes, you can restore the database only up to {{moment}}.',
+          restoreNothingPending:
+            'Nothing can be restored until the first full backup finishes. It is on its way.',
+          restoreNothing: 'Nothing can be restored yet, because no full backup has finished.',
+          startFullBackup: 'Start full backup',
+          fullBackupRequested: 'Full backup requested.',
+          notMeasuredYet: 'Not measured yet',
+          refreshFailed:
+            'Could not refresh the data. The last received numbers stay on screen, and the next attempt runs in 30 seconds.',
+        },
+        keepingUp: {
+          keepingUp:
+            'Databasus saves changes as fast as the database writes them: {{writeRate}} written, {{archiveRate}} saved.',
+          fallingBehind:
+            'The database writes changes faster than Databasus saves them, by about {{differenceRate}}: {{writeRate}} against {{archiveRate}}.',
+          fallingBehindBacklog:
+            '{{unsavedAmount}} is not saved yet, and that grows by about {{growthPerHour}} an hour.',
+          catchingUp:
+            'Databasus is saving a backlog: {{unsavedAmount}} is left, about {{duration}} to go.',
+          catchingUpWithoutEstimate: 'Databasus is saving a backlog: {{unsavedAmount}} is left.',
+          idle: 'The database writes almost nothing; new changes reach storage within minutes.',
+          rebuildConsequence:
+            'At this pace Databasus will start a new backup chain from a full backup in about {{duration}}.',
+          limitConsequence:
+            'At this pace the database will drop changes Databasus has not received yet in about {{duration}}.',
+        },
+        reasons: {
+          streamingStopped: {
+            title: 'Saving has stopped',
+            whatHappened: 'Databasus stopped receiving changes {{duration}} ago.',
+            whatToDo: 'Databasus retries by itself. If this lasts, check the Databasus logs.',
+          },
+          sourceUnreachable: {
+            title: 'The database is unreachable',
+            whatHappened: 'Databasus has not been able to reach the database for {{duration}}.',
+            whatToDo: 'Check that the database server is running and reachable from Databasus.',
+          },
+          walChainBroken: {
+            title: 'Changes were lost between backups',
+            whatHappened:
+              'Part of the change history never reached storage, so the changes made after it cannot be restored.',
+            whatToDo: 'Start a full backup on the Backups tab.',
+            whatToDoPending:
+              'A new full backup is on its way. You can watch it on the Backups tab.',
+          },
+          slotMissing: {
+            title: 'The database stopped keeping changes',
+            whatHappened:
+              'The database no longer keeps changes for Databasus: the reservation Databasus made on it is gone.',
+            whatToDo:
+              'Databasus restores the reservation when streaming restarts, but the changes made in between are lost. Start a full backup on the Backups tab, and check that nobody removes the reservation on the database.',
+            whatToDoPending:
+              'Databasus restores the reservation when streaming restarts, and a new full backup is on its way. Check that nobody removes the reservation on the database.',
+          },
+          slotLost: {
+            title: 'The database deleted unsaved changes',
+            whatHappened: 'The database deleted changes Databasus had not received yet.',
+            whatToDo:
+              'Databasus starts over with a new full backup by itself. To avoid this next time, make saving faster or let the database keep more changes.',
+          },
+          archiveNotAdvancing: {
+            title: 'Changes do not reach storage',
+            whatHappened:
+              'No new changes have reached storage for {{duration}} while the database keeps writing.',
+            whatToDo: 'Check that the storage is reachable and has free space.',
+          },
+          archiveSlowerThanSource: {
+            title: 'Saving is too slow',
+            whatHappened:
+              'The database writes faster than Databasus saves; the backlog grew by {{amount}} in 10 minutes.',
+            whatToDo:
+              'Check the network speed to the storage, or move the storage closer to Databasus.',
+          },
+          slotKeepsExtraWal: {
+            title: 'The database keeps extra changes',
+            whatHappened:
+              'For {{duration}} the database has kept more of its change log than usual for Databasus, and the amount keeps growing.',
+            whatToDo: 'Make sure the database server has free disk space.',
+          },
+          slotLimitApproaching: {
+            title: 'Unsaved changes will soon be deleted',
+            whatHappened:
+              'At this pace the database will delete changes Databasus has not received yet in about {{duration}}.',
+            whatToDo:
+              'Make saving faster, or raise <code>max_slot_wal_keep_size</code> on the database.',
+          },
+          nearSlotRebuild: {
+            title: 'Close to starting over',
+            whatHappened:
+              'Changes not received by Databasus yet reached {{amount}} of the {{limit}} at which Databasus starts over from a full backup.',
+            whatToDo: 'Make saving faster, or raise the limit in the backup settings.',
+          },
+          localQueueFilling: {
+            title: 'The Databasus buffer is filling up',
+            whatHappened: 'The Databasus buffer holds {{amount}} of {{limit}}.',
+            whatToDo:
+              'Databasus pauses receiving by itself when the buffer is full. Check the speed of the storage.',
+          },
+          frequentRestarts: {
+            title: 'Receiving restarts often',
+            whatHappened: 'Restarts of receiving in the last hour: {{count}}.',
+            whatToDo: 'Check the Databasus logs for the cause.',
+          },
+          forcedRotationRefused: {
+            title: 'Quiet periods reach storage late',
+            whatHappened:
+              'The database refuses to close its change file on time, so changes from quiet periods reach storage later.',
+            whatToDo: 'Grant the backup user permission to run <code>pg_switch_wal()</code>.',
+          },
+        },
+        notices: {
+          noSlotWalLimit: {
+            title: 'No limit on kept changes',
+            whatHappened: 'The database keeps changes for Databasus without a limit.',
+            whatToDo:
+              "A limit protects the database server's disk if Databasus stays down for long. The cost is a new full backup when the limit is hit. Set it with <code>max_slot_wal_keep_size</code>.",
+          },
+          slotKeepsExtraWalSteadily: {
+            title: 'The database keeps extra changes',
+            whatHappened: 'The database keeps more of its change log than usual for Databasus.',
+            whatToDo:
+              'This is normal under heavy load. Nothing to do while the amount does not grow.',
+          },
+          noFullBackupYet: {
+            title: 'No full backup yet',
+            whatHappened:
+              'The first full backup has not finished, so saved changes cannot be restored yet.',
+            whatToDo: 'Wait for it, or start it on the Backups tab.',
+          },
+        },
+        figures: {
+          lastSaved: 'Last change saved',
+          waitingToBeSaved: 'Waiting to be saved',
+          notMeasured: 'Not measured yet',
+          averageHint: 'avg. 10 min',
+        },
+        restoreTimeline: {
+          title: 'What you can restore',
+          restorable: 'Can be restored',
+          lost: 'Cannot be restored',
+          notSavedYet: 'Not saved to storage yet',
+          lostSentence:
+            'You cannot restore the database to moments between {{from}} and {{to}}: these changes never reached storage.',
+          moreLost: 'More stretches that cannot be restored: {{count}}.',
+          range: '{{from}} – {{to}}',
+        },
+        technicalDetails: {
+          title: 'Technical details',
+        },
+        path: {
+          database: 'Database',
+          databasus: 'Databasus',
+          storage: 'Storage',
+          notReceivedYet: 'Not received by Databasus yet',
+          rebuildLimit: 'At {{amount}} Databasus starts a new chain from a full backup',
+          allowanceLeft: 'Room before the database drops changes: {{amount}}',
+          nothingWaiting: 'Nothing waiting',
+          ratesCaption:
+            'Speeds are averages over the last 10 minutes; amounts are right now. A database that writes in bursts shows a speed while nothing waits.',
+          waitingInBuffer: 'Waiting in the buffer',
+          pauseLimit: 'Receiving pauses at {{amount}}',
+          receivingPaused: 'Receiving paused',
+          nothingSavedYet: 'Nothing saved yet',
+          overLimit: 'Over the limit',
+          ofLimit: '{{amount}} of {{limit}}',
+          notSavedYetAmount: 'Not saved to storage yet: {{amount}}',
+          unknownAmount: 'Unknown',
+        },
+        tooltips: {
+          notSavedYet:
+            'Changes the database has written that are not in storage yet: those Databasus has not received plus those waiting in its buffer. Technical name: unarchived WAL.',
+          notReceivedYet:
+            'Changes the database keeps for Databasus because Databasus has not received them yet. Technical name: replication slot lag.',
+          rebuildLimit:
+            "Past this amount Databasus drops the replication slot and starts a new backup chain, so the database server's disk does not fill up. Technical name: WAL lag threshold.",
+          allowanceLeft:
+            'How much more the database can write before it deletes changes Databasus has not received. Technical name: safe_wal_size, limited by max_slot_wal_keep_size.',
+          waitingInBuffer:
+            'Changes Databasus has received but not saved to storage yet. Technical name: local WAL queue.',
+          pauseLimit:
+            'When the buffer reaches this size, Databasus pauses receiving until it drains. Technical name: back pressure high watermark.',
+          lastSaved:
+            'When the newest change file reached storage. Technical name: newest archived WAL segment.',
+          writeRate:
+            'How fast the database writes changes, over the last 10 minutes. Technical name: WAL write rate.',
+          saveRate:
+            'How fast Databasus saves changes to storage, over the last 10 minutes. Technical name: WAL archive rate.',
+        },
+        charts: {
+          keepingUpTitle: 'Is Databasus keeping up?',
+          unsavedTitle: 'How much is not saved yet?',
+          unsavedSubtitle: 'Not received by Databasus yet is part of it',
+          bufferTitle: 'Databasus buffer',
+          databaseWrites: 'Database writes',
+          savedToStorage: 'Saved to storage',
+          notSavedYet: 'Not saved to storage yet',
+          notReceivedYet: 'Not received by Databasus yet',
+          waitingInBuffer: 'Waiting in the buffer',
+          pauseLimit: 'Receiving pauses here',
+          restarts: 'Restarts',
+          pauses: 'Pauses',
+          notEnoughData:
+            'Not enough data for this period yet. A shorter period may already have a chart.',
+          dataSince: 'Data since {{time}}',
+          noMeasurements: 'No measurements from {{from}} to {{to}}.',
+          perSecond: '{{amount}}/s',
+        },
+        details: {
+          slotStatus: 'Slot status (wal_status)',
+          allowance: 'Remaining allowance (safe_wal_size)',
+          noLimit: 'No limit',
+          averageSegmentWrite: 'Average segment write',
+          longestSegmentWrite: 'Longest segment write',
+          uploadConcurrency: 'Uploads at once',
+          walToStoredRatio: 'WAL to stored size ratio',
+          walSegmentSize: 'WAL segment size',
+          sessionStart: 'Streaming session start',
+          streamerState: 'Streamer state',
+          sourceState: 'Source state',
+          restartsLastHour: 'Restarts in the last hour',
+          milliseconds: '{{value}} ms',
+          notAvailable: 'Not available',
+          streamerStates: {
+            running: 'Running',
+            notRunning: 'Not running',
+            notStarted: 'Not started yet',
+          },
+          sourceStates: {
+            reachable: 'Reachable',
+            unreachable: 'Unreachable',
+            slotMissing: 'Reachable, replication slot missing',
+          },
+        },
+        durations: {
+          seconds: '{{seconds}} s',
+          minutes: '{{minutes}} min',
+          hoursMinutes: '{{hours}} h {{minutes}} min',
+          daysHours: '{{days}} d {{hours}} h',
+        },
+      },
     },
   },
   storages: {
+    cleanup: {
+      title: 'Cleanup is still running',
+      warning:
+        'We are deleting backup files that are no longer needed, usually because a database was deleted or switched to another storage. Cleanup normally finishes quickly. If you delete this storage now, automatic cleanup will stop and you will need to delete any remaining backup files manually.',
+      wait: 'Wait',
+      deleteAnyway: 'Delete anyway',
+    },
     types: {
       local: 'Local storage',
       s3: 'S3',
@@ -1689,6 +1993,7 @@ export const en = {
       connectionString: 'Connection string',
     },
     sftpAuthMethods: {
+      both: 'Password and private key',
       password: 'Password',
       privateKey: 'Private key',
     },
@@ -1708,23 +2013,14 @@ export const en = {
         sftp: 'Type: SFTP',
         rclone: 'Type: Rclone',
       },
-      hasSaveError: 'Has save error',
     },
     config: {
       namePlaceholder: 'Enter name...',
       settingsTitle: 'Storage settings',
-      lastSaveError: {
-        title: 'Save error',
-        errorLabel: 'The error:',
-        clearHint: 'To clean this error (choose any):',
-        clearByTestingConnection:
-          '- test connection via button below (even if you updated settings);',
-        clearByNextSave: '- wait until the next save is done without errors;',
-      },
       removeConfirmation:
-        'Are you sure you want to remove this storage? This action cannot be undone. If some backups are using this storage, they will be removed too.',
-      removeBlockedByDatabases:
-        'Storage is used by some databases. Please remove the storage from databases first.',
+        'Are you sure you want to remove this storage? This action cannot be undone.',
+      removeBlockedByBackups:
+        'A backup config uses this storage or it still holds backups. Point those backup configs at another storage and delete its backups first.',
     },
     actions: {
       testConnection: 'Test connection',
@@ -1733,6 +2029,7 @@ export const en = {
       title: 'Connection test successful!',
       description: 'Storage connection tested successfully',
     },
+    connectionTestFailed: 'The storage could not be reached: {{error}}',
     transfer: {
       title: 'Transfer storage to another workspace',
       blockedByDatabases:
@@ -1803,6 +2100,22 @@ export const en = {
       googleDrive: {
         guideLink: 'How to connect Google Drive?',
         authorize: 'Authorize',
+        authorized: 'Authorized',
+        waiting: 'Waiting for Google authorization...',
+        exchanging: 'Exchanging authorization code...',
+        cancel: 'Cancel authorization',
+        restart: 'Restart authorization',
+        reconnect: 'Reconnect',
+        reconnectHelp:
+          'Enter the client secret again to reconnect. Stored credentials are kept if reconnection fails.',
+        expired: 'Authorization expired. Start again.',
+        refused: 'Google authorization was refused. You can try again.',
+        exchangeFailed: 'Could not exchange the authorization code. Start again.',
+        missingRefreshToken:
+          'Google did not return a refresh token. Start authorization again and grant offline access.',
+        popupBlocked: 'The authorization window was blocked. Allow popups and try again.',
+        unavailable:
+          'Authorization is unavailable in this browser. Check support for BroadcastChannel and try again.',
       },
       nas: {
         shareWithSlashWarning:
@@ -1826,6 +2139,10 @@ export const en = {
           'Skip TLS certificate verification. Enable this if your FTP server uses a self-signed certificate. Warning: this reduces security.',
       },
       sftp: {
+        savedPassword: 'A password is saved. Leave blank to keep it.',
+        savedPrivateKey: 'A private key is saved. Leave blank to keep it.',
+        requiredPassword: 'Enter a password for this method.',
+        requiredPrivateKey: 'Enter a private key for this method.',
         privateKeyTooltip:
           'Paste your SSH private key (PEM format). Supports RSA, DSA, ECDSA, and Ed25519 keys.',
         skipHostKeyVerification: 'Skip host key verification',

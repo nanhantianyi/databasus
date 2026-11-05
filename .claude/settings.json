@@ -1,48 +1,44 @@
 {
+  "enabledPlugins": {
+    "gopls-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true
+  },
+  "env": {
+    "AGENT_REVIEW_CLIENT": "claude"
+  },
   "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "command": "\"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/run.sh\" plan --client claude",
+            "statusMessage": "Reviewing the plan",
+            "timeout": 600,
+            "type": "command"
+          },
+          {
+            "command": "\"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/run.sh\" necessity --client claude",
+            "statusMessage": "Checking whether the task is needed",
+            "timeout": 600,
+            "type": "command"
+          },
+          {
+            "command": "\"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/run.sh\" architecture --client claude",
+            "statusMessage": "Checking architecture",
+            "timeout": 600,
+            "type": "command"
+          }
+        ],
+        "matcher": "ExitPlanMode"
+      }
+    ],
     "SessionStart": [
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "python3 \"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/review_gate.py\" session-start --client claude",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-    "UserPromptSubmit": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/review_gate.py\" snapshot --client claude",
-            "timeout": 30
-          }
-        ]
-      }
-    ],
-    "PreToolUse": [
-      {
-        "matcher": "ExitPlanMode",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/review_gate.py\" plan --client claude",
-            "timeout": 600,
-            "statusMessage": "Reviewing the plan"
-          },
-          {
-            "type": "command",
-            "command": "python3 \"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/review_gate.py\" necessity --client claude",
-            "timeout": 600,
-            "statusMessage": "Checking whether the task is needed"
-          },
-          {
-            "type": "command",
-            "command": "python3 \"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/review_gate.py\" architecture --client claude",
-            "timeout": 600,
-            "statusMessage": "Checking architecture"
+            "command": "\"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/run.sh\" session-start --client claude",
+            "timeout": 10,
+            "type": "command"
           }
         ]
       }
@@ -51,40 +47,51 @@
       {
         "hooks": [
           {
-            "type": "command",
-            "command": "python3 \"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/review_gate.py\" diff --client claude",
+            "command": "\"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/run.sh\" diff --client claude",
+            "statusMessage": "Reviewing the diff",
             "timeout": 600,
-            "statusMessage": "Reviewing the diff"
+            "type": "command"
           },
           {
-            "type": "command",
-            "command": "python3 \"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/review_gate.py\" necessity --client claude",
+            "command": "\"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/run.sh\" necessity --client claude",
+            "statusMessage": "Checking whether the task is needed",
             "timeout": 600,
-            "statusMessage": "Checking whether the task is needed"
+            "type": "command"
           },
           {
-            "type": "command",
-            "command": "python3 \"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/review_gate.py\" architecture --client claude",
+            "command": "\"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/run.sh\" architecture --client claude",
+            "statusMessage": "Checking architecture",
             "timeout": 600,
-            "statusMessage": "Checking architecture"
+            "type": "command"
           },
           {
-            "type": "command",
-            "command": "python3 \"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/review_gate.py\" naming --client claude",
+            "command": "\"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/run.sh\" code-shape --client claude",
+            "statusMessage": "Checking code shape",
             "timeout": 600,
-            "statusMessage": "Checking names"
+            "type": "command"
           },
           {
-            "type": "command",
-            "command": "python3 \"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/review_gate.py\" implementation --client claude",
-            "timeout": 3600,
-            "statusMessage": "Full implementation review"
+            "command": "\"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/run.sh\" implementation --client claude",
+            "statusMessage": "Full implementation review",
+            "timeout": 7200,
+            "type": "command"
           },
           {
-            "type": "command",
-            "command": "python3 \"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/review_gate.py\" proposal --client claude",
-            "timeout": 3600,
-            "statusMessage": "Full proposal review"
+            "command": "\"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/run.sh\" proposal --client claude",
+            "statusMessage": "Full proposal review",
+            "timeout": 7200,
+            "type": "command"
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "command": "\"$(git -C \"${CLAUDE_PROJECT_DIR}\" rev-parse --show-toplevel)/.agent-hooks/run.sh\" snapshot --client claude",
+            "timeout": 30,
+            "type": "command"
           }
         ]
       }

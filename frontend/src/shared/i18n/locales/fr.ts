@@ -6,22 +6,19 @@ export const fr: typeof en = {
   },
   common: {
     actions: {
-      add: 'Ajouter',
       back: 'Retour',
       cancel: 'Annuler',
       close: 'Fermer',
-      confirm: 'Confirmer',
       continue: 'Continuer',
       copy: 'Copier',
       create: 'Créer',
       delete: 'Supprimer',
-      download: 'Télécharger',
       edit: 'Modifier',
       ok: 'OK',
-      refresh: 'Actualiser',
       remove: 'Supprimer',
       retry: 'Réessayer',
       save: 'Enregistrer',
+      transfer: 'Transférer',
     },
     answers: {
       no: 'Non',
@@ -37,15 +34,16 @@ export const fr: typeof en = {
       username: "Nom d'utilisateur",
     },
     states: {
-      disabled: 'Désactivé',
       enabled: 'Activé',
       loading: 'Chargement...',
     },
     messages: {
       copiedToClipboard: 'Copié dans le presse-papiers',
+      addressChangedEnterSecretAgain: "L'adresse a changé. Saisissez de nouveau cette valeur.",
     },
     // Joins translated words into one list (Chinese uses 、)
     listSeparator: ', ',
+    websiteLink: 'Site web de Databasus',
     confirmation: {
       title: 'Confirmation',
     },
@@ -62,6 +60,7 @@ export const fr: typeof en = {
       system: 'Système',
     },
     navigation: {
+      menu: 'Menu de navigation',
       databases: 'Bases de données',
       storages: 'Stockages',
       notifiers: 'Canaux de notification',
@@ -77,21 +76,12 @@ export const fr: typeof en = {
     diskUsage: {
       title: 'Espace disque',
       hint: "Pour créer des sauvegardes en local et les restaurer, il faut assez d'espace sur le disque. Une restauration demande autant d'espace libre que la taille de la sauvegarde.",
-      compactSummary: '{{used}} sur {{total}} GB<lineBreak/>utilisés ({{percent}} %)',
       summary: '{{used}} sur {{total}} GB utilisés ({{percent}} %)',
     },
     workspaceSelection: {
-      createShort: 'Créer',
       create: 'Créer un espace de travail',
       selected: 'Espace de travail',
-      placeholder: 'Choisissez un espace de travail',
-      search: 'Rechercher un espace de travail...',
-      notFound: 'Aucun espace de travail trouvé',
       createNew: '+ Nouvel espace de travail',
-    },
-    sponsorship: {
-      link: 'Soutenir',
-      hint: "Databasus a sauvé vos données ? Soutenez le projet à votre tour pour qu'il reste gratuit, maintenu et indépendant.",
     },
     starButton: {
       label: 'Mettre une étoile',
@@ -104,30 +94,40 @@ export const fr: typeof en = {
         "L'accès automatique au presse-papiers n'est pas disponible. Collez votre contenu ci-dessous.",
       placeholder: 'Collez votre chaîne de connexion ici...',
     },
-    auth: {
-      accountsCheckFailed: "Impossible de vérifier si l'instance possède un compte : {{error}}",
-    },
     oauthCallback: {
       failedTitle: "Échec de l'authentification",
-      codeNotFound: "Code d'autorisation introuvable",
-      stateMissing: 'Paramètre state OAuth manquant',
-      invalidProvider: 'Fournisseur OAuth non valide',
+      notCompleted: "La connexion n'a pas abouti. Recommencez.",
       returnToSignIn: 'Retour à la connexion',
       completing: "Finalisation de l'authentification...",
     },
     oauthStorage: {
-      configNotFound: 'Configuration du stockage Google Drive introuvable',
-      exchangeFailed: "Impossible d'échanger le code OAuth",
-      unsupportedType: 'Ce type de stockage ne prend pas en charge OAuth',
-      invalidState: 'Paramètre state OAuth non valide',
-      paramNotFound:
-        "Paramètre OAuth introuvable. Vérifiez que l'URL de redirection est correctement configurée.",
-      addStorageTitle: 'Ajouter un stockage',
-      storageDescription:
-        "Un stockage est l'endroit où les sauvegardes sont conservées (disque local, S3, etc.)",
+      waiting: 'Finalisation de l’autorisation du stockage...',
+      complete: 'Autorisation reçue. Revenez à l’éditeur du stockage.',
+      restart:
+        'Impossible de joindre l’éditeur d’origine. Fermez cette fenêtre et relancez l’autorisation depuis cet éditeur.',
     },
   },
   errors: {
+    cleanupPending:
+      'Le nettoyage des fichiers est toujours en cours. Attendez sa fin ou supprimez les stockages concernés un par un, en confirmant que les fichiers restants devront être supprimés manuellement.',
+    alreadyMember: "Cet utilisateur est déjà membre de l'espace de travail.",
+    cannotChangeOwnRole: "Vous ne pouvez pas modifier votre propre rôle dans l'espace de travail.",
+    ownerRequiresTransfer:
+      "Le propriétaire ne peut être ni modifié ni retiré. Transférez d'abord la propriété à un autre membre.",
+    workspaceNotEmpty:
+      "L'espace de travail contient encore des bases de données. Supprimez-les d'abord, puis supprimez l'espace de travail.",
+    databaseConnectionFailed: 'Impossible de se connecter à la base de données : {{detail}}',
+    inUse:
+      "Il est encore utilisé par une base de données ou par une sauvegarde ou une restauration en cours. Réessayez quand plus rien ne l'utilise.",
+    backupNotCompleted: 'Seule une sauvegarde terminée peut être vérifiée.',
+    alreadyRunning: "C'est déjà en cours. Attendez la fin et réessayez.",
+    noExtendableChain: 'Effectuez un backup complet avant de lancer un backup incrémental.',
+    noRestorableBackup: 'Aucun backup terminé ne peut être restauré.',
+    targetTimeUnreachable:
+      'Les backups et le WAL disponibles ne permettent pas de restaurer à l’instant demandé.',
+    notRunning: "Ce n'est plus en cours : il n'y a rien à annuler.",
+    instanceUnhealthy: 'L’instance présente des problèmes.',
+    insufficientDiskSpace: "Le serveur Databasus n'a pas assez d'espace disque libre : {{detail}}",
     unknown: "Une erreur s'est produite. Réessayez.",
     networkUnreachable:
       'Impossible de joindre le serveur Databasus. Vérifiez votre connexion et réessayez.',
@@ -141,17 +141,33 @@ export const fr: typeof en = {
       'Trop de codes de connexion ont été demandés pour ce compte au cours de la dernière heure. Réessayez plus tard.',
     signInCodeResentTooSoon:
       "Un code a été envoyé il y a moins d'une minute. Attendez une minute avant d'en demander un autre.",
-    rateLimitExceeded: 'Trop de tentatives. Patientez un peu et réessayez.',
+    rateLimited: 'Trop de tentatives. Patientez un peu et réessayez.',
     emailNotConfigured: "L'instance n'a pas de serveur de messagerie configuré.",
     adminEmailMissing:
       "Votre compte n'a pas d'adresse e-mail valide à laquelle envoyer un e-mail de test.",
+    invalidRequest:
+      "Le serveur a refusé la requête car elle n'est pas valide. Rechargez la page et réessayez.",
+    notFound: "L'élément demandé est introuvable. Il a peut-être été supprimé.",
+    internal: "Une erreur interne s'est produite sur le serveur. Réessayez plus tard.",
+    unauthenticated: 'Votre session a pris fin. Reconnectez-vous.',
+    permissionDenied: "Vous n'avez pas l'autorisation de faire cela.",
+    humanVerificationFailed: 'La vérification anti-robot a échoué. Effectuez-la et réessayez.',
+    invalidCredentials: "L'adresse e-mail ou le mot de passe est incorrect.",
+    userDeactivated: 'Ce compte est désactivé. Demandez à un administrateur de le réactiver.',
+    registrationClosed:
+      'Les inscriptions sont fermées sur cette instance. Demandez une invitation à un administrateur.',
+    emailTaken: 'Cette adresse e-mail est déjà utilisée.',
+    invalidResetCode:
+      'Le code de réinitialisation est incorrect ou a expiré. Demandez-en un nouveau.',
+    oauthNotConfigured: "La connexion avec ce fournisseur n'est pas configurée sur cette instance.",
+    oauthFailed:
+      "Le fournisseur de connexion n'a pas confirmé votre compte. Vérifiez que votre adresse e-mail y est validée et réessayez.",
   },
   status: {
     logicalBackup: {
       inProgress: 'En cours',
       completed: 'Réussie',
       failed: 'Échouée',
-      deleted: 'Supprimée',
       canceled: 'Annulée',
     },
     physicalBackup: {
@@ -189,7 +205,7 @@ export const fr: typeof en = {
       offline: 'Hors ligne',
     },
   },
-  intervals: {
+  schedules: {
     types: {
       hourly: 'Toutes les heures',
       daily: 'Tous les jours',
@@ -206,18 +222,19 @@ export const fr: typeof en = {
       sat: 'Sam.',
       sun: 'Dim.',
     },
-    periods: {
-      day: '1 jour',
-      week: '1 semaine',
-      month: '1 mois',
-      threeMonths: '3 mois',
-      sixMonths: '6 mois',
-      year: '1 an',
-      twoYears: '2 ans',
-      threeYears: '3 ans',
-      fourYears: '4 ans',
-      fiveYears: '5 ans',
-      forever: 'Sans limite',
+    weekday: 'Jour de la semaine',
+    dayOfMonth: 'Jour du mois',
+    cronExpression: 'Expression cron (UTC)',
+    timeOfDay: 'Heure',
+    nextRun: 'Prochaine exécution : {{time}}',
+    invalidCron: 'Expression cron non valide',
+    cronHelp: {
+      format: 'Format cron : minute, heure, jour, mois, jour de la semaine (UTC)',
+      examples: 'Exemples :',
+      dailyAt2am: 'Tous les jours à 2 h 00 UTC',
+      every6Hours: 'Toutes les 6 heures',
+      mondaysAt3am: 'Tous les lundis à 3 h 00 UTC',
+      twiceAMonth: 'Le 1er et le 15 du mois à 4 h 30 UTC',
     },
   },
   auditLogs: {
@@ -229,10 +246,9 @@ export const fr: typeof en = {
       created: 'Date',
     },
     systemUser: 'Système',
-    loadedOfTotal: 'Chargées : {{loaded}} sur {{total}}',
     empty: "Aucune entrée d'audit trouvée.",
     loadingMore: "Chargement d'autres entrées...",
-    allLoaded: 'Toutes les entrées sont chargées ({{count}} au total)',
+    allLoaded: 'Toutes les entrées sont chargées',
   },
   settings: {
     title: 'Paramètres de Databasus',
@@ -273,6 +289,8 @@ export const fr: typeof en = {
       docs: 'La <docsLink>documentation SMTP</docsLink> explique comment connecter un serveur de messagerie.',
       sendTestEmail: 'Envoyer un e-mail de test',
       testEmailSent: 'E-mail de test envoyé à {{email}}',
+      testEmailNotDelivered:
+        "Le serveur de messagerie n'a pas accepté l'e-mail de test pour <email/> : <failureDetail/>",
     },
     healthcheck: {
       title: 'Vérification de disponibilité',
@@ -316,11 +334,15 @@ export const fr: typeof en = {
       config: 'Configuration',
       backups: 'Sauvegardes',
       verifications: 'Vérifications',
+      monitoring: 'Surveillance',
     },
     create: {
       title: 'Ajouter une base de données à sauvegarder',
       namePlaceholder: 'Ma base préférée',
       creating: 'Création de la base de données...',
+      finishing: 'Finalisation de la configuration de la base de données...',
+      createdButNotFinished:
+        "La base de données a été créée, mais sa configuration n'est pas terminée. Motif : {{reason}}",
       complete: 'Terminer',
       backupType: {
         title: 'Choisissez le type de sauvegarde',
@@ -341,10 +363,7 @@ export const fr: typeof en = {
       lastBackupError: {
         title: 'Erreur de la dernière sauvegarde',
         errorLabel: 'Erreur :',
-        clearHint: 'Pour effacer cette erreur (au choix) :',
-        clearByTestingConnection:
-          '- testez la connexion avec le bouton ci-dessous (même si vous avez déjà modifié les paramètres) ;',
-        clearByNextBackup: '- attendez que la prochaine sauvegarde se termine sans erreur ;',
+        clearedByNextBackup: 'L’erreur disparaîtra après la prochaine sauvegarde réussie.',
       },
       sections: {
         database: 'Paramètres de la base de données',
@@ -371,7 +390,6 @@ export const fr: typeof en = {
       replace: 'Remplacer',
     },
     fields: {
-      databaseType: 'Type de base de données',
       version: 'Version de {{engine}}',
       databaseName: 'Nom de la base',
       sslMode: 'Mode SSL',
@@ -383,6 +401,8 @@ export const fr: typeof en = {
       serverCaCertificate: 'Certificat CA du serveur',
       includeSchemas: 'Schémas inclus',
       excludeTables: 'Tables exclues',
+      excludeWholeTables: 'Tables exclues entièrement',
+      excludeTableData: 'Données de tables exclues',
       skipUserMappings: "Ignorer les correspondances d'utilisateurs",
       excludeExtensions: 'Exclure les extensions',
       restoreOwnership: 'Restaurer les propriétaires',
@@ -402,6 +422,7 @@ export const fr: typeof en = {
       connectionStringParsed: 'Champs remplis à partir de la chaîne de connexion',
       connectionStringParsedWithoutPassword:
         'Champs remplis à partir de la chaîne de connexion. Saisissez le mot de passe manuellement.',
+      connectionTestFailed: 'Impossible de joindre la base de données : {{error}}',
       connectionTestPassed: {
         title: 'Test de connexion réussi',
         description: "Vous pouvez passer à l'étape suivante",
@@ -431,7 +452,10 @@ export const fr: typeof en = {
           '<docsLink>Lisez cette page</docsLink> pour savoir comment sauvegarder une base de données Supabase',
         includeSchemasPlaceholder: 'Tous les schémas (par défaut)',
         excludeTablesTooltip:
-          "Tables à exclure de la sauvegarde. Utilisez 'tablename' ou 'schema.tablename'. Les motifs glob sont acceptés (par ex. 'logs_*'). Vous pouvez coller une liste séparée par des virgules ou des retours à la ligne.",
+          "Tables entièrement exclues de la sauvegarde : après une restauration, elles n'existeront pas. Utilisez 'tablename' ou 'schema.tablename'. Un nom sans schéma ne trouve que les tables du search_path par défaut, généralement 'public' ; utilisez '*.tablename' pour chercher dans tous les schémas. Les motifs glob sont acceptés (par ex. 'logs_*'). Vous pouvez coller une liste séparée par des virgules ou des retours à la ligne.",
+        excludeTableDataTooltip:
+          "Tables sauvegardées sans leurs lignes : après une restauration, elles existent avec leur structure, leurs index et leurs contraintes, mais vides. Utilisez 'tablename' ou 'schema.tablename'. Un nom sans schéma ne trouve que les tables du search_path par défaut, généralement 'public' ; utilisez '*.tablename' pour chercher dans tous les schémas. Les motifs glob sont acceptés (par ex. 'logs_*'). Une table indiquée dans les deux champs est entièrement exclue. Les partitions d'une table partitionnée doivent être indiquées une par une ou par un motif comme 'events_*'. Si une autre table sauvegardée a une clé étrangère vers des lignes d'une table vidée, la restauration ne pourra pas recréer cette clé étrangère. Vous pouvez coller une liste séparée par des virgules ou des retours à la ligne.",
+        excludeTableDataPlaceholder: 'Aucune donnée de table exclue',
         skipUserMappingsTooltip:
           "Ne pas restaurer les correspondances d'utilisateurs (user mappings, instructions CREATE USER MAPPING). Activez cette option si le rôle de sauvegarde ne peut pas lire les identifiants de ces correspondances : sinon, elles sont exportées sans options et font échouer la restauration des FDW comme oracle_fdw.",
         excludeExtensionsTooltip:
@@ -565,7 +589,7 @@ export const fr: typeof en = {
         transferExisting: 'Transférer avec le stockage actuel',
         selectFromTarget: "Choisir un stockage de l'espace de travail cible",
         blocked:
-          "Bases de données utilisant ce stockage : {{count}}. Le transfert est bloqué, car d'autres bases de données en dépendent.",
+          "D'autres bases de données sauvegardent dans ce stockage : il ne peut donc pas être transféré avec cette base de données.",
         canTransfer: 'Le stockage peut être transféré',
         selectPlaceholder: 'Choisissez un stockage',
         createNew: 'Créer un stockage',
@@ -764,7 +788,7 @@ export const fr: typeof en = {
       notifyWhenUnavailable: "Notifier en cas d'indisponibilité",
       checkIntervalMinutes: 'Intervalle de vérification (min)',
       attemptsBeforeDown: 'Tentatives avant indisponibilité',
-      storeAttemptsDays: "Conserver l'historique (jours)",
+      attemptRetentionDays: "Conserver l'historique (jours)",
       tooltips: {
         enable: 'Active ou désactive la vérification de disponibilité de cette base de données',
         notifyWhenUnavailable:
@@ -773,7 +797,7 @@ export const fr: typeof en = {
           'Fréquence de vérification de la disponibilité de la base de données (en minutes)',
         attemptsBeforeDown:
           'Nombre de tentatives échouées avant de considérer la base de données comme indisponible',
-        storeAttemptsDays:
+        attemptRetentionDays:
           "Nombre de jours pendant lesquels l'historique des vérifications de disponibilité est conservé",
       },
     },
@@ -859,6 +883,7 @@ export const fr: typeof en = {
         description:
           "Cet utilisateur n'a pas encore de compte, mais il a été invité dans l'espace de travail. Dès qu'il s'inscrira avec cette adresse e-mail, il en deviendra automatiquement membre.",
       },
+      invitedMark: 'Invité',
       roleChanged: 'Rôle du membre modifié',
       remove: {
         tooltip: 'Supprimer le membre',
@@ -900,6 +925,7 @@ export const fr: typeof en = {
       newPassword: 'Nouveau mot de passe',
     },
     validation: {
+      emailInvalid: 'Saisissez une adresse e-mail valide',
       nameRequired: 'Le nom est obligatoire',
       emailRequired: "L'e-mail est obligatoire",
       passwordTooShort: 'Mot de passe trop court. Longueur minimale : {{minLength}}',
@@ -976,12 +1002,13 @@ export const fr: typeof en = {
         passwordsDoNotMatch: 'Les nouveaux mots de passe ne correspondent pas',
         changing: 'Changement du mot de passe...',
         submit: 'Changer le mot de passe',
-        signedInWithNewPassword: 'Vous êtes connecté avec votre nouveau mot de passe',
+        signInRequired:
+          'Mot de passe modifié. Connectez-vous à nouveau avec votre nouveau mot de passe.',
       },
     },
     list: {
       title: 'Utilisateurs de Databasus',
-      loadedOfTotal: 'Utilisateurs : {{loaded}} sur {{total}}',
+      loaded: 'Utilisateurs chargés : {{count}}',
       searchPlaceholder: 'Rechercher par e-mail ou par nom...',
       empty: 'Aucun utilisateur trouvé.',
       allLoaded: 'Tous les utilisateurs sont chargés ({{count}} au total)',
@@ -1005,6 +1032,7 @@ export const fr: typeof en = {
   },
   verification: {
     triggers: {
+      afterBackup: 'Après la sauvegarde',
       manual: 'Manuelle',
       scheduled: 'Planifiée',
     },
@@ -1020,18 +1048,6 @@ export const fr: typeof en = {
       afterBackup: 'Après chaque sauvegarde',
       afterBackupHint:
         'Se lance automatiquement après chaque sauvegarde réussie. Les vérifications encore en attente dans la file sont annulées, pour que la file ne grossisse pas sans fin quand les sauvegardes vont plus vite que les vérifications.',
-      weekday: 'Jour de la semaine',
-      dayOfMonth: 'Jour du mois',
-      timeOfDay: 'Heure de vérification',
-      cron: {
-        expression: 'Expression cron (UTC)',
-        format: 'Format cron : minute, heure, jour, mois, jour de la semaine (UTC)',
-        examples: 'Exemples :',
-        exampleEverySunday: '- {{expression}} : tous les dimanches à 4 h 00 UTC',
-        exampleEverySixHours: '- {{expression}} : toutes les 6 heures',
-        nextRun: 'Prochaine exécution : {{dateTime}}<lineBreak/>({{relativeTime}})',
-        invalid: 'Expression cron non valide',
-      },
       notifications: 'Notifications',
       noNotifications: 'Aucune',
     },
@@ -1058,7 +1074,6 @@ export const fr: typeof en = {
       },
       details: {
         title: 'Détails de la vérification de restauration',
-        loadFailed: 'Impossible de charger les détails de la vérification.',
         cancellationReason: "Motif de l'annulation",
         failure: 'Échec',
         sections: {
@@ -1097,7 +1112,7 @@ export const fr: typeof en = {
       },
       capacity: {
         cpu: '{{count}} CPU',
-        ram: '{{count}} GB de RAM',
+        ram: '{{size}} de RAM',
         disk: '{{count}} GB de disque',
         jobs: 'tâches : {{count}}',
         notReported: 'pas encore communiquées',
@@ -1191,7 +1206,6 @@ export const fr: typeof en = {
       hasSendError: "Erreur d'envoi",
     },
     create: {
-      title: 'Ajouter un canal de notification',
       namePlaceholder: 'Mes alertes',
     },
     config: {
@@ -1207,11 +1221,11 @@ export const fr: typeof en = {
       },
       removeConfirmation:
         'Voulez-vous vraiment supprimer ce canal de notification ? Cette action est irréversible.',
-      removeBlockedByDatabases:
-        "Ce canal de notification est utilisé par des bases de données. Retirez-le d'abord de ces bases de données.",
     },
+    secretKeptPlaceholder: 'Enregistré - laissez vide pour le conserver',
     testNotification: {
       send: 'Envoyer une notification de test',
+      notDelivered: "Le message de test n'a pas été remis : {{error}}",
       sent: {
         title: 'Notification de test envoyée !',
         description: 'La notification de test est bien partie',
@@ -1236,6 +1250,11 @@ export const fr: typeof en = {
       skipTls: 'Sans vérification TLS',
     },
     email: {
+      validation: {
+        targetEmail: 'Saisissez une adresse e-mail valide',
+        smtpHost: 'Saisissez un serveur SMTP',
+        smtpPort: 'Saisissez un port de 1 à 65535',
+      },
       targetEmail: 'E-mail du destinataire',
       targetEmailTooltip: "L'adresse e-mail à laquelle vous voulez recevoir les messages",
       smtpHost: 'Hôte SMTP',
@@ -1303,9 +1322,12 @@ export const fr: typeof en = {
       customHeaders: 'En-têtes personnalisés',
       customHeadersTooltip:
         'Ajoute des en-têtes HTTP personnalisés à la requête du webhook (par ex. Authorization, X-API-Key)',
-      savedHeadersHidden: '*Les en-têtes enregistrés sont masqués pour des raisons de sécurité',
+      savedHeadersHidden:
+        '*Les valeurs des en-têtes enregistrés sont masquées. Laissez une valeur vide pour la conserver',
       headers: 'En-têtes',
       headerNamePlaceholder: "Nom de l'en-tête",
+      headerNameInvalid:
+        "Utilisez uniquement des lettres latines, des chiffres et les caractères !#$%&'*+-.^_`|~. Les espaces sont interdits.",
       headerValuePlaceholder: "Valeur de l'en-tête",
       addHeader: 'Ajouter un en-tête',
       hiddenHeaderValue: '(masqué)',
@@ -1344,8 +1366,6 @@ export const fr: typeof en = {
       powerAutomateUrlLabel: 'URL Power Automate :',
       powerAutomateUrlTooltip:
         'URL HTTP de votre flux Power Automate (déclencheur When an HTTP request is received)',
-      showFullUrl: 'Afficher',
-      hideFullUrl: 'Masquer',
     },
     mattermost: {
       howToConnect: 'Comment connecter Mattermost ?',
@@ -1383,6 +1403,16 @@ export const fr: typeof en = {
     },
   },
   backups: {
+    cleanup: {
+      pending: 'Suppression des anciens fichiers. Fichiers restants : {{count}}.',
+      retrying: 'La suppression sera retentée pour les fichiers : {{count}}.',
+      retryStatus: 'Actualiser le statut',
+    },
+    storageSwitch: {
+      warning:
+        'Changer de stockage supprime immédiatement l’ancien historique des sauvegardes et active le nouveau stockage. Les anciens fichiers sont supprimés en arrière-plan. Un stockage inaccessible retarde le nettoyage. La suppression explicite de l’ancien stockage arrête le nettoyage automatique ; les fichiers restants doivent être supprimés manuellement. Les nouvelles sauvegardes physiques commencent par une FULL.',
+      confirm: 'Changer de stockage et supprimer l’historique',
+    },
     encryption: {
       none: 'Aucun',
       encrypted: 'Activé',
@@ -1413,6 +1443,7 @@ export const fr: typeof en = {
       },
     },
     filters: {
+      toggle: 'Filtres',
       allTypes: 'Tous les types',
       allStatuses: 'Tous les statuts',
       before: 'Avant le',
@@ -1425,28 +1456,9 @@ export const fr: typeof en = {
       addStorageTitle: 'Ajouter un stockage',
       storageDescription:
         "Un stockage est l'endroit où les sauvegardes sont conservées (disque local, S3, Google Drive, etc.)",
-      storageChangeWarning:
-        'Si vous changez de stockage, toutes les sauvegardes de ce stockage seront supprimées.',
-      storageChangeAcknowledge: "J'ai compris",
       encryption: 'Chiffrement',
       notifications: 'Notifications',
       noNotifications: 'Aucune',
-      schedule: {
-        weekday: 'Jour de la semaine',
-        dayOfMonth: 'Jour du mois',
-        cronExpression: 'Expression cron (UTC)',
-        timeOfDay: 'Heure',
-        nextRun: 'Prochaine exécution : {{time}}',
-        invalidCron: 'Expression cron non valide',
-        cronHelp: {
-          format: 'Format cron : minute, heure, jour, mois, jour de la semaine (UTC)',
-          examples: 'Exemples :',
-          dailyAt2am: 'Tous les jours à 2 h 00 UTC',
-          every6Hours: 'Toutes les 6 heures',
-          mondaysAt3am: 'Tous les lundis à 3 h 00 UTC',
-          twiceAMonth: 'Le 1er et le 15 du mois à 4 h 30 UTC',
-        },
-      },
       gfs: {
         hourly: 'Horaires : {{count}}',
         daily: 'Quotidiennes : {{count}}',
@@ -1457,6 +1469,19 @@ export const fr: typeof en = {
       },
     },
     logical: {
+      retentionPeriods: {
+        day: '1 jour',
+        week: '1 semaine',
+        month: '1 mois',
+        threeMonths: '3 mois',
+        sixMonths: '6 mois',
+        year: '1 an',
+        twoYears: '2 ans',
+        threeYears: '3 ans',
+        fourYears: '4 ans',
+        fiveYears: '5 ans',
+        forever: 'Sans limite',
+      },
       retentionPolicyTypes: {
         gfs: 'GFS (conserver les N dernières sauvegardes horaires, quotidiennes, hebdomadaires, mensuelles et annuelles)',
         timePeriod: 'Période (N derniers jours)',
@@ -1500,9 +1525,6 @@ export const fr: typeof en = {
       },
       config: {
         interval: 'Intervalle de sauvegarde',
-        weekday: 'Jour de la semaine',
-        dayOfMonth: 'Jour du mois',
-        timeOfDay: 'Heure de la sauvegarde',
         encryptionTooltip:
           'Si la sauvegarde est chiffrée, les fichiers de sauvegarde dans votre stockage (S3, local, etc.) ne sont pas utilisables directement. Vous pouvez restaurer les sauvegardes via Databasus ou les télécharger déchiffrées avec le bouton « Télécharger ».',
         retentionPolicy: 'Politique de rétention',
@@ -1561,6 +1583,8 @@ export const fr: typeof en = {
       list: {
         totalUsage: 'Espace utilisé : {{size}}',
         backUpNow: 'Sauvegarder maintenant',
+        startRequirement:
+          'Pour lancer une sauvegarde, activez les sauvegardes et choisissez un stockage dans la configuration des sauvegardes.',
         fullBackup: 'Sauvegarde complète',
         incrementalBackup: 'Sauvegarde incrémentale',
         restore: 'Restaurer',
@@ -1622,7 +1646,8 @@ export const fr: typeof en = {
       restore: {
         errorHints: {
           downloadInProgress:
-            "Un téléchargement pour restauration est déjà en cours pour cette base de données. Attendez qu'il se termine, puis réessayez.",
+            'Vous avez déjà un téléchargement de sauvegarde ou de restauration en cours. Attendez sa fin, puis réessayez.',
+          noRestorableBackup: 'Lancez une sauvegarde complète, attendez sa fin, puis réessayez.',
           targetTimeUnreachable:
             "Impossible d'atteindre l'instant demandé : il y a un trou dans les WAL ou l'instant est hors de la plage disponible. Choisissez un autre instant ou restaurez le dernier point disponible.",
         },
@@ -1637,6 +1662,7 @@ export const fr: typeof en = {
           'Le lien de téléchargement est à usage unique et expire au bout de 15 minutes. Si une commande échoue avec une erreur 401, rouvrez cette fenêtre pour générer un nouveau lien.',
         copied: 'Copié',
         methods: {
+          label: 'Méthode de restauration',
           script: 'Par script',
           manual: 'Manuelle',
         },
@@ -1704,9 +1730,308 @@ export const fr: typeof en = {
             "Une sauvegarde de base ne copie que le répertoire de données. Si votre PostgreSQL source garde sa configuration en dehors (disposition Debian/Ubuntu, <configDir/>), alors <code>postgresql.conf</code>, <code>pg_hba.conf</code> et <code>pg_ident.conf</code> ne sont pas dans la sauvegarde et le serveur ne démarrera pas. Demandez leurs chemins réels à la source avec <code>psql -Atc \"SHOW config_file\"</code>, copiez les trois fichiers, puis commentez <code>data_directory</code>, <code>hba_file</code>, <code>ident_file</code>, <code>external_pid_file</code> et les lignes <code>ssl</code> / <code>ssl_*</code>, créez <code>conf.d</code> et, pour un conteneur, définissez <code>listen_addresses = '*'</code>. Si ces fichiers sont présents et que vous obtenez toujours la même erreur, c'est le répertoire monté qui est en cause, pas la configuration.",
         },
       },
+      monitoring: {
+        periods: {
+          hour: 'Dernière heure',
+          day: 'Dernier jour',
+          week: 'Dernière semaine',
+        },
+        levels: {
+          notStreaming: "L'enregistrement continu des modifications est désactivé",
+          collectingData: 'Collecte des données',
+          broken: 'Quelque chose ne fonctionne plus',
+          needsAttention: 'Quelque chose demande votre attention',
+          healthy: 'Tout va bien',
+        },
+        reasonLevels: {
+          broken: 'En panne',
+          needsAttention: 'Demande votre attention',
+          info: 'Pour information',
+        },
+        banner: {
+          collectingDataDescription:
+            "Le streaming a démarré ; les premiers chiffres arrivent d'ici une minute.",
+          notStreamingDescription:
+            "Les sauvegardes sont désactivées ou aucun stockage n'est sélectionné. Vous pouvez l'activer dans la <configLink>configuration</configLink>.",
+          cannotConfirm: "Impossible de confirmer l'état actuel",
+          cannotConfirmDescription: 'Dernier état connu : {{level}}, il y a {{duration}}.',
+          measuredAgo: 'Mesuré il y a {{duration}}',
+          healthyHeadline: 'Toutes les modifications sont enregistrées',
+          restoreUpTo:
+            "Vous pouvez restaurer la base à n'importe quel moment jusqu'à {{moment}} (il y a {{age}}).",
+          restoreOnlyUpTo:
+            "Tant qu'une nouvelle sauvegarde complète n'est pas terminée, vous ne pouvez restaurer la base que jusqu'à {{moment}} (il y a {{age}}).",
+          restoreFromUpTo:
+            "Vous pouvez restaurer la base à n'importe quel moment entre {{from}} et {{moment}} (il y a {{age}}).",
+          restoreFromUpToWithoutAge:
+            "Vous pouvez restaurer la base à n'importe quel moment entre {{from}} et {{moment}}.",
+          restoreUpToWithoutAge:
+            "Vous pouvez restaurer la base à n'importe quel moment jusqu'à {{moment}}.",
+          restoreOnlyUpToWithoutAge:
+            "Tant qu'une nouvelle sauvegarde complète n'est pas terminée, vous ne pouvez restaurer la base que jusqu'à {{moment}}.",
+          restoreNothingPending:
+            "Rien ne peut être restauré tant que la première sauvegarde complète n'est pas terminée. Elle est déjà en route.",
+          restoreNothing:
+            "Rien ne peut encore être restauré, car aucune sauvegarde complète n'est terminée.",
+          startFullBackup: 'Lancer une sauvegarde complète',
+          fullBackupRequested: 'Sauvegarde complète demandée.',
+          notMeasuredYet: 'Pas encore de mesure',
+          refreshFailed:
+            "Impossible d'actualiser les données. Les derniers chiffres reçus restent affichés, et la prochaine tentative a lieu dans 30 secondes.",
+        },
+        keepingUp: {
+          keepingUp:
+            'Databasus enregistre les modifications aussi vite que la base de données les écrit : {{writeRate}} écrits, {{archiveRate}} enregistrés.',
+          fallingBehind:
+            "La base de données écrit des modifications plus vite que Databasus ne les enregistre, d'environ {{differenceRate}} : {{writeRate}} contre {{archiveRate}}.",
+          fallingBehindBacklog:
+            "{{unsavedAmount}} ne sont pas encore enregistrés, et ce volume augmente d'environ {{growthPerHour}} par heure.",
+          catchingUp:
+            'Databasus enregistre le retard accumulé : il reste {{unsavedAmount}}, soit environ {{duration}}.',
+          catchingUpWithoutEstimate:
+            'Databasus enregistre le retard accumulé : il reste {{unsavedAmount}}.',
+          idle: "La base de données n'écrit presque rien ; les nouvelles modifications arrivent dans le stockage en quelques minutes.",
+          rebuildConsequence:
+            "À ce rythme, Databasus commencera une nouvelle chaîne de sauvegardes à partir d'une sauvegarde complète dans environ {{duration}}.",
+          limitConsequence:
+            "À ce rythme, la base de données supprimera des modifications que Databasus n'a pas encore reçues dans environ {{duration}}.",
+        },
+        reasons: {
+          streamingStopped: {
+            title: "L'enregistrement s'est arrêté",
+            whatHappened: 'Databasus a cessé de recevoir des modifications il y a {{duration}}.',
+            whatToDo:
+              'Databasus réessaie de lui-même. Si cela dure, consultez les journaux de Databasus.',
+          },
+          sourceUnreachable: {
+            title: 'La base de données est injoignable',
+            whatHappened:
+              "Databasus n'arrive pas à joindre la base de données depuis {{duration}}.",
+            whatToDo:
+              "Vérifiez que le serveur de la base de données fonctionne et qu'il est joignable depuis Databasus.",
+          },
+          walChainBroken: {
+            title: 'Des modifications ont été perdues entre les sauvegardes',
+            whatHappened:
+              "Une partie de l'historique des modifications n'a jamais atteint le stockage, les modifications suivantes ne peuvent donc pas être restaurées.",
+            whatToDo: "Lancez une sauvegarde complète dans l'onglet Sauvegardes.",
+            whatToDoPending:
+              "Une nouvelle sauvegarde complète est en cours. Vous pouvez la suivre dans l'onglet Sauvegardes.",
+          },
+          slotMissing: {
+            title: 'La base de données ne conserve plus les modifications',
+            whatHappened:
+              'La base de données ne conserve plus de modifications pour Databasus : la réservation que Databasus y avait créée a disparu.',
+            whatToDo:
+              "Databasus recrée la réservation au redémarrage du streaming, mais les modifications faites entre-temps sont perdues. Lancez une sauvegarde complète dans l'onglet Sauvegardes et vérifiez que personne ne supprime la réservation sur la base de données.",
+            whatToDoPending:
+              'Databasus recrée la réservation au redémarrage du streaming, et une nouvelle sauvegarde complète est en cours. Vérifiez que personne ne supprime la réservation sur la base de données.',
+          },
+          slotLost: {
+            title: 'La base de données a supprimé des modifications non enregistrées',
+            whatHappened:
+              "La base de données a supprimé des modifications que Databasus n'avait pas encore reçues.",
+            whatToDo:
+              "Databasus repart de lui-même avec une nouvelle sauvegarde complète. Pour l'éviter la prochaine fois, accélérez l'enregistrement ou laissez la base de données conserver plus de modifications.",
+          },
+          archiveNotAdvancing: {
+            title: "Les modifications n'arrivent pas dans le stockage",
+            whatHappened:
+              "Aucune nouvelle modification n'est arrivée dans le stockage depuis {{duration}}, alors que la base de données continue d'écrire.",
+            whatToDo:
+              "Vérifiez que le stockage est joignable et qu'il lui reste de l'espace libre.",
+          },
+          archiveSlowerThanSource: {
+            title: "L'enregistrement est trop lent",
+            whatHappened:
+              "La base de données écrit plus vite que Databasus n'enregistre ; le volume en attente a augmenté de {{amount}} en 10 minutes.",
+            whatToDo:
+              'Vérifiez le débit réseau vers le stockage, ou rapprochez le stockage de Databasus.',
+          },
+          slotKeepsExtraWal: {
+            title: 'La base de données conserve trop de modifications',
+            whatHappened:
+              "Depuis {{duration}}, la base de données conserve pour Databasus plus de journal de modifications que d'habitude, et le volume continue d'augmenter.",
+            whatToDo:
+              "Vérifiez qu'il reste de l'espace disque sur le serveur de la base de données.",
+          },
+          slotLimitApproaching: {
+            title: 'Des modifications non enregistrées seront bientôt supprimées',
+            whatHappened:
+              "À ce rythme, la base de données supprimera des modifications que Databasus n'a pas encore reçues dans environ {{duration}}.",
+            whatToDo:
+              "Accélérez l'enregistrement, ou augmentez <code>max_slot_wal_keep_size</code> sur la base de données.",
+          },
+          nearSlotRebuild: {
+            title: 'Bientôt un nouveau départ',
+            whatHappened:
+              "Les modifications pas encore reçues par Databasus atteignent {{amount}} sur les {{limit}} à partir desquels Databasus repart d'une sauvegarde complète.",
+            whatToDo:
+              "Accélérez l'enregistrement, ou relevez la limite dans les paramètres de sauvegarde.",
+          },
+          localQueueFilling: {
+            title: 'Le tampon de Databasus se remplit',
+            whatHappened: 'Le tampon de Databasus contient {{amount}} sur {{limit}}.',
+            whatToDo:
+              'Databasus suspend la réception de lui-même quand le tampon est plein. Vérifiez le débit du stockage.',
+          },
+          frequentRestarts: {
+            title: 'La réception redémarre souvent',
+            whatHappened: 'Redémarrages de la réception au cours de la dernière heure : {{count}}.',
+            whatToDo: 'Cherchez la cause dans les journaux de Databasus.',
+          },
+          forcedRotationRefused: {
+            title: 'Les périodes calmes arrivent en retard dans le stockage',
+            whatHappened:
+              'La base de données refuse de fermer son fichier de modifications à temps, donc les modifications des périodes calmes arrivent plus tard dans le stockage.',
+            whatToDo:
+              "Accordez à l'utilisateur des sauvegardes le droit d'exécuter <code>pg_switch_wal()</code>.",
+          },
+        },
+        notices: {
+          noSlotWalLimit: {
+            title: 'Aucune limite sur les modifications conservées',
+            whatHappened:
+              'La base de données conserve des modifications pour Databasus sans limite.',
+            whatToDo:
+              'Une limite protège le disque du serveur de la base de données si Databasus reste arrêté longtemps. En contrepartie, une nouvelle sauvegarde complète est nécessaire quand la limite est atteinte. Elle se règle avec <code>max_slot_wal_keep_size</code>.',
+          },
+          slotKeepsExtraWalSteadily: {
+            title: 'La base de données conserve trop de modifications',
+            whatHappened:
+              "La base de données conserve pour Databasus plus de journal de modifications que d'habitude.",
+            whatToDo:
+              "C'est normal sous forte charge. Rien à faire tant que le volume n'augmente pas.",
+          },
+          noFullBackupYet: {
+            title: 'Pas encore de sauvegarde complète',
+            whatHappened:
+              "La première sauvegarde complète n'est pas terminée, les modifications enregistrées ne peuvent donc pas encore être restaurées.",
+            whatToDo: "Attendez-la, ou lancez-la dans l'onglet Sauvegardes.",
+          },
+        },
+        figures: {
+          lastSaved: 'Dernière modification enregistrée',
+          waitingToBeSaved: "En attente d'enregistrement",
+          notMeasured: 'Pas encore mesuré',
+          averageHint: 'moy. 10 min',
+        },
+        restoreTimeline: {
+          title: 'Ce que vous pouvez restaurer',
+          restorable: 'Restaurable',
+          lost: 'Non restaurable',
+          notSavedYet: 'Pas encore enregistré dans le stockage',
+          lostSentence:
+            "Vous ne pouvez pas restaurer la base à un moment entre {{from}} et {{to}} : ces modifications n'ont jamais atteint le stockage.",
+          moreLost: 'Autres périodes non restaurables : {{count}}.',
+          range: '{{from}} – {{to}}',
+        },
+        technicalDetails: {
+          title: 'Détails techniques',
+        },
+        path: {
+          database: 'Base de données',
+          databasus: 'Databasus',
+          storage: 'Stockage',
+          notReceivedYet: 'Pas encore reçu par Databasus',
+          rebuildLimit:
+            "À {{amount}}, Databasus commence une nouvelle chaîne à partir d'une sauvegarde complète",
+          allowanceLeft:
+            'Marge avant que la base de données ne supprime des modifications : {{amount}}',
+          nothingWaiting: 'Rien en attente',
+          ratesCaption:
+            "Les débits sont des moyennes sur les 10 dernières minutes ; les volumes sont ceux de cet instant. Une base qui écrit par à-coups affiche un débit alors que rien n'attend.",
+          waitingInBuffer: 'En attente dans le tampon',
+          pauseLimit: 'La réception est suspendue à {{amount}}',
+          receivingPaused: 'Réception suspendue',
+          nothingSavedYet: "Rien n'est encore enregistré",
+          overLimit: 'Au-delà de la limite',
+          ofLimit: '{{amount}} sur {{limit}}',
+          notSavedYetAmount: 'Pas encore enregistré dans le stockage : {{amount}}',
+          unknownAmount: 'Inconnu',
+        },
+        tooltips: {
+          notSavedYet:
+            "Modifications écrites par la base qui ne sont pas encore dans le stockage : celles que Databasus n'a pas reçues et celles qui attendent dans sa mémoire tampon. Nom technique : WAL non archivé.",
+          notReceivedYet:
+            'Modifications que la base de données conserve pour Databasus parce que Databasus ne les a pas encore reçues. Nom technique : retard du slot de réplication.',
+          rebuildLimit:
+            'Au-delà de ce volume, Databasus supprime le slot de réplication et commence une nouvelle chaîne de sauvegardes, pour que le disque du serveur de la base de données ne se remplisse pas. Nom technique : seuil de retard du WAL.',
+          allowanceLeft:
+            "Ce que la base de données peut encore écrire avant de supprimer des modifications que Databasus n'a pas reçues. Nom technique : safe_wal_size, limité par max_slot_wal_keep_size.",
+          waitingInBuffer:
+            'Modifications reçues par Databasus mais pas encore enregistrées dans le stockage. Nom technique : file locale du WAL.',
+          pauseLimit:
+            "Quand le tampon atteint cette taille, Databasus suspend la réception jusqu'à ce qu'il se vide. Nom technique : seuil haut de la contre-pression.",
+          lastSaved:
+            'Quand le fichier de modifications le plus récent est arrivé dans le stockage. Nom technique : dernier segment WAL archivé.',
+          writeRate:
+            "La vitesse à laquelle la base de données écrit des modifications, en moyenne sur les 10 dernières minutes. Nom technique : débit d'écriture du WAL.",
+          saveRate:
+            "La vitesse à laquelle Databasus enregistre les modifications dans le stockage, en moyenne sur les 10 dernières minutes. Nom technique : débit d'archivage du WAL.",
+        },
+        charts: {
+          keepingUpTitle: 'Databasus suit-il le rythme ?',
+          unsavedTitle: "Qu'est-ce qui n'est pas encore enregistré ?",
+          unsavedSubtitle: "Inclut ce que Databasus n'a pas encore reçu",
+          bufferTitle: 'Tampon de Databasus',
+          databaseWrites: 'Écriture de la base de données',
+          savedToStorage: 'Enregistré dans le stockage',
+          notSavedYet: 'Pas encore dans le stockage',
+          notReceivedYet: 'Pas encore reçu par Databasus',
+          waitingInBuffer: 'En attente dans le tampon',
+          pauseLimit: 'La réception est suspendue ici',
+          restarts: 'Redémarrages',
+          pauses: 'Pauses',
+          notEnoughData:
+            'Pas encore assez de données pour cette période. Une période plus courte a peut-être déjà un graphique.',
+          dataSince: 'Données depuis {{time}}',
+          noMeasurements: 'Aucune mesure de {{from}} à {{to}}.',
+          perSecond: '{{amount}}/s',
+        },
+        details: {
+          slotStatus: 'Statut du slot (wal_status)',
+          allowance: 'Marge restante (safe_wal_size)',
+          noLimit: 'Aucune limite',
+          averageSegmentWrite: "Écriture moyenne d'un segment",
+          longestSegmentWrite: "Écriture la plus longue d'un segment",
+          uploadConcurrency: 'Envois simultanés',
+          walToStoredRatio: 'Rapport entre WAL et taille enregistrée',
+          walSegmentSize: 'Taille du segment WAL',
+          sessionStart: 'Début de la session de streaming',
+          streamerState: 'État du streamer',
+          sourceState: 'État de la source',
+          restartsLastHour: 'Redémarrages au cours de la dernière heure',
+          milliseconds: '{{value}} ms',
+          notAvailable: 'Non disponible',
+          streamerStates: {
+            running: 'En marche',
+            notRunning: 'Arrêté',
+            notStarted: 'Pas encore démarré',
+          },
+          sourceStates: {
+            reachable: 'Joignable',
+            unreachable: 'Injoignable',
+            slotMissing: 'Joignable, slot de réplication absent',
+          },
+        },
+        durations: {
+          seconds: '{{seconds}} s',
+          minutes: '{{minutes}} min',
+          hoursMinutes: '{{hours}} h {{minutes}} min',
+          daysHours: '{{days}} j {{hours}} h',
+        },
+      },
     },
   },
   storages: {
+    cleanup: {
+      title: 'Le nettoyage est toujours en cours',
+      warning:
+        'Nous supprimons les fichiers de sauvegarde devenus inutiles, généralement après la suppression d’une base de données ou son passage à un autre stockage. Le nettoyage se termine habituellement rapidement. Si vous supprimez ce stockage maintenant, le nettoyage automatique s’arrêtera et vous devrez supprimer manuellement les fichiers de sauvegarde restants.',
+      wait: 'Attendre',
+      deleteAnyway: 'Supprimer quand même',
+    },
     types: {
       local: 'Stockage local',
       s3: 'S3',
@@ -1731,6 +2056,7 @@ export const fr: typeof en = {
       connectionString: 'Chaîne de connexion',
     },
     sftpAuthMethods: {
+      both: 'Mot de passe et clé privée',
       password: 'Mot de passe',
       privateKey: 'Clé privée',
     },
@@ -1751,23 +2077,14 @@ export const fr: typeof en = {
         sftp: 'Type : SFTP',
         rclone: 'Type : Rclone',
       },
-      hasSaveError: "Erreur d'enregistrement",
     },
     config: {
       namePlaceholder: 'Saisissez un nom...',
       settingsTitle: 'Paramètres du stockage',
-      lastSaveError: {
-        title: "Erreur d'enregistrement",
-        errorLabel: 'Erreur :',
-        clearHint: 'Pour effacer cette erreur (au choix) :',
-        clearByTestingConnection:
-          '- testez la connexion avec le bouton ci-dessous (même si vous avez déjà modifié les paramètres) ;',
-        clearByNextSave: '- attendez que la prochaine sauvegarde soit enregistrée sans erreur ;',
-      },
       removeConfirmation:
-        'Voulez-vous vraiment supprimer ce stockage ? Cette action est irréversible. Les sauvegardes qui se trouvent dans ce stockage seront aussi supprimées.',
-      removeBlockedByDatabases:
-        "Ce stockage est utilisé par des bases de données. Retirez-le d'abord de ces bases de données.",
+        'Voulez-vous vraiment supprimer ce stockage ? Cette action est irréversible.',
+      removeBlockedByBackups:
+        "Une configuration de sauvegarde utilise ce stockage ou il contient encore des sauvegardes. Associez d'abord ces configurations à un autre stockage et supprimez ses sauvegardes.",
     },
     actions: {
       testConnection: 'Tester la connexion',
@@ -1776,6 +2093,7 @@ export const fr: typeof en = {
       title: 'Connexion réussie !',
       description: 'La connexion au stockage fonctionne',
     },
+    connectionTestFailed: 'Impossible de joindre le stockage : {{error}}',
     transfer: {
       title: 'Transférer le stockage vers un autre espace de travail',
       blockedByDatabases:
@@ -1847,6 +2165,23 @@ export const fr: typeof en = {
       googleDrive: {
         guideLink: 'Comment connecter Google Drive ?',
         authorize: 'Autoriser',
+        authorized: 'Autorisé',
+        waiting: 'En attente de l’autorisation Google...',
+        exchanging: 'Échange du code d’autorisation...',
+        cancel: 'Annuler l’autorisation',
+        restart: 'Relancer l’autorisation',
+        reconnect: 'Reconnecter',
+        reconnectHelp:
+          'Saisissez à nouveau le secret client pour reconnecter le stockage. Les identifiants enregistrés sont conservés en cas d’échec.',
+        expired: 'L’autorisation a expiré. Recommencez.',
+        refused: 'L’autorisation Google a été refusée. Vous pouvez réessayer.',
+        exchangeFailed: 'Impossible d’échanger le code d’autorisation. Recommencez.',
+        missingRefreshToken:
+          'Google n’a pas renvoyé de jeton d’actualisation. Relancez l’autorisation et autorisez l’accès hors connexion.',
+        popupBlocked:
+          'La fenêtre d’autorisation a été bloquée. Autorisez les fenêtres surgissantes et réessayez.',
+        unavailable:
+          'L’autorisation n’est pas disponible dans ce navigateur. Vérifiez la prise en charge de BroadcastChannel et réessayez.',
       },
       nas: {
         shareWithSlashWarning:
@@ -1874,6 +2209,10 @@ export const fr: typeof en = {
           'Ne pas vérifier le certificat TLS. Activez cette option si votre serveur FTP utilise un certificat auto-signé. Attention : cela réduit la sécurité.',
       },
       sftp: {
+        savedPassword: 'Un mot de passe est enregistré. Laissez le champ vide pour le conserver.',
+        savedPrivateKey: 'Une clé privée est enregistrée. Laissez le champ vide pour la conserver.',
+        requiredPassword: 'Saisissez un mot de passe pour cette méthode.',
+        requiredPrivateKey: 'Saisissez une clé privée pour cette méthode.',
         privateKeyTooltip:
           'Collez votre clé privée SSH (format PEM). Les clés RSA, DSA, ECDSA et Ed25519 sont prises en charge.',
         skipHostKeyVerification: "Ignorer la vérification de la clé d'hôte",

@@ -29,8 +29,7 @@
     <a href="#-功能特性">功能特性</a> •
     <a href="#-安装">安装</a> •
     <a href="#-使用">使用</a> •
-    <a href="#-许可证">许可证</a> •
-    <a href="#-参与贡献">参与贡献</a>
+    <a href="#-许可证">许可证</a>
   </p>
 
   <p style="margin-top: 20px; margin-bottom: 20px; font-size: 1.2em;">
@@ -295,13 +294,13 @@ docker exec -it databasus ./main --create-user --email="ops@example.com" --passw
 
 Databasus 处理的是敏感数据，所以防范漏洞、越权访问和数据泄露是首要任务。我们在系统的两侧都投入了精力：代码本身（权限校验、加密、对密钥凭据的谨慎处理）和它周围的基础设施（依赖分析、CVE 响应、DevSecOps 最佳实践）。下面这条流水线在每次提交和每个 PR 上自动运行。单独任何一层都不够，但叠在一起就能显著降低有漏洞的代码、不安全的依赖、损坏的镜像或者无法恢复的备份混进发布版本的概率。
 
-静态分析由几道彼此独立的检查组成。CodeQL 扫描整个代码库找安全问题。CodeRabbit 审查每个 PR，并在其中直接运行 gitleaks 做密钥扫描、运行 semgrep 做安全规则检查。Dockerfile 和 CI 工作流还有各自额外的规则（action 引用是否固定、权限是否最小化、基础镜像是否可疑），不安全的写法在合并之前就会被标出来。在这些逐 PR 的检查之上，OpenAI 的 Codex Security 会定期对整个代码库做更深入的审计。这是一个独立的计划，能发现只看单个 PR 的扫描容易漏掉的架构性和跨模块问题。
+静态分析由几道彼此独立的检查组成。CodeQL 扫描整个代码库找安全问题。每个 PR 都会运行 gitleaks 扫描泄露的密钥，并用 semgrep 按安全规则检查代码。Dockerfile 和 CI 工作流还有各自额外的规则（action 引用是否固定、权限是否最小化、基础镜像是否可疑），不安全的写法在合并之前就会被标出来。在这些逐 PR 的检查之上，OpenAI 的 Codex Security 会定期对整个代码库做更深入的审计。这是一个独立的计划，能发现只看单个 PR 的扫描容易漏掉的架构性和跨模块问题。
 
-依赖方面，Dependabot 对照 GitHub Advisory Database 盯着我们所有的依赖，CVE 公布后几分钟内就会浮出来。更新会经过一段冷却期，让刚发布的版本先沉淀一下我们再采用。这是对投毒包事件（比如供应链攻击）的一道有意为之的防线。Dependency Review Action 则会直接拦下任何引入新的 HIGH 或 CRITICAL 级别 CVE 的 PR。
+依赖方面，Dependabot 对照 GitHub Advisory Database 盯着我们所有的依赖，CVE 公布后几分钟内就会浮出来。更新会经过一段冷却期，让刚发布的版本先沉淀一下我们再采用。这是对投毒包事件（比如供应链攻击）的一道有意为之的防线。Dependency Review Action 则会让任何引入新的 HIGH 或 CRITICAL 级别 CVE 的 PR 检查失败。Go 代码方面，只要我们的代码调用了存在已知漏洞的函数，govulncheck 就会让 PR 失败；`go mod verify` 则用记录的校验和核对每个下载的模块。
 
-每次构建的容器镜像都会用 Trivy 扫描。另外还有一遍针对 Dockerfile 的 Trivy 扫描，在配置问题进入镜像之前就把它抓住。所有 GitHub Actions 都固定到完整的提交 SHA，而不是 `@v4`、`@main` 这类浮动标签，后者在 2025 年一直是活跃的攻击面。工作流默认使用最小权限，只在确实需要时按 job 提权。
+发布前，应用镜像会在两种架构上都用 Trivy 扫描。另外还有一遍针对 Dockerfile 的 Trivy 扫描，在配置问题进入镜像之前就把它抓住。所有 GitHub Actions 都固定到完整的提交 SHA，而不是 `@v4`、`@main` 这类浮动标签，后者在 2025 年一直是活跃的攻击面。工作流默认使用最小权限，只在确实需要时按 job 提权。
 
-关键路径由单元测试和集成测试共同覆盖，针对每个支持的数据库引擎和主版本，跑在真实的数据库容器上。对备份工具来说最要紧的路径是恢复，所以我们专门测它：每个 PR 都会在同样的真实容器上跑完整的「备份然后恢复」流程，验证备份确实能端到端恢复出来，而不只是写成功了。CI/CD 的其余部分在每个 PR 上运行 lint、类型检查、完整测试套件、镜像冒烟测试和多架构构建。全部通过，才会发布。
+关键路径由单元测试和集成测试共同覆盖，针对每个支持的数据库引擎和主版本，跑在真实的数据库容器上。对备份工具来说最要紧的路径是恢复，所以我们专门测它：每个 PR 都会在同样的真实容器上跑完整的「备份然后恢复」流程，验证备份确实能端到端恢复出来，而不只是写成功了。CI/CD 的其余部分在每个 PR 上运行 lint、类型检查、完整测试套件、镜像冒烟测试和多架构构建。只有这些检查和安全扫描全部通过，且没有未处理的 CodeQL 严重告警，才会发布。
 
 发现漏洞了？通过 GitHub 的 Security 页面上报，详见 [SECURITY.md](https://github.com/databasus/databasus?tab=security-ov-file#readme)。安全报告是我们优先级最高的工作。运行时的应用安全（静态数据的 AES-256-GCM 加密、零信任存储、加密的凭据、默认只读的数据库用户）见上面功能特性里的[企业级安全](#-企业级安全-文档)。
 
@@ -311,39 +310,6 @@ Databasus 处理的是敏感数据，所以防范漏洞、越权访问和数据�
 
 本项目采用 Apache 2.0 许可证，详见 [LICENSE](../../LICENSE) 文件
 
-## 🤝 参与贡献
+## 💬 社区
 
-欢迎贡献！更多细节、优先级和规则见<a href="https://databasus.com/contribute">贡献指南</a>。如果你想参与但不知道从哪下手，在 Telegram 上找我 [@rostislav_dugin](https://t.me/rostislav_dugin)
-
-你也可以加入我们在 Telegram 上的开发者、DBA 和 DevOps 工程师社群 [@databasus_community](https://t.me/databasus_community)。
-
-## AI 声明
-
-在 issue 和讨论区里有人问到项目开发中如何使用 AI。既然这个项目关注的是安全、可靠和生产环境的实际使用，就有必要说明 AI 在开发过程中的位置。
-
-首先，我们很高兴地宣布，Databasus 在 2026 年 3 月同时入选了 Anthropic 的 [Claude for Open Source](https://claude.com/contact-sales/claude-for-oss) 和 OpenAI 的 [Codex for Open Source](https://developers.openai.com/codex/community/codex-for-oss/)。对我们来说，这是又一个信号：世界上两家领先的 AI 公司各自独立地认可了这个项目，把它看作重要的开源软件和值得支持的关键基础设施。详见 [databasus.com/faq](https://databasus.com/zh/faq/#oss-programs)。
-
-即便如此，我们对开发过程中如何使用 AI 仍有明确的规定：
-
-AI 用来辅助：
-
-- 检查代码质量、寻找漏洞
-- 整理和改进文档、注释与代码
-- 在开发过程中提供协助
-- 在人工审查之后复核 PR 和提交
-- 通过 Codex Security 对 PR 做额外的安全分析
-
-AI 不用来：
-
-- 写整份代码
-- 「vibe coding」那一套
-- 产出没有经过人工逐行核对的代码
-- 产出没有测试的代码
-
-所以 AI 只是开发者提高效率、保证代码质量的助手和工具。活儿还是开发者干的。
-
-另外要说明的是，我们不区分糟糕的人写代码和 AI 的 vibe code。任何代码想要合并都要满足严格的要求，这样代码库才维护得下去。
-
-哪怕代码是人手写的，也不保证一定能合并。vibe code 完全不允许，这类 PR 一律默认拒绝（见[贡献指南](https://databasus.com/contribute)）。
-
-支撑这些规定的工程手段（CI、静态分析、依赖扫描、测试覆盖和漏洞响应）记录在上面的[安全与可靠性工程](#️-安全与可靠性工程)。
+欢迎加入我们在 Telegram 上的开发者、DBA 和 DevOps 工程师社群 [@databasus_community](https://t.me/databasus_community)。

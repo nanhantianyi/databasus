@@ -29,8 +29,7 @@
     <a href="#-fonctionnalités">Fonctionnalités</a> •
     <a href="#-installation">Installation</a> •
     <a href="#-utilisation">Utilisation</a> •
-    <a href="#-licence">Licence</a> •
-    <a href="#-contribuer">Contribuer</a>
+    <a href="#-licence">Licence</a>
   </p>
 
   <p style="margin-top: 20px; margin-bottom: 20px; font-size: 1.2em;">
@@ -295,13 +294,13 @@ Après l'installation, il est aussi recommandé de <a href="https://databasus.co
 
 Databasus manipule des données sensibles, donc la prévention des vulnérabilités, des accès non autorisés et des fuites de données est une préoccupation de premier plan. Nous y investissons des deux côtés du système : dans le code lui-même (contrôles de permissions, chiffrement, gestion soigneuse des secrets) et dans l'infrastructure qui l'entoure (analyse des dépendances, réponse aux CVE, pratiques DevSecOps). Le pipeline ci-dessous s'exécute automatiquement sur chaque commit et chaque PR. Aucune couche ne suffit à elle seule, mais ensemble elles réduisent le risque qu'un code vulnérable, des dépendances dangereuses, des images cassées ou des backups non restaurables atteignent une release.
 
-L'analyse statique s'exécute en plusieurs passes indépendantes. CodeQL analyse l'ensemble du code à la recherche de problèmes de sécurité. CodeRabbit relit chaque PR et exécute gitleaks pour la détection de secrets et semgrep pour les règles de sécurité, directement dans la revue. Les Dockerfiles et les workflows CI ont leurs propres règles supplémentaires (références d'actions épinglées, permissions de moindre privilège, images de base suspectes), si bien que les schémas non sûrs sont signalés avant même d'être fusionnés. En plus de ces contrôles par PR, Codex Security d'OpenAI effectue des audits réguliers et plus approfondis de tout le code. C'est un programme distinct qui détecte les problèmes architecturaux et transverses que les analyses limitées au moment de la PR laissent passer.
+L'analyse statique s'exécute en plusieurs passes indépendantes. CodeQL analyse l'ensemble du code à la recherche de problèmes de sécurité. Sur chaque PR, gitleaks recherche les secrets divulgués et semgrep vérifie le code selon des règles de sécurité. Les Dockerfiles et les workflows CI ont leurs propres règles supplémentaires (références d'actions épinglées, permissions de moindre privilège, images de base suspectes), si bien que les schémas non sûrs sont signalés avant même d'être fusionnés. En plus de ces contrôles par PR, Codex Security d'OpenAI effectue des audits réguliers et plus approfondis de tout le code. C'est un programme distinct qui détecte les problèmes architecturaux et transverses que les analyses limitées au moment de la PR laissent passer.
 
-Côté dépendances, Dependabot surveille toutes nos dépendances par rapport à la GitHub Advisory Database et fait remonter les CVE quelques minutes après leur publication. Les mises à jour sont appliquées avec un délai, pour laisser aux versions fraîchement publiées le temps de mûrir avant que nous les adoptions. C'est une défense délibérée contre les incidents de paquets compromis, comme les attaques de la chaîne d'approvisionnement. La Dependency Review Action bloque catégoriquement toute PR qui introduit une nouvelle CVE HIGH ou CRITICAL.
+Côté dépendances, Dependabot surveille toutes nos dépendances par rapport à la GitHub Advisory Database et fait remonter les CVE quelques minutes après leur publication. Les mises à jour sont appliquées avec un délai, pour laisser aux versions fraîchement publiées le temps de mûrir avant que nous les adoptions. C'est une défense délibérée contre les incidents de paquets compromis, comme les attaques de la chaîne d'approvisionnement. La Dependency Review Action fait échouer le contrôle de toute PR qui introduit une nouvelle CVE HIGH ou CRITICAL. Pour le code Go, govulncheck fait échouer une PR dès que notre code appelle une fonction présentant une vulnérabilité connue, et `go mod verify` contrôle chaque module téléchargé par rapport à sa somme de contrôle enregistrée.
 
-Les images de conteneurs sont analysées avec Trivy à chaque build. Une passe Trivy distincte sur le Dockerfile détecte les erreurs de configuration avant qu'elles n'arrivent dans une image. Toutes les GitHub Actions sont épinglées sur des SHA de commit complets plutôt que sur des tags flottants comme `@v4` ou `@main`, qui ont été un vecteur d'attaque actif en 2025. Les workflows utilisent par défaut des permissions de moindre privilège et ne les élèvent par job que lorsque c'est réellement nécessaire.
+L'image de l'application est analysée avec Trivy sur les deux architectures avant chaque release. Une passe Trivy distincte sur le Dockerfile détecte les erreurs de configuration avant qu'elles n'arrivent dans une image. Toutes les GitHub Actions sont épinglées sur des SHA de commit complets plutôt que sur des tags flottants comme `@v4` ou `@main`, qui ont été un vecteur d'attaque actif en 2025. Les workflows utilisent par défaut des permissions de moindre privilège et ne les élèvent par job que lorsque c'est réellement nécessaire.
 
-Les chemins critiques sont couverts par des tests unitaires et d'intégration, exécutés contre de vrais conteneurs de bases de données pour chaque moteur et version majeure pris en charge. La restauration est le chemin qui compte le plus pour un outil de sauvegarde, donc nous la testons explicitement : chaque PR exécute des cycles complets de sauvegarde puis restauration contre ces mêmes conteneurs réels, en vérifiant que les backups peuvent réellement être restaurés de bout en bout, et pas seulement écrits avec succès. Le reste du pipeline CI/CD exécute le lint, la vérification de types, la suite de tests complète, des smoke tests d'image et des builds multi-architecture sur chaque PR. Une release ne sort que si tout passe.
+Les chemins critiques sont couverts par des tests unitaires et d'intégration, exécutés contre de vrais conteneurs de bases de données pour chaque moteur et version majeure pris en charge. La restauration est le chemin qui compte le plus pour un outil de sauvegarde, donc nous la testons explicitement : chaque PR exécute des cycles complets de sauvegarde puis restauration contre ces mêmes conteneurs réels, en vérifiant que les backups peuvent réellement être restaurés de bout en bout, et pas seulement écrits avec succès. Le reste du pipeline CI/CD exécute le lint, la vérification de types, la suite de tests complète, des smoke tests d'image et des builds multi-architecture sur chaque PR. Une release ne sort qu'une fois tout cela et les analyses de sécurité passés, sans alerte critique CodeQL ouverte.
 
 Vous avez trouvé une vulnérabilité ? Signalez-la via l'onglet GitHub Security. Voir [SECURITY.md](https://github.com/databasus/databasus?tab=security-ov-file#readme). Les rapports de sécurité sont traités en priorité absolue. Pour la sécurité applicative à l'exécution (AES-256-GCM au repos, stockage zero-trust, secrets chiffrés, utilisateur de base en lecture seule par défaut), voir [Sécurité de niveau entreprise](#-sécurité-de-niveau-entreprise-docs) dans la section Fonctionnalités ci-dessus.
 
@@ -311,39 +310,6 @@ Vous avez trouvé une vulnérabilité ? Signalez-la via l'onglet GitHub Security
 
 Ce projet est distribué sous licence Apache 2.0 - voir le fichier [LICENSE](../../LICENSE) pour les détails
 
-## 🤝 Contribuer
+## 💬 Communauté
 
-Les contributions sont les bienvenues ! Lisez le <a href="https://databasus.com/contribute">guide de contribution</a> pour les détails, les priorités et les règles. Si vous voulez contribuer sans savoir par où commencer, écrivez-moi sur Telegram [@rostislav_dugin](https://t.me/rostislav_dugin)
-
-Vous pouvez aussi rejoindre notre grande communauté de développeurs, de DBA et d'ingénieurs DevOps sur Telegram [@databasus_community](https://t.me/databasus_community).
-
-## Avertissement sur l'utilisation de l'IA
-
-L'usage de l'IA dans le développement du projet a soulevé des questions dans les issues et les discussions. Comme le projet vise la sécurité, la fiabilité et l'usage en production, il est important d'expliquer comment l'IA intervient dans le processus de développement.
-
-D'abord, nous sommes fiers d'annoncer que Databasus a été accepté en mars 2026 à la fois dans [Claude for Open Source](https://claude.com/contact-sales/claude-for-oss) d'Anthropic et dans [Codex for Open Source](https://developers.openai.com/codex/community/codex-for-oss/) d'OpenAI. Pour nous, c'est un signal de plus que le projet est reconnu comme un logiciel open source important et comme une infrastructure critique digne d'être soutenue, et ce de façon indépendante par deux des principales entreprises d'IA au monde. Plus de détails sur [databasus.com/faq](https://databasus.com/fr/faq/#oss-programs).
-
-Malgré cela, nous appliquons les règles suivantes sur l'usage de l'IA dans le développement.
-
-L'IA est utilisée comme aide pour :
-
-- vérifier la qualité du code et chercher des vulnérabilités
-- nettoyer et améliorer la documentation, les commentaires et le code
-- assister pendant le développement
-- revérifier les PR et les commits après la revue humaine
-- analyser en plus la sécurité des PR via Codex Security
-
-L'IA n'est pas utilisée pour :
-
-- écrire du code entier
-- l'approche « vibe code »
-- produire du code sans vérification ligne à ligne par un humain
-- produire du code sans tests
-
-L'IA n'est donc qu'un assistant, un outil qui aide les développeurs à travailler plus vite et à garantir la qualité du code. Le travail est fait par des développeurs.
-
-Il faut aussi préciser que nous ne faisons pas de différence entre du mauvais code humain et du vibe code produit par une IA. Tout code fusionné doit satisfaire des exigences strictes, pour que la base de code reste maintenable.
-
-Même écrit à la main par un humain, un code n'est pas garanti d'être fusionné. Le vibe code n'est pas admis du tout et toutes les PR de ce type sont refusées par défaut (voir le [guide de contribution](https://databasus.com/contribute)).
-
-Les garde-fous techniques derrière ces règles (CI, analyse statique, analyse des dépendances, couverture de tests et réponse aux vulnérabilités) sont décrits dans [Ingénierie de sécurité et de fiabilité](#️-ingénierie-de-sécurité-et-de-fiabilité) ci-dessus.
+Rejoignez notre grande communauté de développeurs, de DBA et d'ingénieurs DevOps sur Telegram [@databasus_community](https://t.me/databasus_community).

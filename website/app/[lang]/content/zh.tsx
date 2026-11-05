@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import LanguageSelectorComponent from "@/app/components/LanguageSelectorComponent";
+import LandingFooterComponent from "@/app/components/LandingFooterComponent";
+import LandingHeaderComponent from "@/app/components/LandingHeaderComponent";
 import { OG_LOCALES, getLanguageAlternates, getLocalizedUrl } from "@/app/i18n";
 import HeroStatsComponent from "@/app/components/HeroStatsComponent";
 import InstallationComponent from "@/app/components/InstallationComponent";
@@ -178,7 +179,7 @@ export default function Index() {
                 name: "Databasus 如何保证安全性？",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "Databasus 从三个层面保障安全：（1）敏感数据加密——所有密码、令牌和凭据均使用 AES-256-GCM 加密，并与数据库分开存储；（2）备份加密——每个备份文件都使用由主密钥、备份 ID 和随机盐派生出的唯一密钥加密，即使有人获得了存储的访问权限，没有你的加密密钥备份也毫无用处；（3）只读数据库访问——Databasus 只需要 SELECT 权限，并会做全面检查确保不存在任何写权限，即使工具本身被攻破也不会破坏数据。登录本身也可以要求第二重验证：启用后，密码正确之后账号邮箱会收到六位验证码，而通过 Google 或 GitHub 登录仍然依赖这些服务商自己的验证。在运行时之外，安全性和可靠性也被落实到每一次提交和 PR：CodeQL 静态分析、集成 gitleaks 和 semgrep 的 CodeRabbit、Dependabot CVE 监控、Trivy 镜像与 Dockerfile 扫描，以及 OpenAI 定期进行的 Codex Security 审计。集成测试针对真实的 PostgreSQL、MySQL、MariaDB 和 MongoDB 容器运行，并在每个 PR 上验证完整的备份加恢复流程。GitHub Actions 固定到提交 SHA，工作流遵循最小权限原则。所有操作都在你控制的容器和你拥有的服务器上运行，而且因为它是开源的，你的安全团队可以在部署前审计每一行代码。",
+                  text: "Databasus 从三个层面保障安全：（1）敏感数据加密——所有密码、令牌和凭据均使用 AES-256-GCM 加密，并与数据库分开存储；（2）备份加密——每个备份文件都使用由主密钥、备份 ID 和随机盐派生出的唯一密钥加密，即使有人获得了存储的访问权限，没有你的加密密钥备份也毫无用处；（3）只读数据库访问——Databasus 只需要 SELECT 权限，并会做全面检查确保不存在任何写权限，即使工具本身被攻破也不会破坏数据。登录本身也可以要求第二重验证：启用后，密码正确之后账号邮箱会收到六位验证码，而通过 Google 或 GitHub 登录仍然依赖这些服务商自己的验证。在运行时之外，安全性和可靠性也被落实到每一次提交和 PR：CodeQL 静态分析、gitleaks 密钥扫描、semgrep 安全规则检查、Dependabot CVE 监控、Trivy 镜像与 Dockerfile 扫描，以及 OpenAI 定期进行的 Codex Security 审计。集成测试针对真实的 PostgreSQL、MySQL、MariaDB 和 MongoDB 容器运行，并在每个 PR 上验证完整的备份加恢复流程。GitHub Actions 固定到提交 SHA，工作流遵循最小权限原则。所有操作都在你控制的容器和你拥有的服务器上运行，而且因为它是开源的，你的安全团队可以在部署前审计每一行代码。",
                 },
               },
               {
@@ -234,100 +235,12 @@ export default function Index() {
         }}
       />
 
-      {/* HEADER */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-3 md:pt-5 px-4 md:px-0">
-        <div className="mx-auto w-full max-w-[1000px] 2xl:max-w-[1200px]">
-          <nav className="relative flex items-center justify-between border backdrop-blur-md bg-[#0C0E13]/80 md:bg-[#0C0E13]/20 border-[#ffffff20] px-3 py-2 rounded-xl">
-            <a href="/zh/" className="flex items-center gap-2.5">
-              <img
-                src="/logo.svg"
-                alt="Databasus logo"
-                width={32}
-                height={32}
-                className="h-7 w-7 md:h-8 md:w-8"
-                fetchPriority="high"
-                loading="eager"
-              />
-
-              <span className="text-base md:text-lg font-semibold pl-1">
-                Databasus
-              </span>
-            </a>
-
-            {/* Desktop Navigation */}
-            <div className="absolute left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-3">
-              <a
-                href="#how-to-use"
-                className="py-2 hover:text-gray-300 transition-colors"
-              >
-                使用方法
-              </a>
-
-              <a
-                href="/zh/installation"
-                className="py-2 hover:text-gray-300 transition-colors"
-              >
-                文档
-              </a>
-
-              <a
-                href="https://t.me/databasus_community"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-2 hover:text-gray-300 transition-colors"
-              >
-                社区
-              </a>
-
-              <a
-                href="/sponsorship"
-                className="py-2 hover:text-gray-300 transition-colors"
-              >
-                赞助
-              </a>
-            </div>
-
-            {/* GitHub + language split button */}
-            <div className="flex items-stretch">
-              <a
-                href="https://github.com/databasus/databasus"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:opacity-70 rounded-l-lg px-2 md:px-3 py-2 text-[14px] border border-[#ffffff20] bg-[#0C0E13] transition-colors"
-              >
-                <svg
-                  aria-hidden={true}
-                  width="24"
-                  height="24"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <g clipPath="url(#clip0_1_2459)">
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M9.9702 0C4.45694 0 0 4.4898 0 10.0443C0 14.4843 2.85571 18.2427 6.81735 19.5729C7.31265 19.6729 7.49408 19.3567 7.49408 19.0908C7.49408 18.858 7.47775 18.0598 7.47775 17.2282C4.70429 17.8269 4.12673 16.0308 4.12673 16.0308C3.68102 14.8667 3.02061 14.5676 3.02061 14.5676C2.11286 13.9522 3.08673 13.9522 3.08673 13.9522C4.09367 14.0188 4.62204 14.9833 4.62204 14.9833C5.51327 16.5131 6.94939 16.0808 7.52714 15.8147C7.60959 15.1661 7.87388 14.7171 8.15449 14.4678C5.94245 14.2349 3.6151 13.3702 3.6151 9.51204C3.6151 8.41449 4.01102 7.51653 4.63837 6.81816C4.53939 6.56878 4.19265 5.53755 4.73755 4.15735C4.73755 4.15735 5.57939 3.89122 7.47755 5.18837C8.29022 4.9685 9.12832 4.85666 9.9702 4.85571C10.812 4.85571 11.6702 4.97225 12.4627 5.18837C14.361 3.89122 15.2029 4.15735 15.2029 4.15735C15.7478 5.53755 15.4008 6.56878 15.3018 6.81816C15.9457 7.51653 16.3253 8.41449 16.3253 9.51204C16.3253 13.3702 13.998 14.2182 11.7694 14.4678C12.1327 14.7837 12.4461 15.3822 12.4461 16.3302C12.4461 17.6771 12.4298 18.7582 12.4298 19.0906C12.4298 19.3567 12.6114 19.6729 13.1065 19.5731C17.0682 18.2424 19.9239 14.4843 19.9239 10.0443C19.9402 4.4898 15.4669 0 9.9702 0Z"
-                      fill="white"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_1_2459">
-                      <rect width="20" height="20" fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-                <span className="hidden 2xl:inline">
-                  在 GitHub 上点个 Star ❤️
-                </span>
-                <span className="inline 2xl:hidden">GitHub</span>
-              </a>
-
-              <LanguageSelectorComponent isSplitEnd />
-            </div>
-          </nav>
-        </div>
-      </header>
+      <LandingHeaderComponent
+        lang="zh"
+        sectionLinks={[
+          { href: "#how-to-use", label: "使用方法" },
+        ]}
+      />
 
       {/* MAIN SECTION */}
       <main className="relative overflow-hidden pt-[60px] md:pt-[68px]">
@@ -1280,7 +1193,7 @@ export default function Index() {
                   <br />
                   <br />
                   在运行时之外，安全性和可靠性也被落实到每一次提交和 PR：CodeQL
-                  静态分析、集成 gitleaks 和 semgrep 的 CodeRabbit、Dependabot
+                  静态分析、gitleaks 密钥扫描、semgrep 安全规则检查、Dependabot
                   CVE 监控、Trivy 镜像与 Dockerfile 扫描，以及 OpenAI 定期进行的
                   Codex Security 审计。集成测试针对真实的
                   PostgreSQL、MySQL、MariaDB 和 MongoDB 容器运行，并在每个 PR
@@ -1508,32 +1421,6 @@ export default function Index() {
             />
             <FaqItem
               number="12"
-              question="Databasus 的开发过程中是如何使用 AI 的？"
-              answer={
-                <>
-                  一直有人询问项目开发中 AI
-                  的使用情况。由于项目专注于安全性、可靠性和生产环境使用，我们希望对开发过程中
-                  AI 的使用保持透明。
-                  <br />
-                  <br />
-                  AI 被用作代码质量校验、文档改进和开发辅助的助手。AI
-                  不会用于编写全部代码，也不会用于编写没有测试的代码。项目拥有扎实的测试覆盖率、CI/CD
-                  自动化，并由经验丰富的开发者进行审核。
-                  <br />
-                  <br />
-                  关于 AI 使用、开发流程和安全措施的详细信息，请访问我们的{" "}
-                  <a
-                    href="/zh/faq#ai-usage"
-                    className="text-blue-400 hover:text-blue-600"
-                  >
-                    专门的 FAQ 页面
-                  </a>
-                  。
-                </>
-              }
-            />
-            <FaqItem
-              number="13"
               question="如何加入 Databasus 社区？"
               answer={
                 <>
@@ -1552,7 +1439,7 @@ export default function Index() {
               }
             />
             <FaqItem
-              number="14"
+              number="13"
               question="Databasus 的普及程度如何？"
               answer={
                 <>
@@ -1580,7 +1467,7 @@ export default function Index() {
               }
             />
             <FaqItem
-              number="15"
+              number="14"
               question="我忘记了管理员邮箱或密码"
               answer={
                 <>
@@ -1607,117 +1494,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="py-8 md:py-12 border-t border-[#ffffff20] px-4 md:px-6 lg:px-0">
-        <div className="mx-auto w-full max-w-[1000px] 2xl:max-w-[1200px]">
-          <div className="flex flex-col items-center">
-            <a href="/zh/" className="flex items-center gap-2.5 mb-6">
-              <img
-                src="/logo.svg"
-                alt="Databasus logo"
-                width={32}
-                height={32}
-                className="h-7 w-7 md:h-8 md:w-8"
-              />
-
-              <span className="text-base md:text-lg font-semibold">
-                Databasus
-              </span>
-            </a>
-
-            <div className="flex flex-col gap-3 mb-4 text-sm md:text-base">
-              {/* First row - Database backup links */}
-              <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
-                <a
-                  href="/zh/"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  PostgreSQL 备份
-                </a>
-                <a
-                  href="/zh/mysql-backup"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  MySQL 和 MariaDB 备份
-                </a>
-                <a
-                  href="/zh/mongodb-backup"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  MongoDB 备份
-                </a>
-              </div>
-
-              {/* Second row - General links */}
-              <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
-                <a
-                  href="/zh/installation"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  文档
-                </a>
-                <a
-                  href="https://github.com/databasus/databasus"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  GitHub
-                </a>
-                <a
-                  href="https://t.me/databasus_community"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  社区
-                </a>
-                <a
-                  href="/sponsorship"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  赞助
-                </a>
-                <a
-                  href="https://rostislav-dugin.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  开发者
-                </a>
-              </div>
-
-              {/* Third row - Legal links */}
-              <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
-                <a
-                  href="/privacy"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  隐私政策
-                </a>
-                <a
-                  href="/terms-of-use"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  使用条款
-                </a>
-              </div>
-            </div>
-
-            <a
-              href="mailto:info@databasus.com"
-              className="hover:text-gray-200 transition-colors text-sm md:text-base mb-4"
-            >
-              info@databasus.com
-            </a>
-
-            <p className="text-gray-400 text-sm md:text-base text-center">
-              © 2026 Databasus™。保留所有权利。
-            </p>
-          </div>
-        </div>
-      </footer>
+      <LandingFooterComponent lang="zh" />
     </div>
   );
 }

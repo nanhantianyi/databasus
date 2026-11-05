@@ -1,7 +1,35 @@
 #!/usr/bin/env python3
-"""Review hooks for Claude Code and Codex, wired in .claude/settings.json and .codex/hooks.json.
+r"""Review hooks for Claude Code and Codex, wired in .claude/settings.json and .codex/hooks.json.
 
-Usage: review_gate.py <action> --client <claude|codex>
+Usage: review_gate.py <action> [--client codex|claude]
+       mise run doctor [--client codex|claude]
+       mise run review [change] [--client codex|claude]
+
+Both clients start it through run.sh, which runs it with the Python and OpenSpec versions pinned
+in mise.toml and stops the agent with the reason when the hook cannot start or crashes.
+
+Codex loads the project configuration only for a trusted project and runs its hooks only after
+the user trusts their current definitions. Trust the project and its hooks when Codex asks.
+Changing a hook command invalidates its previous approval. Run `mise run doctor --client codex`
+to inspect native loading and trust; approve modified definitions with `/hooks` in Codex CLI
+at the repository root. If an editor does not expose that approval, use the CLI and restart
+the editor's agent session. The doctor never changes trust or starts a paid model call.
+Hooks pass --client explicitly. Terminal actions use --client first, then AGENT_REVIEW_CLIENT,
+and reject absent or invalid selection. Agent shell environments declare their own client.
+Only the selected CLI must be installed and signed in; failure never switches clients.
+Doctor checks executable availability, without a paid authentication or model probe.
+Its Codex hook inspection starts `codex app-server`, which writes to the Codex home directory, so
+inside the Codex sandbox it has to run outside the sandbox. Keep that directory out of the project's
+writable roots: it holds the hook trust that the doctor checks.
+Examples outside an agent: `mise run doctor --client claude` and
+`mise run review support-codex-review-pipeline --client codex`.
+Change verification accepts exactly `mise run test`, `pnpm --dir frontend test:browser --project=ui`
+and `mise run e2e:browser`; these are parsed without execution.
+The plan gates intercept ExitPlanMode only in Claude Code; Codex runs the Stop gates.
+Codex 0.164.0 needs persisted project trust to load a new clone's .codex/ layer; a command-line
+trust override alone is insufficient. The project's chrome-devtools entry replaces the global one.
+A linked worktree of this trusted repository starts without a separate project trust prompt.
+Each worktree still needs its own .codex/ files: without them, Codex uses the global browser server.
 
 Actions:
   session-start  SessionStart: tells the agent to load the communication skill in a fresh context.
@@ -9,26 +37,102 @@ Actions:
   plan           Reviews a plan before the user sees it.
   necessity      Checks a plan or an OpenSpec proposal: is the task needed, is there a much simpler option.
   diff           Reviews a finished change.
-  architecture   Checks a plan or a change against the architecture rules of the module docs and the ADRs.
-  naming         Checks names in code the request changed against the naming rules of AGENTS.md
-                 and the module docs. Runs when a .go, .ts or .tsx file under backend/, agent/,
-                 frontend/src/ or website/ changed.
-  implementation Full review of an OpenSpec change whose tasks are all checked: first the read-only
-                 checks of the touched modules, then parallel reviewers by spec and for documentation,
-                 after a block a repeat over the previous findings only.
-  proposal       Full review of a finished OpenSpec proposal with no checked task: first
-                 openspec validate --strict, then parallel reviewers by spec, for proposal and design
-                 and for tasks. While it runs, necessity, diff, architecture and naming skip a turn
-                 that only wrote the artifacts.
+  architecture   Checks a plan or a change against docs/architecture.md and the architecture rules of the module docs.
+  code-shape     Checks how code the request changed is split into files, functions and steps separated
+                 by blank lines, and its names and comments, against AGENTS.md and the module docs.
+                 Includes test code. Runs when a .go, .ts or .tsx
+                 file under backend/, frontend/src/ or website/ changed.
+  implementation Full review of an OpenSpec change whose tasks are all checked: parallel reviewers,
+                 one per delta spec, and one each for architecture, documentation and tasks, and tests;
+                 after a block a repeat over the previous findings only. The implementing agent runs
+                 linting and tests before finishing the turn; this hook never runs them.
+  proposal       Full review of a finished OpenSpec proposal with no checked task: first the format
+                 check of the "Change verification" section without running it, then
+                 openspec validate --strict, then parallel reviewers: one per delta spec, and one each
+                 for necessity, architecture, names, proposal and design, and tasks. While it runs,
+                 necessity, diff, architecture and code-shape skip a turn that only wrote the artifacts.
+  doctor         Reports whether Python, git, openspec and the selected reviewer CLI are found.
+                 For Codex, also inspects the native hooks/list and config/read APIs without starting
+                 a model: project hooks must be loaded, enabled and trusted, and features.hooks enabled.
+                 Exits non-zero when a tool is missing or automatic hooks cannot run. A successful
+                 manual review does not establish hook trust or prove automatic event dispatch.
+  review [change]
+                 Manual fallback or repeat, `mise run review [change]`: quick reviewers for diff, architecture
+                 and code-shape over the whole working tree run in the same parallel pool as the full
+                 implementation reviewers of the named change, or of every active change whose tasks are
+                 all checked. It runs no linting, tests or builds. The full review repeats stored findings,
+                 otherwise it starts fresh even for a state the hook accepted. Reads no hook payload, prints
+                 a report for a person, and exits with 0 when everything accepted the change, 1 when
+                 something did not and 2 when there is nothing to review. Its outcome is stored like the hook's, so the next Stop hook
+                 repeats over its findings or skips an accepted state.
 
-Every review runs a separate read-only process of the same agent.
+Both full reviews run within FULL_REVIEW_BUDGET_SECONDS from the hook's start. Proposal validation
+has a total limit; a reviewer starts only when the budget still holds its whole limit.
+
+Review profiles and state:
+  Claude uses opus with low effort for quick checks and medium for full and repeat reviews.
+  Codex uses its configured default model with medium effort for quick checks and high for full
+  and repeat reviews. It inherits local Codex configuration, not the main session's one-off model
+  override. Unsupported effort or unavailable models fail the review without lowering effort.
+  Request snapshots and per-request counters retain their session-ID paths in the worktree's
+  Git directory. Full acceptance and findings use client/profile/gate/change namespaces and are
+  reusable across sessions of that profile. Identity includes model, both effort levels, prompt
+  and schema digests, execution-policy version, and digests of Codex home, system and ancestor
+  project configuration inputs. Digests store no configuration contents or credentials. An
+  unrelated configuration edit can invalidate acceptance. Remote changes behind the same model
+  alias are not detected; explicit manual review forces review even after acceptance.
+  Old unscoped full-review state stays on disk and is never imported or used as a fallback.
+
+Every review runs a separate read-only instance of its selected client. Claude uses plan
+permissions, the restricted built-in tool and Git-command allowlist, disabled hooks and no session
+persistence. Codex disables hooks, apps, multi-agent variants and plugins in the child, enumerates
+configured MCP servers and installed plugin identities through JSON CLI listings, and disables
+those servers and plugins individually. It uses read-only sandboxing, approval policy never and
+an ephemeral session. The prompt goes through stdin; only its private final-answer file is parsed
+and schema-validated. Metadata setup and execution share one timeout. Unsupported CLI restrictions
+or managed-policy conflicts fail closed. Child restrictions never edit parent configuration.
+AGENT_REVIEW_HOOK_ACTIVE=1 prevents nested hooks from replacing the initiating request snapshot.
+
+Native read-only consultations during apply:
+  Consult the active client with the full-review profile above and the same child restrictions.
+  Supply the decision and relevant repository context on stdin. Advice is plain text: no review
+  schema, acceptance state or consultation action is involved. The implementing agent considers
+  the advice and owns the decision. Failure yields no advice and never selects the other client.
+
+  Claude Code (run at the repository root, with the decision/context piped to stdin):
+    env -u CLAUDECODE -u CLAUDE_CODE_SESSION_ID AGENT_REVIEW_HOOK_ACTIVE=1 \
+      CLAUDE_CODE_EFFORT_LEVEL=medium claude --print --model opus --effort medium \
+      --permission-mode plan --settings '{"disableAllHooks": true}' \
+      --tools Read,Glob,Grep,Bash \
+      --allowed-tools 'Read,Glob,Grep,Bash(git status *),Bash(git diff *),Bash(git log *),Bash(git show *),Bash(git ls-files *),Bash(git rev-parse *)' \
+      --no-session-persistence --prompt-suggestions false
+
+  Codex: first obtain `codex mcp list --json` and `codex plugin list --json` with hooks, apps and
+  multi-agent features disabled and read-only/never settings, as get_codex_restrictions does.
+  Do not print metadata, since it can contain credentials. Build an argument array named
+  external_tool_overrides containing `-c 'mcp_servers={"<name>"={enabled=false},...}'` and
+  `-c 'plugins={"<pluginId>"={enabled=false},...}'` with an entry for every configured server
+  and installed plugin. Inline tables merge with configuration while preserving transport fields.
+  Quote and escape names as TOML table keys; CLI dotted-key overrides treat quotes literally.
+  At the repository root, pipe the decision/context to:
+    env -u CLAUDECODE -u CLAUDE_CODE_SESSION_ID AGENT_REVIEW_HOOK_ACTIVE=1 \
+      codex -c 'approval_policy="never"' -c 'sandbox_mode="read-only"' \
+      --disable hooks --disable apps --disable enable_mcp_apps --disable multi_agent \
+      --disable multi_agent_v2 --disable multi_agent_v2_dynamic_tools --disable plugins \
+      "${external_tool_overrides[@]}" exec --sandbox read-only --ephemeral \
+      -c 'model_reasoning_effort="high"' -
+  Bound metadata and the native consultation within the full-review timeout of 1800 seconds.
+  If metadata or any restriction cannot be applied, stop the consultation and report that no
+  advice was received. Decide from available evidence; ask only for something the user alone can
+  supply. Never bypass project, hook or sandbox trust, and never modify the parent's permissions.
 The review prompt lives in .agent-hooks/<action>-prompt.md, the shared part in common-prompt.md:
 they say what the reviewer reads and checks.
-A review that could not run never accepts the result.
+A review that could not run never accepts the result, and a missing openspec stops the agent.
 """
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor
+from contextlib import nullcontext
 from collections.abc import Callable
 from dataclasses import dataclass, replace
 import hashlib
@@ -36,53 +140,63 @@ import json
 import os
 from pathlib import Path
 import re
+import shlex
+import shutil
+import signal
 import subprocess
 import sys
-import tempfile
+import time
+
+from review_client import ReviewExecution, get_review_profile
+from codex_reviewer import run_codex_reviewer
+from review_profile import get_review_profile_identity
+from codex_hooks import check_project_hooks
 
 
 AUTOMATIC_REVIEW_PREFIX = "AUTOMATIC REVIEW:"
-MAX_REVISIONS = 3
-MAX_FULL_REVIEW_REVISIONS = 2
+MAX_REVISIONS = 15
+MAX_FULL_REVIEW_REVISIONS = 15
 MAX_PARALLEL_REVIEWERS = 6
 CHECK_TIMEOUT_SECONDS = 900
+CHECKS_TOTAL_TIMEOUT_SECONDS = 1800
+KILLED_CHECK_OUTPUT_TIMEOUT_SECONDS = 10
+# Both full review hooks have a 7200-second client timeout. The budget leaves 600 seconds for Git,
+# openspec status, prompts and result handling, and still fits the checks' total limit plus two
+# waves of reviewers, so the client never kills a review without a message.
+FULL_REVIEW_BUDGET_SECONDS = 6600
+BUDGET_EXHAUSTED_ERROR = "the review time budget ran out before this reviewer started"
 CHECK_OUTPUT_LINES = 80
 OPENSPEC_TIMEOUT_SECONDS = 60
 REVIEWER_ACTIVE_ENV = "AGENT_REVIEW_HOOK_ACTIVE"
 HOOKS_DIR = Path(__file__).resolve().parent
-GATES = ("plan", "necessity", "diff", "architecture", "naming", "implementation", "proposal")
-GATES_YIELDING_TO_PROPOSAL_REVIEW = ("necessity", "diff", "architecture", "naming")
-CODE_DIRS = ("backend/", "agent/", "frontend/src/", "website/")
+GATES = ("plan", "necessity", "diff", "architecture", "code-shape", "implementation", "proposal")
+GATES_YIELDING_TO_PROPOSAL_REVIEW = ("necessity", "diff", "architecture", "code-shape")
+CODE_DIRS = ("backend/", "frontend/src/", "website/")
 CODE_SUFFIXES = (".go", ".ts", ".tsx")
 TASK_PATTERN = re.compile(r"^\s*[-*] \[([ xX])\]", re.MULTILINE)
 
 
+class MissingToolError(Exception):
+    def __init__(self, tool):
+        super().__init__(tool)
+        self.tool = tool
+
+
 @dataclass(frozen=True)
 class Reviewer:
-    claude_model: str
-    claude_effort: str
-    codex_model: str
-    codex_effort: str
+    is_full: bool
     schema_path: Path
     timeout_seconds: int
 
 
-# The strongest model plans and writes code, and the reviewer runs one step below at low effort:
-# smart enough to check and quick to answer. The full proposal and implementation reviews run
-# once per change and look for what the quick checks miss, so their effort is higher.
+REVIEW_PROFILE = None
 QUICK_REVIEWER = Reviewer(
-    claude_model="opus",
-    claude_effort="low",
-    codex_model="gpt-6.1-sol",
-    codex_effort="low",
+    is_full=False,
     schema_path=HOOKS_DIR / "review-result.schema.json",
     timeout_seconds=540,
 )
 IMPLEMENTATION_REVIEWER = Reviewer(
-    claude_model="opus",
-    claude_effort="medium",
-    codex_model="gpt-6.1-sol",
-    codex_effort="high",
+    is_full=True,
     schema_path=HOOKS_DIR / "implementation-result.schema.json",
     timeout_seconds=1800,
 )
@@ -90,10 +204,14 @@ PROPOSAL_REVIEWER = replace(IMPLEMENTATION_REVIEWER, schema_path=HOOKS_DIR / "pr
 OPENSPEC_PLANNING_COMMANDS = (
     "/opsx:propose",
     "/opsx:update",
-    "$openspec-propose",
-    "$openspec-update-change",
 )
-PLANNING_COMMANDS = (*OPENSPEC_PLANNING_COMMANDS, "/plan")
+# The repeat review reads the reply after a block, so the reply names the rejected findings,
+# and the summary for the user waits until the review accepts the result.
+FULL_REVIEW_REPLY_INSTRUCTION = (
+    "Then finish the turn again with one short line about your fixes that names every rejected finding "
+    "with the reason. Do not write the summary for the user yet: the hook asks for it once the review accepts the result. "
+    "The repeat review checks the previous findings and the new edits."
+)
 HUMANIZER_CONTEXT = (
     "Mandatory first step: load the communication skill (.agents/skills/humanizer/SKILL.md) "
     "before any other action and apply it to all prose you write. "
@@ -107,25 +225,86 @@ class Check:
     arguments: tuple
 
 
-# The hook only runs checks that leave files untouched: a formatter would rewrite files a parallel
-# agent is editing. `just test` resets the test containers other agents share, so it never runs here.
-MODULE_CHECKS = (
-    ("backend/", (Check("backend", ("golangci-lint", "run", "./cmd/...", "./internal/...")),)),
-    (
-        "agent/",
-        (Check("agent/verification", ("golangci-lint", "run", "./cmd/...", "./internal/...", "./e2e/...")),),
-    ),
-    ("frontend/", (Check(".", ("pnpm", "--dir", "frontend", "lint")),)),
-    (
-        "website/",
-        (
-            Check(".", ("npm", "--prefix", "website", "run", "lint")),
-            Check(".", ("npm", "--prefix", "website", "run", "build")),
-        ),
-    ),
-    # Under test PATH holds stubs, so the hook tests run on this interpreter rather than python3 from PATH.
-    (".agent-hooks/", (Check(".", (sys.executable, "-m", "unittest", "discover", "-s", ".agent-hooks", "-p", "*_test.py")),)),
+class ChangeVerificationError(Exception):
+    pass
+
+
+CHANGE_VERIFICATION_HEADING = "## Change verification"
+# Verification entries describe commands for the implementing agent, not for review to execute.
+# Each form is a whole command, so no form takes arguments.
+VERIFICATION_FORMS = (
+    ("mise", "run", "test"),
+    ("pnpm", "--dir", "frontend", "test:browser", "--project=ui"),
+    ("mise", "run", "e2e:browser"),
 )
+ALLOWED_VERIFICATION_FORMS = (
+    "Allowed forms, one command per line in one ```sh block, each with nothing after it:\n"
+    "- `mise run test`\n"
+    "- `pnpm --dir frontend test:browser --project=ui`\n"
+    "- `mise run e2e:browser`"
+)
+
+
+def read_change_verification_block(tasks_text):
+    lines = tasks_text.splitlines()
+    try:
+        start = next(index for index, line in enumerate(lines) if line.strip() == CHANGE_VERIFICATION_HEADING)
+    except StopIteration:
+        return None
+
+    # A shell comment inside a code block looks like a heading, so only a heading outside blocks ends the section.
+    is_inside_other_block = False
+    for index in range(start + 1, len(lines)):
+        line = lines[index].strip()
+        if line == "```sh" and not is_inside_other_block:
+            return read_code_block(lines[index + 1 :])
+        if line.startswith("```"):
+            is_inside_other_block = not is_inside_other_block
+        elif not is_inside_other_block and re.match(r"#{1,2} ", line):
+            break
+    raise ChangeVerificationError("the section has no ```sh code block")
+
+
+def read_code_block(lines):
+    for index, line in enumerate(lines):
+        if line.strip() == "```":
+            return lines[:index]
+    raise ChangeVerificationError("the ```sh code block is not closed")
+
+
+def parse_verification_command(line):
+    try:
+        words = shlex.split(line)
+    except ValueError as error:
+        raise ChangeVerificationError(f"`{line}` cannot be split into words: {error}")
+
+    for form in VERIFICATION_FORMS:
+        if tuple(words) == form:
+            return Check(".", form)
+        if tuple(words[: len(form)]) == form:
+            raise ChangeVerificationError(f"`{line}` does not match the form `{' '.join(form)}`")
+    raise ChangeVerificationError(f"`{line}` is not an allowed command")
+
+
+def parse_change_verification(change_dir):
+    try:
+        tasks_text = (change_dir / "tasks.md").read_text()
+    except OSError:
+        return []
+
+    try:
+        block = read_change_verification_block(tasks_text)
+        if block is None:
+            return []
+        commands = [line.strip() for line in block if line.strip() and not line.strip().startswith("#")]
+        if not commands:
+            raise ChangeVerificationError("the ```sh code block holds no command")
+        return [parse_verification_command(line) for line in commands]
+    except ChangeVerificationError as error:
+        raise ChangeVerificationError(
+            f"The \"Change verification\" section of `{change_dir.name}/tasks.md` is not valid: {error}.\n\n"
+            f"{ALLOWED_VERIFICATION_FORMS}"
+        ) from None
 
 
 def read_payload():
@@ -197,11 +376,13 @@ def get_workspace_fingerprint(root):
     for relative_path in get_untracked_paths(root):
         path = root / relative_path
         digest.update(relative_path.encode())
+
         if path.is_symlink():
             digest.update(os.readlink(path).encode())
             continue
         if not path.is_file():
             continue
+
         try:
             with path.open("rb") as source:
                 for chunk in iter(lambda: source.read(1024 * 1024), b""):
@@ -284,6 +465,7 @@ def snapshot(session):
             "prompt": prompt,
         },
     )
+
     for gate in GATES:
         try:
             session.gate_path(gate).unlink()
@@ -296,12 +478,6 @@ def has_command(request, commands):
     return any(command in prompt for command in commands)
 
 
-def is_planning(payload, request):
-    if get_field(payload, "permission_mode", "permissionMode") == "plan":
-        return True
-    return has_command(request, PLANNING_COMMANDS)
-
-
 def get_active_changes(root):
     changes_dir = root / "openspec" / "changes"
     if not changes_dir.is_dir():
@@ -310,7 +486,8 @@ def get_active_changes(root):
 
 
 def get_change_state_path(root, gate, change_name):
-    return get_state_dir(root) / gate / f"{change_name}.json"
+    identity = get_review_profile_identity(root, REVIEW_PROFILE)
+    return get_state_dir(root) / REVIEW_PROFILE.client / identity / gate / f"{change_name}.json"
 
 
 def get_changes_with_findings(root):
@@ -373,6 +550,8 @@ def build_review_prompt(session, gate, subject, candidate, paths):
     )
     baseline_paths = "\n".join(f"- {path}" for path in request.get("baseline_paths") or []) or "- none"
     changed_paths = "\n".join(f"- {path}" for path in paths) or "- none"
+    # This builds a reviewer prompt, not an HTTP response.
+    # nosemgrep: python.flask.security.audit.directly-returned-format-string.directly-returned-format-string
     return f"""{instructions}
 
 Under review: {subject}
@@ -414,58 +593,19 @@ def parse_review_result(value):
 def get_reviewer_environment():
     environment = os.environ.copy()
     environment[REVIEWER_ACTIVE_ENV] = "1"
-    for name in ("CLAUDECODE", "CLAUDE_CODE_SESSION_ID", "CODEX_SESSION_ID", "CODEX_THREAD_ID"):
+    for name in ("CLAUDECODE", "CLAUDE_CODE_SESSION_ID"):
         environment.pop(name, None)
     return environment
 
 
-def run_codex_reviewer(root, prompt, model, effort, schema_path, timeout_seconds):
-    with tempfile.TemporaryDirectory(prefix="codex-review-") as temporary_dir:
-        output_path = Path(temporary_dir) / "result.json"
-        command = [
-            "codex",
-            "exec",
-            "--ephemeral",
-            "--disable",
-            "hooks",
-            "--model",
-            model,
-            "--config",
-            f'model_reasoning_effort="{effort}"',
-            "--sandbox",
-            "read-only",
-            "--cd",
-            str(root),
-            "--output-schema",
-            str(schema_path),
-            "--output-last-message",
-            str(output_path),
-            "--color",
-            "never",
-            "-",
-        ]
-        process = subprocess.run(
-            command,
-            input=prompt,
-            text=True,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            env=get_reviewer_environment(),
-            timeout=timeout_seconds,
-        )
-        if process.returncode != 0:
-            raise RuntimeError(process.stderr.strip() or f"codex exited with code {process.returncode}")
-        return load_reviewer_output(output_path.read_text())
-
-
-def run_claude_reviewer(root, prompt, model, effort, schema_path, timeout_seconds):
+def run_claude_reviewer(request):
     command = [
         "claude",
         "--print",
         "--model",
-        model,
+        request.model,
         "--effort",
-        effort,
+        request.effort,
         "--permission-mode",
         "plan",
         # The reviewer loads this repository's hooks too, and its own turn must never be gated.
@@ -482,44 +622,65 @@ def run_claude_reviewer(root, prompt, model, effort, schema_path, timeout_second
         "--output-format",
         "json",
         "--json-schema",
-        schema_path.read_text(),
+        request.schema_path.read_text(),
     ]
-    environment = get_reviewer_environment()
-    environment["CLAUDE_CODE_EFFORT_LEVEL"] = effort
+    environment = request.environment.copy()
+    environment["CLAUDE_CODE_EFFORT_LEVEL"] = request.effort
 
     process = subprocess.run(
         command,
-        cwd=root,
-        input=prompt,
+        cwd=request.root,
+        input=request.prompt,
         text=True,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         env=environment,
-        timeout=timeout_seconds,
+        timeout=request.timeout_seconds,
     )
     if process.returncode != 0:
         raise RuntimeError(process.stderr.strip() or process.stdout.strip() or f"claude exited with code {process.returncode}")
     return load_reviewer_output(process.stdout)
 
 
-def run_reviewer(root, prompt, client, reviewer):
-    if client == "codex":
-        return run_codex_reviewer(
-            root, prompt, reviewer.codex_model, reviewer.codex_effort, reviewer.schema_path, reviewer.timeout_seconds
-        )
-    return run_claude_reviewer(
-        root, prompt, reviewer.claude_model, reviewer.claude_effort, reviewer.schema_path, reviewer.timeout_seconds
+def run_reviewer(root, prompt, reviewer):
+    request = ReviewExecution(
+        root=root, prompt=prompt, client=REVIEW_PROFILE.client, model=REVIEW_PROFILE.model,
+        effort=REVIEW_PROFILE.full_effort if reviewer.is_full else REVIEW_PROFILE.quick_effort,
+        schema_path=reviewer.schema_path, timeout_seconds=reviewer.timeout_seconds,
+        environment=get_reviewer_environment(),
     )
+    answer = run_codex_reviewer(request) if request.client == "codex" else run_claude_reviewer(request)
+    validate_review_answer(answer, json.loads(request.schema_path.read_text()))
+    return answer
+
+
+def validate_review_answer(answer, schema):
+    kind = schema["type"]
+    if kind == "object":
+        if not isinstance(answer, dict) or set(answer) != set(schema["properties"]):
+            raise ValueError("the reviewer result does not match the schema")
+        for name, field in schema["properties"].items():
+            validate_review_answer(answer[name], field)
+    elif kind == "array":
+        if not isinstance(answer, list):
+            raise ValueError("the reviewer result does not match the schema")
+        for item in answer:
+            validate_review_answer(item, schema["items"])
+    elif kind == "string":
+        if not isinstance(answer, str) or ("enum" in schema and answer not in schema["enum"]):
+            raise ValueError("the reviewer result does not match the schema")
+    elif kind == "boolean" and not isinstance(answer, bool):
+        raise ValueError("the reviewer result does not match the schema")
 
 
 def describe_reviewer_error(error):
     message = str(error).strip()[-1200:] or "unknown reviewer error"
-    return f"The automatic reviewer could not run: {message}"
+    return f"The automatic reviewer ({REVIEW_PROFILE.client}) could not run: {message}"
 
 
-def review(root, prompt, client):
+def review(root, prompt):
     try:
-        result = parse_review_result(run_reviewer(root, prompt, client, QUICK_REVIEWER))
+        result = parse_review_result(run_reviewer(root, prompt, QUICK_REVIEWER))
     except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
         return False, describe_reviewer_error(error)
 
@@ -528,13 +689,13 @@ def review(root, prompt, client):
     return False, result["reason"].strip() or "The reviewer rejected the result without a reason."
 
 
-def gate_plan_tool(session, gate, client):
+def gate_plan_tool(session, gate):
     gate_path = session.gate_path(gate)
     state = load_state(gate_path)
     plan = read_plan(get_field(session.payload, "tool_input", "toolInput") or {})
     if plan:
         prompt = build_review_prompt(session, gate, "plan", plan, get_changed_paths(session.root))
-        is_accepted, reason = review(session.root, prompt, client)
+        is_accepted, reason = review(session.root, prompt)
     else:
         is_accepted, reason = False, "ExitPlanMode carried no plan text, so the plan could not be reviewed."
 
@@ -566,30 +727,22 @@ def gate_plan_tool(session, gate, client):
     )
 
 
-def get_stop_subject(
-    gate, client, is_plan_turn, is_openspec_turn, is_workspace_changed, blocks, is_code_changed=False
-):
-    # Claude shows a plan through ExitPlanMode, which has its own check. Codex has no such
-    # tool, and its plan reaches the user in the final message.
-    is_plan_in_message = is_plan_turn and client != "claude"
-
-    if gate == "naming":
+# A plan reaches the reviewer through ExitPlanMode, which has its own check, so a finished turn
+# never carries one.
+def get_stop_subject(gate, is_openspec_turn, is_workspace_changed, blocks, is_code_changed=False):
+    if gate == "code-shape":
         return "finished change" if is_code_changed or blocks > 0 else None
 
     if gate == "necessity":
-        if is_openspec_turn and is_workspace_changed:
-            return "OpenSpec proposal"
-        return "plan" if is_plan_in_message else None
+        return "OpenSpec proposal" if is_openspec_turn and is_workspace_changed else None
     if gate == "plan":
-        return "plan" if is_plan_in_message else None
-    if gate == "architecture" and is_plan_in_message:
-        return "plan"
+        return None
     if is_workspace_changed or blocks > 0:
         return "finished change"
     return None
 
 
-def gate_stop(session, gate, client):
+def gate_stop(session, gate):
     request = session.load_request()
     if gate in GATES_YIELDING_TO_PROPOSAL_REVIEW and is_proposal_review_turn(session.root, request):
         emit({})
@@ -601,12 +754,10 @@ def gate_stop(session, gate, client):
     blocks = int(state.get("blocks") or 0)
     subject = get_stop_subject(
         gate,
-        client,
-        is_planning(session.payload, request),
         is_openspec_planning(request, session.root),
         request.get("baseline") != fingerprint,
         blocks,
-        gate == "naming" and is_code_changed_since_request(session.root, request),
+        gate == "code-shape" and is_code_changed_since_request(session.root, request),
     )
 
     if subject is None or (state.get("accepted") == fingerprint and blocks == 0):
@@ -615,7 +766,7 @@ def gate_stop(session, gate, client):
 
     candidate = str(get_field(session.payload, "last_assistant_message", "lastAssistantMessage") or "(not available)")
     prompt = build_review_prompt(session, gate, subject, candidate, get_changed_paths(session.root))
-    is_accepted, reason = review(session.root, prompt, client)
+    is_accepted, reason = review(session.root, prompt)
 
     if is_accepted:
         save_state(gate_path, {"blocks": 0, "accepted": fingerprint})
@@ -634,8 +785,15 @@ def gate_stop(session, gate, client):
         )
         return
 
-    feedback = f"{AUTOMATIC_REVIEW_PREFIX} {gate}\n{reason}\nFix the result and finish the turn again; the review will repeat."
-    emit({"decision": "block", "reason": feedback})
+    if subject == "plan":
+        instruction = "Revise the plan and show it again; the review will repeat."
+    else:
+        instruction = (
+            f"Fix the {subject}, then finish the turn again with a new reply written for the user: "
+            "a summary of the final state, without retelling this review, its findings or your fixes. "
+            "The review will repeat."
+        )
+    emit({"decision": "block", "reason": f"{AUTOMATIC_REVIEW_PREFIX} {gate}\n{reason}\n{instruction}"})
 
 
 def get_task_marks(change_dir):
@@ -656,7 +814,8 @@ def is_unstarted(change_dir):
 
 
 # The CLI decides whether the artifacts are complete: it knows the change's schema, an optional
-# design.md and skip_specs. Without the CLI the proposal review does not run, and the quick checks do.
+# design.md and skip_specs. A CLI that cannot start raises MissingToolError, because skipping
+# the proposal review would let an unreviewed proposal pass silently.
 def is_planning_complete(root, change_name):
     try:
         process = subprocess.run(
@@ -668,8 +827,13 @@ def is_planning_complete(root, change_name):
             stderr=subprocess.PIPE,
             timeout=OPENSPEC_TIMEOUT_SECONDS,
         )
+    except OSError as error:
+        raise MissingToolError("openspec") from error
+    except subprocess.TimeoutExpired:
+        return False
+    try:
         status = json.loads(process.stdout)
-    except (OSError, subprocess.TimeoutExpired, json.JSONDecodeError):
+    except json.JSONDecodeError:
         return False
     return process.returncode == 0 and isinstance(status, dict) and status.get("isPlanningComplete") is True
 
@@ -706,7 +870,7 @@ def is_code_path(path):
 
 
 # Changed code is found by file hashes, as in is_proposal_review_turn: someone else's changed
-# file that was already in the tree before the request does not start the naming reviewer.
+# file that was already in the tree before the request does not start the code-shape reviewer.
 def is_code_changed_since_request(root, request):
     current_files = get_file_hashes(root, get_changed_paths(root))
     changed_paths = get_paths_changed_since(request.get("baseline_files") or {}, current_files)
@@ -735,37 +899,57 @@ def get_output_tail(output):
     return "\n".join((output or "").rstrip().splitlines()[-CHECK_OUTPUT_LINES:]) or "(no output)"
 
 
-def run_checks(root, checks):
+# `mise` starts bash, bash starts `go test`, and `go test` starts test binaries that hold a test slot
+# database and containers. Each check runs in its own process group, so a timeout kills them all.
+def stop_process_group(process):
+    try:
+        os.killpg(process.pid, signal.SIGKILL)
+    except ProcessLookupError:
+        pass
+    try:
+        return process.communicate(timeout=KILLED_CHECK_OUTPUT_TIMEOUT_SECONDS)[0]
+    except subprocess.TimeoutExpired as error:
+        # A descendant that left the group still holds the pipe, so the output read so far is all there is.
+        # TimeoutExpired carries it as bytes even for a text-mode process; get_output_tail decodes it.
+        process.stdout.close()
+        process.wait()
+        return error.output
+
+
+def run_checks(root, checks, check_timeout_seconds=CHECK_TIMEOUT_SECONDS, total_timeout_seconds=CHECKS_TOTAL_TIMEOUT_SECONDS):
+    deadline = time.monotonic() + total_timeout_seconds
     for check in checks:
         command = f"`{' '.join(check.arguments)}` in `{check.directory}`"
+        remaining_seconds = max(deadline - time.monotonic(), 0)
+        if check_timeout_seconds <= remaining_seconds:
+            timeout_seconds, exceeded_limit = check_timeout_seconds, f"its limit of {check_timeout_seconds} seconds per check"
+        else:
+            timeout_seconds, exceeded_limit = remaining_seconds, f"the total limit of {total_timeout_seconds} seconds for all checks"
+
         try:
-            process = subprocess.run(
+            # The hooks run on Python 3.6 or newer.
+            # nosemgrep: python.lang.compatibility.python36.python36-compatibility-Popen1
+            process = subprocess.Popen(
                 list(check.arguments),
                 cwd=root / check.directory,
                 text=True,
                 errors="replace",
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                timeout=CHECK_TIMEOUT_SECONDS,
+                start_new_session=True,
             )
-        except subprocess.TimeoutExpired as error:
-            return f"{command} did not finish in {CHECK_TIMEOUT_SECONDS} seconds.\n\nEnd of output:\n{get_output_tail(error.output)}"
         except OSError as error:
             return f"{command} could not start: {error}"
 
+        try:
+            output = process.communicate(timeout=timeout_seconds)[0]
+        except subprocess.TimeoutExpired:
+            output = stop_process_group(process)
+            return f"{command} did not finish within {exceeded_limit} and was stopped with every process it started.\n\nEnd of output:\n{get_output_tail(output)}"
+
         if process.returncode != 0:
-            return f"{command} exited with code {process.returncode}.\n\nEnd of output:\n{get_output_tail(process.stdout)}"
+            return f"{command} exited with code {process.returncode}.\n\nEnd of output:\n{get_output_tail(output)}"
     return None
-
-
-def get_module_checks(root):
-    changed_paths = get_changed_paths(root)
-    return [
-        check
-        for prefix, checks in MODULE_CHECKS
-        if any(path.startswith(prefix) for path in changed_paths)
-        for check in checks
-    ]
 
 
 @dataclass(frozen=True)
@@ -789,10 +973,12 @@ class FullReview:
     first_roles: tuple
     files_title: str
     select_targets: Callable
-    get_checks: Callable
+    get_checks: Callable | None
     block_instruction: str
     optional_findings_title: str
     summary_instruction: str
+    should_always_ask_for_summary: bool
+    repeat_limit_note: str
 
 
 @dataclass(frozen=True)
@@ -823,6 +1009,8 @@ def build_full_review_prompt(session, full_review, change_dir, role, details):
         ]
     )
     candidate = str(get_field(session.payload, "last_assistant_message", "lastAssistantMessage") or "(not available)")
+    # This builds a reviewer prompt, not an HTTP response.
+    # nosemgrep: python.flask.security.audit.directly-returned-format-string.directly-returned-format-string
     return f"""{instructions}
 
 OpenSpec change: {change_dir.relative_to(session.root)}
@@ -878,9 +1066,11 @@ def parse_findings(full_review, value):
     return [{"category": finding["category"], "file": finding["file"], "summary": finding["summary"]} for finding in findings]
 
 
-def run_review_job(root, client, full_review, job):
+def run_review_job(root, full_review, job, deadline):
+    if deadline - time.monotonic() < full_review.reviewer.timeout_seconds:
+        return [], describe_reviewer_error(BUDGET_EXHAUSTED_ERROR)
     try:
-        return parse_findings(full_review, run_reviewer(root, job.prompt, client, full_review.reviewer)), None
+        return parse_findings(full_review, run_reviewer(root, job.prompt, full_review.reviewer)), None
     except (OSError, ValueError, RuntimeError, subprocess.TimeoutExpired) as error:
         return [], describe_reviewer_error(error)
 
@@ -893,7 +1083,7 @@ def block_full_review(session, full_review, report, instruction):
         emit(
             {
                 "continue": False,
-                "stopReason": f"{full_review.title} still fails after {MAX_FULL_REVIEW_REVISIONS} repeats.\n\n{report}",
+                "stopReason": f"{full_review.title} still fails after {MAX_FULL_REVIEW_REVISIONS} repeats.{full_review.repeat_limit_note}\n\n{report}",
                 "systemMessage": f"{full_review.title} reached its repeat limit. The result was not accepted.",
             }
         )
@@ -902,26 +1092,32 @@ def block_full_review(session, full_review, report, instruction):
     emit({"decision": "block", "reason": f"{AUTOMATIC_REVIEW_PREFIX} {full_review.gate}\n{report}\n\n{instruction}"})
 
 
-def gate_full_review(session, client, full_review):
-    root = session.root
-    targets = full_review.select_targets(session)
-    if not targets:
-        emit({})
-        return
+@dataclass(frozen=True)
+class FullReviewOutcome:
+    is_accepted: bool
+    report: str
+    block_instruction: str = ""
+    has_summary_findings: bool = False
 
-    check_failure = run_checks(root, full_review.get_checks(root, targets))
-    if check_failure:
-        block_full_review(
-            session,
-            full_review,
-            f"{check_failure}\n\nNo reviewer ran.",
-            "Fix the failure and finish the turn again; the full review will repeat.",
-        )
-        return
+
+def run_full_review(session, full_review, targets, deadline, executor=None):
+    root = session.root
+    try:
+        for target in targets:
+            parse_change_verification(target.change_dir)
+        checks = full_review.get_checks(root, targets) if full_review.get_checks else []
+    except ChangeVerificationError as error:
+        return FullReviewOutcome(False, f"{error}\n\nNo check or reviewer ran.", "Fix the section. " + FULL_REVIEW_REPLY_INSTRUCTION)
+
+    if checks:
+        checks_timeout_seconds = min(CHECKS_TOTAL_TIMEOUT_SECONDS, max(deadline - time.monotonic(), 0))
+        check_failure = run_checks(root, checks, total_timeout_seconds=checks_timeout_seconds)
+        if check_failure:
+            return FullReviewOutcome(False, f"{check_failure}\n\nNo reviewer ran.", "Fix the failure. " + FULL_REVIEW_REPLY_INSTRUCTION)
 
     jobs = [job for target in targets for job in build_review_jobs(session, full_review, target)]
-    with ThreadPoolExecutor(max_workers=MAX_PARALLEL_REVIEWERS) as executor:
-        results = list(executor.map(lambda job: run_review_job(root, client, full_review, job), jobs))
+    with (ThreadPoolExecutor(max_workers=MAX_PARALLEL_REVIEWERS) if executor is None else nullcontext(executor)) as review_executor:
+        results = list(review_executor.map(lambda job: run_review_job(root, full_review, job, deadline), jobs))
 
     reports = []
     has_blocking = False
@@ -951,16 +1147,30 @@ def gate_full_review(session, client, full_review):
 
     report = "\n\n".join(reports)
     if has_blocking:
-        block_full_review(session, full_review, f"{full_review.title} did not accept the {full_review.subject}.\n\n{report}", full_review.block_instruction)
+        return FullReviewOutcome(
+            False, f"{full_review.title} did not accept the {full_review.subject}.\n\n{report}", full_review.block_instruction
+        )
+    return FullReviewOutcome(True, report, has_summary_findings=has_summary_findings)
+
+
+def gate_full_review(session, full_review, deadline):
+    targets = full_review.select_targets(session)
+    if not targets:
+        emit({})
+        return
+
+    outcome = run_full_review(session, full_review, targets, deadline)
+    if not outcome.is_accepted:
+        block_full_review(session, full_review, outcome.report, outcome.block_instruction)
         return
 
     gate_path = session.gate_path(full_review.gate)
     previous_blocks = int(load_state(gate_path).get("blocks") or 0)
     save_state(gate_path, {"blocks": 0})
-    # After fix rounds the agent's last response covers only the fixes,
-    # so it writes the summary of the whole work in a separate turn.
-    if previous_blocks or has_summary_findings:
-        optional_findings = f"\n\n{full_review.optional_findings_title}:\n\n{report}" if report else ""
+    # After fix rounds the agent's last response covers only the fixes, and before the review it could
+    # not know the outcome, so the agent writes the summary of the whole work in a separate turn.
+    if full_review.should_always_ask_for_summary or previous_blocks or outcome.has_summary_findings:
+        optional_findings = f"\n\n{full_review.optional_findings_title}:\n\n{outcome.report}" if outcome.report else ""
         emit(
             {
                 "decision": "block",
@@ -970,8 +1180,8 @@ def gate_full_review(session, client, full_review):
         )
         return
 
-    if report:
-        emit({"systemMessage": f"{full_review.title} accepted the {full_review.subject}. {full_review.optional_findings_title}:\n\n{report}"})
+    if outcome.report:
+        emit({"systemMessage": f"{full_review.title} accepted the {full_review.subject}. {full_review.optional_findings_title}:\n\n{outcome.report}"})
         return
     emit({})
 
@@ -985,12 +1195,16 @@ def select_implementation_targets(session):
 
     change_dirs = [change_dir for change_dir in get_active_changes(root) if is_implemented(change_dir)]
     states = {change_dir: load_state(get_change_state_path(root, "implementation", change_dir.name)) for change_dir in change_dirs}
-    change_dirs = [change_dir for change_dir in change_dirs if states[change_dir].get("accepted") != fingerprint]
-    if not change_dirs:
+    unaccepted_states = {change_dir: state for change_dir, state in states.items() if state.get("accepted") != fingerprint}
+    return build_implementation_targets(root, fingerprint, unaccepted_states)
+
+
+def build_implementation_targets(root, fingerprint, states_by_change_dir):
+    if not states_by_change_dir:
         return []
 
     files = get_file_hashes(root, get_changed_paths(root))
-    return [ReviewTarget(change_dir, states[change_dir], fingerprint, files) for change_dir in change_dirs]
+    return [ReviewTarget(change_dir, state, fingerprint, files) for change_dir, state in states_by_change_dir.items()]
 
 
 def select_proposal_targets(session):
@@ -1015,28 +1229,38 @@ def select_proposal_targets(session):
     return targets
 
 
+def get_proposal_checks(root, targets):
+    return [Check(".", ("openspec", "validate", target.change_dir.name, "--strict")) for target in targets]
+
+
 IMPLEMENTATION_REVIEW = FullReview(
     gate="implementation",
     title="Full implementation review",
     subject="change",
     reviewer=IMPLEMENTATION_REVIEWER,
-    categories=("bug", "spec_mismatch", "missing_test", "docs", "minor"),
+    categories=("bug", "spec_mismatch", "missing_test", "architecture", "docs", "minor"),
     non_blocking_categories=("minor",),
     summary_categories=(),
     category_notes={"minor": " (optional)"},
-    first_roles=("documentation and tasks",),
+    first_roles=("architecture", "documentation and tasks", "tests"),
     files_title="Paths changed relative to HEAD",
     select_targets=select_implementation_targets,
-    get_checks=lambda root, targets: get_module_checks(root),
+    get_checks=None,
     block_instruction="Resolve every finding yourself, without asking the user. Fix a bug in the code. "
     "On a spec mismatch, pick the right side and fix the other one, including the change's delta spec. "
-    "Reject a false finding and explain why in your final response. Minor findings are optional. "
-    "If a reviewer could not run, find the cause of the failure. "
-    "Then finish the turn again: the repeat review checks the previous findings and the new edits.",
+    "On an architecture finding, move the code to follow docs/architecture.md, "
+    "or change docs/architecture.md in the same change when the rule itself is wrong. "
+    "Reject a false finding. Minor findings are optional. "
+    "If a reviewer could not run, find the cause of the failure. " + FULL_REVIEW_REPLY_INSTRUCTION,
     optional_findings_title="Optional findings",
-    summary_instruction="Do not change files any more. Write the user a summary of the whole implementation, not only the last round: "
-    "what was done for the change's tasks; what the full review found in each round and how you resolved it, "
-    "which findings you rejected and why, which minor ones you left; which checks passed; the next step.",
+    summary_instruction="Do not change files any more. Write the user the full summary of the change. "
+    "Open it by saying that the automatic review passed and accepted the change in its current state. "
+    "Then say what was done for the change's tasks, which decisions were made, which checks passed, "
+    "which minor findings you left, and the next step. "
+    "End with a short list of what the review made you fix, or say it found nothing to fix.",
+    should_always_ask_for_summary=True,
+    repeat_limit_note=" The edits stay in the working tree, but the change is not accepted. "
+    "Once the cause is fixed, `mise run review` runs the whole review again.",
 )
 PROPOSAL_REVIEW = FullReview(
     gate="proposal",
@@ -1047,55 +1271,214 @@ PROPOSAL_REVIEW = FullReview(
     non_blocking_categories=("scope", "minor"),
     summary_categories=("scope",),
     category_notes={"scope": " (the user decides)", "minor": " (optional)"},
-    first_roles=("proposal and design", "tasks"),
+    first_roles=("necessity", "architecture", "names", "proposal and design", "tasks"),
     files_title="Change files",
     select_targets=select_proposal_targets,
-    get_checks=lambda root, targets: [
-        Check(".", ("openspec", "validate", target.change_dir.name, "--strict")) for target in targets
-    ],
+    get_checks=get_proposal_checks,
     block_instruction="Resolve every gap, mismatch, tasks and simplify finding yourself, without asking the user: "
-    "fix the change's artifacts, and reject a false finding with the reason in your final response. "
+    "fix the change's artifacts, and reject a false finding. "
     "Do not apply scope findings: cutting the feature needs the user's consent, and the user sees them in the summary. "
-    "Minor findings are optional. If a reviewer could not run, find the cause of the failure. "
-    "Then finish the turn again: the repeat review checks the previous findings and the new edits.",
+    "Minor findings are optional. If a reviewer could not run, find the cause of the failure. " + FULL_REVIEW_REPLY_INSTRUCTION,
     optional_findings_title="Findings that do not block the turn",
-    summary_instruction="Do not change files any more. Write the user a summary of the whole proposal, not only the last round: "
-    "what is proposed; what the full review found in each round and how you resolved it, "
-    "which findings you rejected and why, which minor ones you left. "
+    summary_instruction="Do not change files any more. Write the user a summary of the proposal as if there had been no review: "
+    "what is proposed and which decisions were made. "
+    "Leave out review rounds, findings and the fixes made for them. "
     "List every scope finding separately: what the user loses and what they save, the decision is theirs. "
     "End with the next step.",
+    should_always_ask_for_summary=False,
+    repeat_limit_note="",
 )
 FULL_REVIEWS = {full_review.gate: full_review for full_review in (IMPLEMENTATION_REVIEW, PROPOSAL_REVIEW)}
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("action", choices=("session-start", "snapshot", *GATES))
-    parser.add_argument("--client", choices=("claude", "codex"), required=True)
-    arguments = parser.parse_args()
+MANUAL_REVIEW_SESSION_ID = "manual-review"
+MANUAL_REVIEW_REQUEST = (
+    "The user started `mise run review` by hand: review the current working tree as the finished implementation "
+    "of the change, as the hooks do when the agent finishes its last task."
+)
+MANUAL_REVIEW_CANDIDATE = "(none: the user started the review by hand, so there is no agent response to check)"
+# The Stop gates that review a finished change; necessity reviews only proposals.
+MANUAL_REVIEW_QUICK_GATES = ("diff", "architecture", "code-shape")
 
-    payload = read_payload()
+
+class ManualReviewError(Exception):
+    pass
+
+
+class ManualSession(Session):
+    def __init__(self, root):
+        super().__init__(
+            root, {"session_id": MANUAL_REVIEW_SESSION_ID, "last_assistant_message": MANUAL_REVIEW_CANDIDATE}
+        )
+
+    def load_request(self):
+        return {"prompt": MANUAL_REVIEW_REQUEST}
+
+
+# A manual run reviews even a state the hook already accepted, because the user asks for it when
+# they doubt the hook's result. Findings of an earlier review are repeated like the hook does,
+# so a run after the fixes checks them instead of starting a new review that finds new details.
+def select_manual_targets(root, change_name):
+    change_dirs = [change_dir for change_dir in get_active_changes(root) if change_name in (None, change_dir.name)]
+    if change_name and not change_dirs:
+        raise ManualReviewError(f"No active OpenSpec change is named `{change_name}`.")
+
+    implemented_dirs = [change_dir for change_dir in change_dirs if is_implemented(change_dir)]
+    if not implemented_dirs:
+        names = ", ".join(f"`{change_dir.name}`" for change_dir in change_dirs) or "none"
+        raise ManualReviewError(f"No active OpenSpec change has every task checked. Active changes: {names}.")
+
+    states = {}
+    for change_dir in implemented_dirs:
+        state = load_state(get_change_state_path(root, "implementation", change_dir.name))
+        states[change_dir] = state if state.get("findings") else {}
+    return build_implementation_targets(root, get_workspace_fingerprint(root), states)
+
+
+def run_manual_quick_gate(session, gate, changed_paths):
+    if gate == "code-shape" and not any(is_code_path(path) for path in changed_paths):
+        return gate, None
+    prompt = build_review_prompt(session, gate, "finished change", MANUAL_REVIEW_CANDIDATE, changed_paths)
+    return gate, review(session.root, prompt)
+
+
+def report_progress(message):
+    print(message, file=sys.stderr, flush=True)
+
+
+# Prints a report for a person or for the agent that reads the output of `! mise run review`,
+# and returns the exit code: 0 when every review accepted the change.
+def run_manual_review(change_name, deadline):
+    print(f"Review client: {REVIEW_PROFILE.client}")
+    root = find_root({})
+    session = ManualSession(root)
+    try:
+        targets = select_manual_targets(root, change_name)
+    except ManualReviewError as error:
+        print(error)
+        return 2
+
+    change_names = ", ".join(f"`{target.change_dir.name}`" for target in targets)
+    changed_paths = get_changed_paths(root)
+    report_progress(f"Reviewing {change_names}: quick and full AI reviewers run in parallel; linting and tests must already be complete.")
+    with ThreadPoolExecutor(max_workers=MAX_PARALLEL_REVIEWERS) as executor:
+        quick_futures = [executor.submit(run_manual_quick_gate, session, gate, changed_paths) for gate in MANUAL_REVIEW_QUICK_GATES]
+        outcome = run_full_review(session, IMPLEMENTATION_REVIEW, targets, deadline, executor)
+        quick_results = [future.result() for future in quick_futures]
+
+    sections = []
+    is_accepted = True
+    for gate, result in quick_results:
+        if result is None:
+            sections.append(f"Quick check `{gate}`: skipped, no code file changed.")
+            continue
+        is_gate_accepted, reason = result
+        is_accepted = is_accepted and is_gate_accepted
+        sections.append(f"Quick check `{gate}`: accepted." if is_gate_accepted else f"Quick check `{gate}`: not accepted.\n{reason}")
+
+    is_accepted = is_accepted and outcome.is_accepted
+    if outcome.is_accepted:
+        optional_findings = f" {IMPLEMENTATION_REVIEW.optional_findings_title}:\n\n{outcome.report}" if outcome.report else ""
+        sections.append(f"{IMPLEMENTATION_REVIEW.title} accepted the change.{optional_findings}")
+    else:
+        sections.append(outcome.report)
+
+    verdict = (
+        "Result: the review accepted the change in its current state."
+        if is_accepted
+        else "Result: the review did not accept the change. Fix the findings above, then run `mise run review` again."
+    )
+    print("\n\n".join([*sections, verdict]))
+    return 0 if is_accepted else 1
+
+
+def check_environment():
+    print(f"Review client: {REVIEW_PROFILE.client}")
+    tool_paths = {
+        "python": sys.executable,
+        "git": shutil.which("git"),
+        "openspec": shutil.which("openspec"),
+        REVIEW_PROFILE.client: shutil.which(REVIEW_PROFILE.client),
+    }
+    for tool, path in tool_paths.items():
+        print(f"{tool}: {path or 'not found'}")
+
+    if not all(tool_paths.values()):
+        return 1
+    if REVIEW_PROFILE.client == "codex":
+        root = find_root({})
+        if not check_project_hooks(tool_paths["codex"], root):
+            return 1
+    return 0
+
+
+def stop_for_missing_tool(error):
+    message = (
+        f"The review hooks could not find `{error.tool}`, so the review did not run. "
+        f"Run `mise install` to install the pinned tools and `mise run doctor --client {REVIEW_PROFILE.client}` to check the environment."
+    )
+    emit({"continue": False, "stopReason": message, "systemMessage": message})
+
+
+def main():
+    global REVIEW_PROFILE
+    deadline = time.monotonic() + FULL_REVIEW_BUDGET_SECONDS
+    parser = argparse.ArgumentParser()
+    parser.add_argument("action", choices=("session-start", "snapshot", "doctor", "review", *GATES))
+    parser.add_argument("change", nargs="?", help="the OpenSpec change that `review` checks; all implemented ones when omitted")
+    parser.add_argument("--client")
+    arguments = parser.parse_intermixed_args()
+
+    try:
+        REVIEW_PROFILE = get_review_profile(arguments.client)
+        get_review_profile_identity.cache_clear()
+    except ValueError as error:
+        parser.error(str(error))
+
     if os.environ.get(REVIEWER_ACTIVE_ENV) == "1":
-        emit({})
+        if arguments.action in ("doctor", "review"):
+            print("Nested review action skipped inside an active reviewer.")
+        else:
+            emit({})
         return
-    if arguments.action == "session-start":
+
+    if arguments.action == "doctor":
+        sys.exit(check_environment())
+    if arguments.change and arguments.action != "review":
+        parser.error("only the review action takes a change")
+    if arguments.action == "review":
+        try:
+            sys.exit(run_manual_review(arguments.change or None, deadline))
+        except MissingToolError as error:
+            print(f"The review could not find `{error.tool}`. Run `mise install`, then `mise run doctor --client {REVIEW_PROFILE.client}`.")
+            sys.exit(2)
+
+    try:
+        run_action(arguments.action, deadline)
+    except MissingToolError as error:
+        stop_for_missing_tool(error)
+
+
+def run_action(action, deadline):
+    payload = read_payload()
+    if action == "session-start":
         start_session()
         return
 
     session = Session(find_root(payload), payload)
-    if arguments.action == "snapshot":
+    if action == "snapshot":
         snapshot(session)
         return
 
-    if arguments.action in FULL_REVIEWS:
-        gate_full_review(session, arguments.client, FULL_REVIEWS[arguments.action])
+    if action in FULL_REVIEWS:
+        gate_full_review(session, FULL_REVIEWS[action], deadline)
         return
 
     event = get_field(payload, "hook_event_name", "hookEventName")
     if event == "PreToolUse":
-        gate_plan_tool(session, arguments.action, arguments.client)
+        gate_plan_tool(session, action)
         return
-    gate_stop(session, arguments.action, arguments.client)
+    gate_stop(session, action)
 
 
 if __name__ == "__main__":

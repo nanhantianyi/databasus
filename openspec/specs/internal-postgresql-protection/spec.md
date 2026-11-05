@@ -103,50 +103,62 @@ The database name passed to a logical dump SHALL follow the same rule even when 
 
 ### Requirement: Direct connection tests require workspace authorization
 
-The direct connection-test endpoint SHALL require an authenticated user who can manage databases in the relevant workspace. An ad hoc database SHALL identify that workspace. A request referencing a saved database SHALL be authorized against the workspace stored on that database before saved credentials are merged with request fields.
+The test of unsaved database settings SHALL require an authenticated user who can manage databases in the relevant workspace. The request SHALL name that workspace. A request that names a saved database SHALL be authorized against the workspace stored on that database before saved credentials are merged with request fields. The named database SHALL be checked first: one that does not exist or does not belong to the workspace in the request SHALL get `404` before the caller's role in that workspace is checked.
 
 #### Scenario: Ad hoc request without a workspace
 
-- **WHEN** an authenticated user submits an unsaved database without `workspaceId`
-- **THEN** the endpoint returns HTTP 400
+- **WHEN** an authenticated user submits unsaved database settings without a workspace
+- **THEN** the response is `400` with `code` `invalid_request`
 - **AND** no connection is attempted
 
 #### Scenario: Ad hoc request for an unauthorized workspace
 
-- **WHEN** an authenticated user submits an unsaved database for a workspace where they cannot manage databases
-- **THEN** the endpoint returns HTTP 403
+- **WHEN** a viewer of a workspace submits unsaved database settings for that workspace
+- **THEN** the response is `403` with `code` `permission_denied`
+- **AND** no connection is attempted
+
+#### Scenario: Ad hoc request for another team's workspace
+
+- **WHEN** an authenticated user submits unsaved database settings for a workspace they are not a member of
+- **THEN** the response is `404` with `code` `not_found`
 - **AND** no connection is attempted
 
 #### Scenario: Saved database from another workspace
 
-- **WHEN** a user references a saved database outside a workspace they can manage and supplies a different host
-- **THEN** the endpoint returns HTTP 403 before applying the saved password
+- **WHEN** a user names a saved database of a workspace other than the one in the request, or of a workspace they are not a member of, and supplies a different host
+- **THEN** the response is `404` with `code` `not_found` before the saved password is applied
+- **AND** the system makes no connection to the supplied host
+
+#### Scenario: Viewer names a saved database of their own workspace
+
+- **WHEN** a viewer of a workspace names a saved database of that workspace and supplies a different host
+- **THEN** the response is `403` with `code` `permission_denied` before the saved password is applied
 - **AND** the system makes no connection to the supplied host
 
 #### Scenario: Authorized workspace member tests a saved database
 
-- **WHEN** a workspace member who can manage databases tests a saved database in that workspace and leaves its password blank
-- **THEN** the system may use the saved password and performs the connection test
+- **WHEN** a workspace member who can manage databases tests the settings of a saved database in that workspace and leaves its password blank
+- **THEN** the system uses the saved password and performs the connection test
 
 ### Requirement: Direct connection-test failures do not disclose protected records or internal errors
 
-The endpoint SHALL return the same HTTP 403 response for an unknown saved database and a saved database the caller cannot manage. Storage failures while loading a saved target and failures while checking workspace permissions SHALL return distinct, sanitized HTTP 500 messages that do not include the underlying error.
+The test of unsaved database settings SHALL return the same `404` response for an unknown saved database and a saved database of a workspace the caller is not a member of. Failures while loading a saved target and failures while checking workspace permissions SHALL return `500` with `code` `internal` and SHALL NOT include the underlying error.
 
 #### Scenario: Unknown saved database ID
 
-- **WHEN** a caller submits an ID that does not identify a saved database
-- **THEN** the endpoint returns the same HTTP 403 body used for an unauthorized saved database
+- **WHEN** a caller names an ID that does not identify a saved database
+- **THEN** the response is the same `404` body used for a saved database of another team's workspace, apart from the ID
 
 #### Scenario: Saved target lookup fails internally
 
-- **WHEN** storage fails while loading the referenced saved database
-- **THEN** the endpoint returns HTTP 500 with `failed to load database connection target`
-- **AND** the storage error is absent from the response
+- **WHEN** the internal database fails while loading the named saved database
+- **THEN** the response is `500` with `code` `internal`
+- **AND** the database error is absent from the response
 
 #### Scenario: Permission lookup fails internally
 
-- **WHEN** the workspace permission lookup fails for either an ad hoc or saved database
-- **THEN** the endpoint returns HTTP 500 with `failed to verify database connection permissions`
+- **WHEN** the workspace permission lookup fails for an ad hoc request or one that names a saved database
+- **THEN** the response is `500` with `code` `internal`
 - **AND** the underlying membership error is absent from the response
 
 ### Requirement: Healthchecks use a trusted internal connection path
@@ -164,21 +176,16 @@ Scheduled healthchecks SHALL test a database already loaded by the system withou
 - **WHEN** an HTTP caller requests a direct connection test
 - **THEN** the system uses the workspace-authorized path rather than the trusted healthcheck path
 
-### Requirement: The embedded PostgreSQL instance stays private under the shared runtime account
+### Requirement: The embedded PostgreSQL instance accepts only authenticated loopback TCP
 
-The embedded PostgreSQL server SHALL run under the same non-root operating-system account as the Databasus application. During bootstrap only, peer mapping SHALL allow that account to administer the PostgreSQL role named `postgres`. After bootstrap, Unix-socket database login SHALL be rejected. Loopback TCP connections SHALL require SCRAM authentication with the generated credential and replication connections to the embedded cluster SHALL be rejected.
+The embedded PostgreSQL server SHALL run under the same non-root operating-system account as the Databasus application. The server SHALL create no Unix socket, so no process in the container can open a socket connection to it. Loopback TCP connections SHALL require SCRAM authentication with the generated credential from the first connection the server accepts, and replication connections to the embedded cluster SHALL be rejected.
 
 The embedded PostgreSQL port SHALL remain unpublished by the image.
 
-#### Scenario: Application account opens the private socket
+#### Scenario: A process looks for a local socket
 
-- **WHEN** the Databasus application account attempts a Unix-socket database login after bootstrap
-- **THEN** PostgreSQL authentication rejects the connection
-
-#### Scenario: Shared runtime account performs startup administration
-
-- **WHEN** the shared `databasus` operating-system account connects as role `postgres` during startup
-- **THEN** the temporary peer mapping permits the administrative connection
+- **WHEN** any process in a running container attempts a Unix-socket connection to the embedded PostgreSQL server
+- **THEN** the connection fails because the server exposes no socket
 
 #### Scenario: Loopback TCP connection without the generated password
 
@@ -194,6 +201,37 @@ The embedded PostgreSQL port SHALL remain unpublished by the image.
 
 - **WHEN** a client requests a replication connection to the embedded PostgreSQL server
 - **THEN** PostgreSQL rejects it
+
+### Requirement: Startup administration of the embedded cluster opens no connection path
+
+The container SHALL set the generated password on the internal role before the embedded PostgreSQL server accepts any connection. That step SHALL run while the cluster has no network listener and no Unix socket. No startup step SHALL grant a password-less or identity-mapped login to the embedded cluster.
+
+#### Scenario: First connection after startup administration
+
+- **WHEN** the embedded PostgreSQL server accepts its first connection after a container start
+- **THEN** the internal role already carries the newly generated password
+- **AND** the connection must authenticate with that password
+
+#### Scenario: Password from the previous run after a restart
+
+- **WHEN** the container restarts and a process logs in over loopback with the password published by the previous run
+- **THEN** SCRAM authentication rejects the connection
+- **AND** a loopback login with the newly published password succeeds
+
+### Requirement: The generated password stays out of process arguments and server logs
+
+Startup SHALL NOT pass the generated password to any process through its command-line arguments. When the statement that sets the password fails, the container SHALL exit with an error before the Databasus application starts, and the container log SHALL NOT contain that statement or the password.
+
+#### Scenario: Process list during startup
+
+- **WHEN** a process in the container reads the command-line arguments of the startup processes
+- **THEN** none of them contains the generated password
+
+#### Scenario: Password statement fails
+
+- **WHEN** the statement that sets the generated password fails
+- **THEN** the container exits before starting the Databasus application
+- **AND** the container log contains neither the statement nor the generated password
 
 ### Requirement: Internal PostgreSQL credentials are generated at startup
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import LanguageSelectorComponent from "@/app/components/LanguageSelectorComponent";
+import LandingFooterComponent from "@/app/components/LandingFooterComponent";
+import LandingHeaderComponent from "@/app/components/LandingHeaderComponent";
 import { OG_LOCALES, getLanguageAlternates, getLocalizedUrl } from "@/app/i18n";
 import HeroStatsComponent from "@/app/components/HeroStatsComponent";
 import InstallationComponent from "@/app/components/InstallationComponent";
@@ -178,7 +179,7 @@ export default function Index() {
                 name: "Como o Databasus garante a segurança?",
                 acceptedAnswer: {
                   "@type": "Answer",
-                  text: "O Databasus aplica segurança em três níveis: (1) Criptografia de dados sensíveis — todas as senhas, tokens e credenciais são criptografados com AES-256-GCM e guardados separadamente da base de dados; (2) Criptografia de backups — cada arquivo de backup é criptografado com uma chave única derivada de uma chave mestra, do ID do backup e de um salt aleatório, tornando os backups inúteis sem a sua chave de criptografia mesmo que alguém obtenha acesso ao armazenamento; (3) Acesso somente leitura à base de dados — o Databasus exige apenas permissões SELECT e faz verificações completas para garantir que não existem privilégios de escrita, evitando corrupção de dados mesmo que a ferramenta seja comprometida. O próprio login pode exigir um segundo fator: com ele ativado, depois da senha correta chega um código de seis dígitos ao e-mail da conta, enquanto o login pelo Google ou pelo GitHub continua contando com as verificações desses provedores. Além do tempo de execução, segurança e confiabilidade fazem parte de cada commit e PR: análise estática com CodeQL, CodeRabbit com gitleaks e semgrep, monitoramento de CVEs pelo Dependabot, varreduras de imagem e Dockerfile com Trivy e auditorias periódicas do Codex Security da OpenAI. Testes de integração rodam contra contêineres reais de PostgreSQL, MySQL, MariaDB e MongoDB e verificam ciclos completos de backup e restauração em cada PR. As GitHub Actions são fixadas em SHAs de commit e os workflows seguem permissões de privilégio mínimo. Todas as operações rodam em contêineres sob o seu controle, em servidores seus, e como o código é aberto, a sua equipe de segurança pode auditar cada linha antes da implantação.",
+                  text: "O Databasus aplica segurança em três níveis: (1) Criptografia de dados sensíveis — todas as senhas, tokens e credenciais são criptografados com AES-256-GCM e guardados separadamente da base de dados; (2) Criptografia de backups — cada arquivo de backup é criptografado com uma chave única derivada de uma chave mestra, do ID do backup e de um salt aleatório, tornando os backups inúteis sem a sua chave de criptografia mesmo que alguém obtenha acesso ao armazenamento; (3) Acesso somente leitura à base de dados — o Databasus exige apenas permissões SELECT e faz verificações completas para garantir que não existem privilégios de escrita, evitando corrupção de dados mesmo que a ferramenta seja comprometida. O próprio login pode exigir um segundo fator: com ele ativado, depois da senha correta chega um código de seis dígitos ao e-mail da conta, enquanto o login pelo Google ou pelo GitHub continua contando com as verificações desses provedores. Além do tempo de execução, segurança e confiabilidade fazem parte de cada commit e PR: análise estática com CodeQL, detecção de segredos com gitleaks, regras de segurança com semgrep, monitoramento de CVEs pelo Dependabot, varreduras de imagem e Dockerfile com Trivy e auditorias periódicas do Codex Security da OpenAI. Testes de integração rodam contra contêineres reais de PostgreSQL, MySQL, MariaDB e MongoDB e verificam ciclos completos de backup e restauração em cada PR. As GitHub Actions são fixadas em SHAs de commit e os workflows seguem permissões de privilégio mínimo. Todas as operações rodam em contêineres sob o seu controle, em servidores seus, e como o código é aberto, a sua equipe de segurança pode auditar cada linha antes da implantação.",
                 },
               },
               {
@@ -234,100 +235,12 @@ export default function Index() {
         }}
       />
 
-      {/* HEADER */}
-      <header className="fixed top-0 left-0 right-0 z-50 flex justify-center pt-3 md:pt-5 px-4 md:px-0">
-        <div className="mx-auto w-full max-w-[1000px] 2xl:max-w-[1200px]">
-          <nav className="relative flex items-center justify-between border backdrop-blur-md bg-[#0C0E13]/80 md:bg-[#0C0E13]/20 border-[#ffffff20] px-3 py-2 rounded-xl">
-            <a href="/pt/" className="flex items-center gap-2.5">
-              <img
-                src="/logo.svg"
-                alt="Logotipo do Databasus"
-                width={32}
-                height={32}
-                className="h-7 w-7 md:h-8 md:w-8"
-                fetchPriority="high"
-                loading="eager"
-              />
-
-              <span className="text-base md:text-lg font-semibold pl-1">
-                Databasus
-              </span>
-            </a>
-
-            {/* Desktop Navigation */}
-            <div className="absolute left-1/2 -translate-x-1/2 hidden lg:flex items-center gap-3">
-              <a
-                href="#how-to-use"
-                className="py-2 hover:text-gray-300 transition-colors"
-              >
-                Como usar
-              </a>
-
-              <a
-                href="/pt/installation"
-                className="py-2 hover:text-gray-300 transition-colors"
-              >
-                Docs
-              </a>
-
-              <a
-                href="https://t.me/databasus_community"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="py-2 hover:text-gray-300 transition-colors"
-              >
-                Comunidade
-              </a>
-
-              <a
-                href="/sponsorship"
-                className="py-2 hover:text-gray-300 transition-colors"
-              >
-                Patrocínio
-              </a>
-            </div>
-
-            {/* GitHub + language split button */}
-            <div className="flex items-stretch">
-              <a
-                href="https://github.com/databasus/databasus"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 hover:opacity-70 rounded-l-lg px-2 md:px-3 py-2 text-[14px] border border-[#ffffff20] bg-[#0C0E13] transition-colors"
-              >
-                <svg
-                  aria-hidden={true}
-                  width="24"
-                  height="24"
-                  viewBox="0 0 20 20"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <g clipPath="url(#clip0_1_2459)">
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M9.9702 0C4.45694 0 0 4.4898 0 10.0443C0 14.4843 2.85571 18.2427 6.81735 19.5729C7.31265 19.6729 7.49408 19.3567 7.49408 19.0908C7.49408 18.858 7.47775 18.0598 7.47775 17.2282C4.70429 17.8269 4.12673 16.0308 4.12673 16.0308C3.68102 14.8667 3.02061 14.5676 3.02061 14.5676C2.11286 13.9522 3.08673 13.9522 3.08673 13.9522C4.09367 14.0188 4.62204 14.9833 4.62204 14.9833C5.51327 16.5131 6.94939 16.0808 7.52714 15.8147C7.60959 15.1661 7.87388 14.7171 8.15449 14.4678C5.94245 14.2349 3.6151 13.3702 3.6151 9.51204C3.6151 8.41449 4.01102 7.51653 4.63837 6.81816C4.53939 6.56878 4.19265 5.53755 4.73755 4.15735C4.73755 4.15735 5.57939 3.89122 7.47755 5.18837C8.29022 4.9685 9.12832 4.85666 9.9702 4.85571C10.812 4.85571 11.6702 4.97225 12.4627 5.18837C14.361 3.89122 15.2029 4.15735 15.2029 4.15735C15.7478 5.53755 15.4008 6.56878 15.3018 6.81816C15.9457 7.51653 16.3253 8.41449 16.3253 9.51204C16.3253 13.3702 13.998 14.2182 11.7694 14.4678C12.1327 14.7837 12.4461 15.3822 12.4461 16.3302C12.4461 17.6771 12.4298 18.7582 12.4298 19.0906C12.4298 19.3567 12.6114 19.6729 13.1065 19.5731C17.0682 18.2424 19.9239 14.4843 19.9239 10.0443C19.9402 4.4898 15.4669 0 9.9702 0Z"
-                      fill="white"
-                    />
-                  </g>
-                  <defs>
-                    <clipPath id="clip0_1_2459">
-                      <rect width="20" height="20" fill="white" />
-                    </clipPath>
-                  </defs>
-                </svg>
-                <span className="hidden 2xl:inline">
-                  Dê uma estrela no GitHub ❤️
-                </span>
-                <span className="inline 2xl:hidden">GitHub</span>
-              </a>
-
-              <LanguageSelectorComponent isSplitEnd />
-            </div>
-          </nav>
-        </div>
-      </header>
+      <LandingHeaderComponent
+        lang="pt"
+        sectionLinks={[
+          { href: "#how-to-use", label: "Como usar" },
+        ]}
+      />
 
       {/* MAIN SECTION */}
       <main className="relative overflow-hidden pt-[60px] md:pt-[68px]">
@@ -1339,8 +1252,9 @@ export default function Index() {
                   <br />
                   Além do tempo de execução, segurança e confiabilidade fazem
                   parte de cada commit e PR: análise estática com CodeQL,
-                  CodeRabbit com gitleaks e semgrep, monitoramento de CVEs pelo
-                  Dependabot, varreduras de imagem e Dockerfile com Trivy e
+                  detecção de segredos com gitleaks, regras de segurança com
+                  semgrep, monitoramento de CVEs pelo Dependabot, varreduras de
+                  imagem e Dockerfile com Trivy e
                   auditorias periódicas do Codex Security da OpenAI. Testes de
                   integração rodam contra contêineres reais de PostgreSQL,
                   MySQL, MariaDB e MongoDB e verificam ciclos completos de
@@ -1604,37 +1518,6 @@ export default function Index() {
             />
             <FaqItem
               number="12"
-              question="Como a IA é usada no desenvolvimento do Databasus?"
-              answer={
-                <>
-                  Surgiram perguntas sobre o uso de IA no desenvolvimento do
-                  projeto. Como o projeto foca em segurança, confiabilidade e
-                  uso em produção, queremos ser transparentes sobre como a IA
-                  participa do processo de desenvolvimento.
-                  <br />
-                  <br />
-                  A IA é usada como auxiliar na verificação da qualidade do
-                  código, na melhoria da documentação e como apoio durante o
-                  desenvolvimento. A IA NÃO é usada para escrever código inteiro
-                  nem código sem testes. O projeto tem cobertura de testes
-                  sólida, automação de CI/CD e verificação por desenvolvedores
-                  experientes.
-                  <br />
-                  <br />
-                  Para informações detalhadas sobre o uso de IA, o processo de
-                  desenvolvimento e as medidas de segurança, visite a nossa{" "}
-                  <a
-                    href="/pt/faq#ai-usage"
-                    className="text-blue-400 hover:text-blue-600"
-                  >
-                    página de FAQ dedicada
-                  </a>
-                  .
-                </>
-              }
-            />
-            <FaqItem
-              number="13"
               question="Como posso entrar para a comunidade do Databasus?"
               answer={
                 <>
@@ -1655,7 +1538,7 @@ export default function Index() {
               }
             />
             <FaqItem
-              number="14"
+              number="13"
               question="Qual é o nível de adoção do Databasus?"
               answer={
                 <>
@@ -1690,7 +1573,7 @@ export default function Index() {
               }
             />
             <FaqItem
-              number="15"
+              number="14"
               question="Esqueci o email ou a senha do administrador"
               answer={
                 <>
@@ -1724,117 +1607,7 @@ export default function Index() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="py-8 md:py-12 border-t border-[#ffffff20] px-4 md:px-6 lg:px-0">
-        <div className="mx-auto w-full max-w-[1000px] 2xl:max-w-[1200px]">
-          <div className="flex flex-col items-center">
-            <a href="/pt/" className="flex items-center gap-2.5 mb-6">
-              <img
-                src="/logo.svg"
-                alt="Logotipo do Databasus"
-                width={32}
-                height={32}
-                className="h-7 w-7 md:h-8 md:w-8"
-              />
-
-              <span className="text-base md:text-lg font-semibold">
-                Databasus
-              </span>
-            </a>
-
-            <div className="flex flex-col gap-3 mb-4 text-sm md:text-base">
-              {/* First row - Database backup links */}
-              <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
-                <a
-                  href="/pt/"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  Backup PostgreSQL
-                </a>
-                <a
-                  href="/pt/mysql-backup"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  Backup MySQL e MariaDB
-                </a>
-                <a
-                  href="/pt/mongodb-backup"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  Backup MongoDB
-                </a>
-              </div>
-
-              {/* Second row - General links */}
-              <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
-                <a
-                  href="/pt/installation"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  Documentação
-                </a>
-                <a
-                  href="https://github.com/databasus/databasus"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  GitHub
-                </a>
-                <a
-                  href="https://t.me/databasus_community"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  Comunidade
-                </a>
-                <a
-                  href="/sponsorship"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  Patrocínio
-                </a>
-                <a
-                  href="https://rostislav-dugin.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  Desenvolvedor
-                </a>
-              </div>
-
-              {/* Third row - Legal links */}
-              <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6">
-                <a
-                  href="/privacy"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  Privacidade
-                </a>
-                <a
-                  href="/terms-of-use"
-                  className="hover:text-gray-200 transition-colors"
-                >
-                  Termos de uso
-                </a>
-              </div>
-            </div>
-
-            <a
-              href="mailto:info@databasus.com"
-              className="hover:text-gray-200 transition-colors text-sm md:text-base mb-4"
-            >
-              info@databasus.com
-            </a>
-
-            <p className="text-gray-400 text-sm md:text-base text-center">
-              © 2026 Databasus™. Todos os direitos reservados.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <LandingFooterComponent lang="pt" />
     </div>
   );
 }

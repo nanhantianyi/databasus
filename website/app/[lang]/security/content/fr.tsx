@@ -376,10 +376,10 @@ export default function SecurityPage() {
               <p>
                 L&apos;analyse statique s&apos;exécute en plusieurs passes
                 indépendantes. CodeQL analyse l&apos;ensemble du code à la
-                recherche de problèmes de sécurité. CodeRabbit relit chaque PR
-                et exécute <strong>gitleaks</strong> pour la détection de
-                secrets et <strong>semgrep</strong> pour les règles de sécurité
-                directement dans la revue. Les Dockerfiles et les workflows CI
+                recherche de problèmes de sécurité. Sur chaque PR,{" "}
+                <strong>gitleaks</strong> recherche les secrets divulgués et{" "}
+                <strong>semgrep</strong> vérifie le code selon des règles de
+                sécurité. Les Dockerfiles et les workflows CI
                 ont leurs propres règles supplémentaires (références
                 d&apos;actions épinglées, permissions de moindre privilège,
                 images de base suspectes), si bien que les schémas non sûrs sont
@@ -407,8 +407,8 @@ export default function SecurityPage() {
               </p>
 
               <p>
-                La <strong>Dependency Review Action</strong> bloque
-                catégoriquement toute PR qui introduit une nouvelle CVE{" "}
+                La <strong>Dependency Review Action</strong> fait échouer le
+                contrôle de toute PR qui introduit une nouvelle CVE{" "}
                 <strong>HIGH</strong> ou <strong>CRITICAL</strong>.
               </p>
 
@@ -418,8 +418,8 @@ export default function SecurityPage() {
 
               <ul>
                 <li>
-                  Les images de conteneurs sont analysées avec{" "}
-                  <strong>Trivy</strong> à chaque build.
+                  L&apos;image de l&apos;application est analysée avec <strong>Trivy</strong> sur
+                  les deux architectures avant chaque release.
                 </li>
                 <li>
                   Une passe Trivy distincte sur le Dockerfile détecte les
@@ -460,7 +460,8 @@ export default function SecurityPage() {
                 Le reste du pipeline CI/CD exécute le lint, la vérification de
                 types, la suite de tests complète, des smoke tests d&apos;image
                 et des builds multi-architecture sur chaque PR. Une release ne
-                sort que si tout passe.
+                sort qu&apos;une fois tout cela et les analyses de sécurité
+                passés, sans alerte critique CodeQL ouverte.
               </p>
 
               <h3 id="reporting-a-vulnerability">Signaler une vulnérabilité</h3>

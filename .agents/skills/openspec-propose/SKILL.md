@@ -14,6 +14,10 @@ metadata:
 
 Before starting this workflow, read the sibling `../humanizer/SKILL.md` completely. This preflight is mandatory before any message or action. Apply the skill in embedded mode to every user-facing message and all prose written to OpenSpec artifacts. Preserve exact commands, code, paths, identifiers, schema keywords, templates, quotations, user-provided text, facts, scope, and technical meaning.
 
+## Environment preflight
+
+Before any other step of this workflow, run `mise run doctor` as [Environment check before a change](../../../AGENTS.md#environment-check-before-a-change) says. If it fails, stop, change nothing and show the user its output.
+
 Propose a new change - create the change and generate all artifacts in one step.
 
 **Planning boundary**: This workflow creates planning artifacts only. The user request that selected or triggered this workflow authorizes planning only, even if it asks to build or fix something. Do not edit project code. After the planning artifacts are complete, stop. Do not start implementation in the same response, even if the initial request asks for it. Wait for a new user request after the artifacts are presented; then start the apply workflow.
@@ -131,7 +135,7 @@ After completing all artifacts, summarize:
 - Change name and location
 - List of artifacts created with brief descriptions, plus any conditional artifact you skipped and why
 - What's ready: "All artifacts needed for implementation are ready."
-- Prompt: "The artifacts are ready for review. When you are ready, run `$openspec-apply-change (Codex) or /openspec-apply-change (other agents)` or ask me to apply this change."
+- Prompt: "The artifacts are ready for review. When you are ready, run `/opsx:apply` or ask me to apply this change."
 
 **Artifact Creation Guidelines**
 

@@ -352,9 +352,9 @@ export default function SecurityPage() {
               <p>
                 Статический анализ идет в нескольких независимых проходах.
                 CodeQL сканирует всю кодовую базу на проблемы безопасности.
-                CodeRabbit ревьюит каждый PR и прямо в нем запускает{" "}
-                <strong>gitleaks</strong> для поиска секретов и{" "}
-                <strong>semgrep</strong> с правилами безопасности. У Dockerfile
+                В каждом PR <strong>gitleaks</strong> ищет утекшие секреты, а{" "}
+                <strong>semgrep</strong> проверяет код по правилам безопасности. У
+                Dockerfile
                 и CI-процессов есть свои дополнительные правила (закрепленные
                 ссылки на actions, минимальные привилегии, подозрительные
                 базовые образы), так что небезопасные паттерны отлавливаются до
@@ -381,7 +381,7 @@ export default function SecurityPage() {
               </p>
 
               <p>
-                <strong>Dependency Review Action</strong> сразу блокирует любой
+                <strong>Dependency Review Action</strong> роняет проверку любого
                 PR, который приносит новую CVE уровня <strong>HIGH</strong> или{" "}
                 <strong>CRITICAL</strong>.
               </p>
@@ -390,8 +390,8 @@ export default function SecurityPage() {
 
               <ul>
                 <li>
-                  Образы контейнеров сканируются <strong>Trivy</strong> при
-                  каждой сборке.
+                  Образ приложения перед релизом сканируется <strong>Trivy</strong> на
+                  обеих архитектурах.
                 </li>
                 <li>
                   Отдельный проход Trivy по Dockerfile ловит ошибки конфигурации
@@ -429,7 +429,9 @@ export default function SecurityPage() {
               <p>
                 Остальной конвейер CI/CD запускает линтер, проверку типов,
                 полный набор тестов, smoke-тесты образов и мультиархитектурные
-                сборки на каждом PR. Релиз выходит, только если все это прошло.
+                сборки на каждом PR. Релиз выходит только после того, как все
+                это и сканы безопасности прошли, а открытых критичных алертов
+                CodeQL нет.
               </p>
 
               <h3 id="reporting-a-vulnerability">Как сообщить об уязвимости</h3>

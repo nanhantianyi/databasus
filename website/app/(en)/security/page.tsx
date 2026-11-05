@@ -343,9 +343,9 @@ export default function SecurityPage() {
 
               <p>
                 Static analysis runs in several independent passes. CodeQL
-                scans the full codebase for security issues. CodeRabbit reviews
-                every PR and runs <strong>gitleaks</strong> for secret scanning
-                and <strong>semgrep</strong> for security rules inline.
+                scans the full codebase for security issues. On every PR,{" "}
+                <strong>gitleaks</strong> scans for leaked secrets and{" "}
+                <strong>semgrep</strong> checks the code against security rules.
                 Dockerfiles and CI workflows get extra rules of their own
                 (pinned action references, least-privilege permissions,
                 suspicious base images), so insecure patterns are flagged
@@ -372,9 +372,8 @@ export default function SecurityPage() {
               </p>
 
               <p>
-                The <strong>Dependency Review Action</strong> blocks any PR
-                that introduces a new <strong>HIGH</strong> or{" "}
-                <strong>CRITICAL</strong> CVE outright.
+                The <strong>Dependency Review Action</strong> fails the check of
+                any PR that introduces a new <strong>HIGH</strong> or <strong>CRITICAL</strong> CVE.
               </p>
 
               <h3 id="container-and-ci-hardening">
@@ -383,8 +382,8 @@ export default function SecurityPage() {
 
               <ul>
                 <li>
-                  Container images are scanned with <strong>Trivy</strong> on
-                  every build.
+                  Before a release, <strong>Trivy</strong> scans the application
+                  image on both architectures.
                 </li>
                 <li>
                   A separate Trivy pass on the Dockerfile catches
@@ -420,7 +419,8 @@ export default function SecurityPage() {
               <p>
                 The rest of the CI/CD pipeline runs lint, type-check, the full
                 test suite, image smoke tests and multi-architecture builds on
-                every PR. A release only ships if all of it passes.
+                every PR. A release ships only after all of it and the security
+                scans pass, with no open critical CodeQL alert.
               </p>
 
               <h3 id="reporting-a-vulnerability">

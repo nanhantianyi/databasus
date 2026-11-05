@@ -29,8 +29,7 @@
     <a href="#-features">Features</a> •
     <a href="#-installation">Installation</a> •
     <a href="#-usage">Usage</a> •
-    <a href="#-license">License</a> •
-    <a href="#-contributing">Contributing</a>
+    <a href="#-license">License</a>
   </p>
 
   <p style="margin-top: 20px; margin-bottom: 20px; font-size: 1.2em;">
@@ -295,13 +294,13 @@ After installation, it is also recommended to <a href="https://databasus.com/faq
 
 Databasus works with sensitive data, so preventing vulnerabilities, unauthorised access and data leaks is a primary concern. We invest in this on both sides of the system: in the code itself (permission checks, encryption, careful handling of secrets) and in the infrastructure around it (dependency analysis, CVE response, DevSecOps best practices). The pipeline below runs automatically on every commit and PR. No single layer is enough on its own, but together they reduce the chance of vulnerable code, unsafe dependencies, broken images, or non-restorable backups reaching a release.
 
-For static analysis we combine several independent passes. CodeQL scans the full codebase for security issues. CodeRabbit reviews every PR and runs gitleaks for secret scanning and semgrep for security rules inline. Dockerfiles and CI workflows get extra rules of their own (pinned action references, least-privilege permissions, suspicious base images), so insecure patterns are flagged before they ever merge. On top of these per-PR checks, Codex Security from OpenAI runs regular, deeper audits of the whole codebase. It's a separate program that catches architectural and cross-cutting issues narrow PR-time scans can miss.
+For static analysis we combine several independent passes. CodeQL scans the full codebase for security issues. On every PR, gitleaks scans for leaked secrets and semgrep checks the code against security rules. Dockerfiles and CI workflows get extra rules of their own (pinned action references, least-privilege permissions, suspicious base images), so insecure patterns are flagged before they ever merge. On top of these per-PR checks, Codex Security from OpenAI runs regular, deeper audits of the whole codebase. It's a separate program that catches architectural and cross-cutting issues narrow PR-time scans can miss.
 
-On the dependency side, Dependabot watches all of our dependencies against the GitHub Advisory Database and surfaces CVEs within minutes of publication. Updates run through a cooldown so newly-published versions get a chance to mature before we adopt them. This is a deliberate defence against compromised-package incidents like supply-chain attack. The Dependency Review Action blocks any PR that introduces a new HIGH or CRITICAL CVE outright.
+On the dependency side, Dependabot watches all of our dependencies against the GitHub Advisory Database and surfaces CVEs within minutes of publication. Updates run through a cooldown so newly-published versions get a chance to mature before we adopt them. This is a deliberate defence against compromised-package incidents like supply-chain attack. The Dependency Review Action fails the check of any PR that introduces a new HIGH or CRITICAL CVE. For the Go code, govulncheck fails a PR when our code calls a function with a known vulnerability, and `go mod verify` checks every downloaded module against its recorded checksum.
 
-Container images are scanned with Trivy on every build. A separate Trivy pass on the Dockerfile catches misconfigurations before they make it into an image. All GitHub Actions are pinned to full commit SHAs rather than floating tags like `@v4` or `@main`, which have been an active attack vector in 2025. Workflows default to least-privilege permissions and only elevate per-job when genuinely needed.
+Before a release, Trivy scans the application image on both architectures. A separate Trivy pass on the Dockerfile catches misconfigurations before they make it into an image. All GitHub Actions are pinned to full commit SHAs rather than floating tags like `@v4` or `@main`, which have been an active attack vector in 2025. Workflows default to least-privilege permissions and only elevate per-job when genuinely needed.
 
-Critical paths are covered by both unit and integration tests, run against real database containers for every supported engine and major version. Restore is the path that matters most for a backup tool, so we test it explicitly: every PR runs full backup-then-restore cycles against those same real containers, verifying that backups can actually be restored end-to-end, not just written successfully. The rest of the CI/CD pipeline runs lint, type-check, the full test suite, image smoke tests and multi-architecture builds on every PR. A release only ships if all of it passes.
+Critical paths are covered by both unit and integration tests, run against real database containers for every supported engine and major version. Restore is the path that matters most for a backup tool, so we test it explicitly: every PR runs full backup-then-restore cycles against those same real containers, verifying that backups can actually be restored end-to-end, not just written successfully. The rest of the CI/CD pipeline runs lint, type-check, the full test suite, image smoke tests and multi-architecture builds on every PR. A release ships only after all of it and the security scans pass, with no open critical CodeQL alert.
 
 Found a vulnerability? Report it via the GitHub Security tab. See [SECURITY.md](https://github.com/databasus/databasus?tab=security-ov-file#readme). Security reports are the highest-priority work queue. For runtime application security (AES-256-GCM at rest, zero-trust storage, encrypted secrets, read-only DB user by default) see [Enterprise-grade security](#-enterprise-grade-security-docs) in the Features section above.
 
@@ -311,39 +310,6 @@ Found a vulnerability? Report it via the GitHub Security tab. See [SECURITY.md](
 
 This project is licensed under the Apache 2.0 License - see the [LICENSE](LICENSE) file for details
 
-## 🤝 Contributing
+## 💬 Community
 
-Contributions are welcome! Read the <a href="https://databasus.com/contribute">contributing guide</a> for more details, priorities and rules. If you want to contribute but don't know where to start, message me on Telegram [@rostislav_dugin](https://t.me/rostislav_dugin)
-
-Also you can join our large community of developers, DBAs and DevOps engineers on Telegram [@databasus_community](https://t.me/databasus_community).
-
-## AI disclaimer
-
-There have been questions about AI usage in project development in issues and discussions. As the project focuses on security, reliability and production usage, it's important to explain how AI is used in the development process.
-
-First of all, we are proud to say that Databasus has been accepted into both [Claude for Open Source](https://claude.com/contact-sales/claude-for-oss) by Anthropic and [Codex for Open Source](https://developers.openai.com/codex/community/codex-for-oss/) by OpenAI in March 2026. For us it is one more signal that the project was recognized as important open-source software and was as critical infrastructure worth supporting independently by two of the world's leading AI companies. Read more at [databasus.com/faq](https://databasus.com/faq#oss-programs).
-
-Despite of this, we have the following rules how AI is used in the development process:
-
-AI is used as a helper for:
-
-- verification of code quality and searching for vulnerabilities
-- cleaning up and improving documentation, comments and code
-- assistance during development
-- double-checking PRs and commits after human review
-- additional security analysis of PRs via Codex Security
-
-AI is not used for:
-
-- writing entire code
-- "vibe code" approach
-- code without line-by-line verification by a human
-- code without tests
-
-So AI is just an assistant and a tool for developers to increase productivity and ensure code quality. The work is done by developers.
-
-Moreover, it's important to note that we do not differentiate between bad human code and AI vibe code. There are strict requirements for any code to be merged to keep the codebase maintainable.
-
-Even if code is written manually by a human, it's not guaranteed to be merged. Vibe code is not allowed at all and all such PRs are rejected by default (see [contributing guide](https://databasus.com/contribute)).
-
-The engineering safeguards behind these rules (CI, static analysis, dependency scanning, test coverage and vulnerability response) are documented in [Security & reliability engineering](#️-security--reliability-engineering) above.
+Join our large community of developers, DBAs and DevOps engineers on Telegram [@databasus_community](https://t.me/databasus_community).

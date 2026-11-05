@@ -6,22 +6,19 @@ export const ru: typeof en = {
   },
   common: {
     actions: {
-      add: 'Добавить',
       back: 'Назад',
       cancel: 'Отмена',
       close: 'Закрыть',
-      confirm: 'Подтвердить',
       continue: 'Продолжить',
       copy: 'Копировать',
       create: 'Создать',
       delete: 'Удалить',
-      download: 'Скачать',
       edit: 'Изменить',
       ok: 'OK',
-      refresh: 'Обновить',
       remove: 'Удалить',
       retry: 'Повторить',
       save: 'Сохранить',
+      transfer: 'Перенести',
     },
     answers: {
       no: 'Нет',
@@ -37,15 +34,16 @@ export const ru: typeof en = {
       username: 'Имя пользователя',
     },
     states: {
-      disabled: 'Выключено',
       enabled: 'Включено',
       loading: 'Загрузка...',
     },
     messages: {
       copiedToClipboard: 'Скопировано в буфер обмена',
+      addressChangedEnterSecretAgain: 'Адрес изменился. Введите это значение заново.',
     },
     // Joins translated words into one list (Chinese uses 、)
     listSeparator: ', ',
+    websiteLink: 'Сайт Databasus',
     confirmation: {
       title: 'Подтверждение',
     },
@@ -62,6 +60,7 @@ export const ru: typeof en = {
       system: 'Системная',
     },
     navigation: {
+      menu: 'Меню навигации',
       databases: 'Базы данных',
       storages: 'Хранилища',
       notifiers: 'Каналы уведомлений',
@@ -77,21 +76,12 @@ export const ru: typeof en = {
     diskUsage: {
       title: 'Место на диске',
       hint: 'Чтобы делать бекапы локально и восстанавливаться из них, на диске должно хватать места. Для восстановления нужно столько же свободного места, сколько занимает бекап.',
-      compactSummary: 'Занято {{used}} из {{total}} GB<lineBreak/>({{percent}}%)',
       summary: 'Занято {{used}} из {{total}} GB ({{percent}}%)',
     },
     workspaceSelection: {
-      createShort: 'Создать',
       create: 'Создать рабочее пространство',
       selected: 'Рабочее пространство',
-      placeholder: 'Выберите рабочее пространство',
-      search: 'Поиск рабочих пространств...',
-      notFound: 'Рабочие пространства не найдены',
       createNew: '+ Новое рабочее пространство',
-    },
-    sponsorship: {
-      link: 'Поддержать',
-      hint: 'Databasus спас ваши данные? Поддержите проект, чтобы он оставался бесплатным, развивался и не зависел ни от кого.',
     },
     starButton: {
       label: 'Поставить звезду',
@@ -104,29 +94,40 @@ export const ru: typeof en = {
         'Автоматический доступ к буферу обмена недоступен. Вставьте содержимое в поле ниже.',
       placeholder: 'Вставьте строку подключения...',
     },
-    auth: {
-      accountsCheckFailed: 'Не удалось проверить, есть ли на инстансе учетные записи: {{error}}',
-    },
     oauthCallback: {
       failedTitle: 'Не удалось войти',
-      codeNotFound: 'Не найден код авторизации',
-      stateMissing: 'Нет параметра state OAuth',
-      invalidProvider: 'Неизвестный OAuth-провайдер',
+      notCompleted: 'Вход не завершён. Начните заново.',
       returnToSignIn: 'Вернуться ко входу',
       completing: 'Завершаем вход...',
     },
     oauthStorage: {
-      configNotFound: 'Не найдены настройки хранилища Google Drive',
-      exchangeFailed: 'Не удалось обменять код OAuth на токен',
-      unsupportedType: 'Этот тип хранилища не поддерживает OAuth',
-      invalidState: 'Некорректный параметр state OAuth',
-      paramNotFound:
-        'Не найдены параметры OAuth. Проверьте, правильно ли настроен адрес перенаправления.',
-      addStorageTitle: 'Добавить хранилище',
-      storageDescription: 'Хранилище — место, где хранятся бекапы (локальный диск, S3 и т. п.)',
+      waiting: 'Завершаем авторизацию хранилища...',
+      complete: 'Ответ получен. Вернитесь в редактор хранилища.',
+      restart:
+        'Не удалось связаться с исходным редактором. Закройте это окно и запустите авторизацию заново из редактора.',
     },
   },
   errors: {
+    cleanupPending:
+      'Очистка файлов ещё идёт. Дождитесь её завершения или удалите затронутые хранилища по отдельности, подтвердив, что оставшиеся файлы придётся удалить вручную.',
+    alreadyMember: 'Этот пользователь уже участник рабочего пространства.',
+    cannotChangeOwnRole: 'Нельзя изменить свою собственную роль в рабочем пространстве.',
+    ownerRequiresTransfer:
+      'Владельца нельзя изменить или удалить. Сначала передайте владение другому участнику.',
+    workspaceNotEmpty:
+      'В рабочем пространстве еще есть базы данных. Сначала удалите их, затем удалите рабочее пространство.',
+    databaseConnectionFailed: 'Не удалось подключиться к базе данных: {{detail}}',
+    inUse:
+      'Он ещё используется базой данных, идущим бэкапом или восстановлением. Повторите, когда он освободится.',
+    backupNotCompleted: 'Проверить можно только завершённую резервную копию.',
+    alreadyRunning: 'Это уже выполняется. Дождитесь завершения и попробуйте снова.',
+    noExtendableChain: 'Перед инкрементальным бэкапом выполните полный бэкап.',
+    noRestorableBackup: 'Нет завершённого бэкапа, из которого можно восстановить данные.',
+    targetTimeUnreachable:
+      'Доступных бэкапов и WAL недостаточно для восстановления на выбранный момент.',
+    notRunning: 'Это уже не выполняется, отменять нечего.',
+    instanceUnhealthy: 'Экземпляр Databasus работает с ошибками.',
+    insufficientDiskSpace: 'На сервере Databasus не хватает свободного места на диске: {{detail}}',
     unknown: 'Что-то пошло не так. Попробуйте еще раз.',
     networkUnreachable: 'Сервер Databasus недоступен. Проверьте подключение и попробуйте еще раз.',
     requestFailed: 'Сервер не смог выполнить запрос (HTTP {{status}}). Попробуйте позже.',
@@ -138,17 +139,32 @@ export const ru: typeof en = {
       'За последний час для этого аккаунта запросили слишком много кодов входа. Попробуйте позже.',
     signInCodeResentTooSoon:
       'Код отправлен меньше минуты назад. Подождите минуту, прежде чем запрашивать новый.',
-    rateLimitExceeded: 'Слишком много попыток. Подождите немного и попробуйте снова.',
+    rateLimited: 'Слишком много попыток. Подождите немного и попробуйте снова.',
     emailNotConfigured: 'Почтовый сервер не настроен.',
     adminEmailMissing:
       'У вашего аккаунта нет корректного адреса почты, на который можно отправить тестовое письмо.',
+    invalidRequest:
+      'Сервер отклонил запрос как некорректный. Обновите страницу и попробуйте еще раз.',
+    notFound: 'Запрошенный объект не найден. Возможно, его удалили.',
+    internal: 'На сервере произошла внутренняя ошибка. Попробуйте позже.',
+    unauthenticated: 'Сессия завершилась. Войдите снова.',
+    permissionDenied: 'У вас нет прав на это действие.',
+    humanVerificationFailed: 'Проверка на робота не пройдена. Пройдите ее и попробуйте снова.',
+    invalidCredentials: 'Неверная почта или пароль.',
+    userDeactivated: 'Аккаунт деактивирован. Попросите администратора активировать его.',
+    registrationClosed:
+      'Регистрация на этом сервере закрыта. Попросите администратора пригласить вас.',
+    emailTaken: 'Этот адрес почты уже занят.',
+    invalidResetCode: 'Код сброса неверный или устарел. Запросите новый.',
+    oauthNotConfigured: 'Вход через этого провайдера на сервере не настроен.',
+    oauthFailed:
+      'Провайдер входа не подтвердил ваш аккаунт. Проверьте, что почта у него подтверждена, и попробуйте снова.',
   },
   status: {
     logicalBackup: {
       inProgress: 'Выполняется',
       completed: 'Успешно',
       failed: 'Ошибка',
-      deleted: 'Удален',
       canceled: 'Отменен',
     },
     physicalBackup: {
@@ -186,7 +202,7 @@ export const ru: typeof en = {
       offline: 'Не в сети',
     },
   },
-  intervals: {
+  schedules: {
     types: {
       hourly: 'Ежечасно',
       daily: 'Ежедневно',
@@ -203,18 +219,19 @@ export const ru: typeof en = {
       sat: 'Сб',
       sun: 'Вс',
     },
-    periods: {
-      day: '1 день',
-      week: '1 неделя',
-      month: '1 месяц',
-      threeMonths: '3 месяца',
-      sixMonths: '6 месяцев',
-      year: '1 год',
-      twoYears: '2 года',
-      threeYears: '3 года',
-      fourYears: '4 года',
-      fiveYears: '5 лет',
-      forever: 'Бессрочно',
+    weekday: 'День недели',
+    dayOfMonth: 'День месяца',
+    cronExpression: 'Cron-выражение (UTC)',
+    timeOfDay: 'Время',
+    nextRun: 'Следующий запуск: {{time}}',
+    invalidCron: 'Некорректное cron-выражение',
+    cronHelp: {
+      format: 'Формат cron: минута, час, день, месяц, день недели (UTC)',
+      examples: 'Примеры:',
+      dailyAt2am: 'Ежедневно в 2:00 UTC',
+      every6Hours: 'Каждые 6 часов',
+      mondaysAt3am: 'Каждый понедельник в 3:00 UTC',
+      twiceAMonth: '1-го и 15-го числа в 4:30 UTC',
     },
   },
   auditLogs: {
@@ -226,10 +243,9 @@ export const ru: typeof en = {
       created: 'Время',
     },
     systemUser: 'Система',
-    loadedOfTotal: 'Загружено: {{loaded}} из {{total}}',
     empty: 'Записей в журнале нет.',
     loadingMore: 'Загружаем еще записи...',
-    allLoaded: 'Все записи загружены (всего {{count}})',
+    allLoaded: 'Все записи загружены',
   },
   settings: {
     title: 'Настройки Databasus',
@@ -268,6 +284,8 @@ export const ru: typeof en = {
       docs: 'Как подключить почтовый сервер, описано <docsLink>в документации по SMTP</docsLink>.',
       sendTestEmail: 'Отправить тестовое письмо',
       testEmailSent: 'Тестовое письмо отправлено на {{email}}',
+      testEmailNotDelivered:
+        'Почтовый сервер не принял тестовое письмо на <email/>: <failureDetail/>',
     },
     healthcheck: {
       title: 'Проверка доступности',
@@ -310,11 +328,14 @@ export const ru: typeof en = {
       config: 'Настройки',
       backups: 'Бекапы',
       verifications: 'Проверки',
+      monitoring: 'Мониторинг',
     },
     create: {
       title: 'Добавить базу данных для бекапа',
       namePlaceholder: 'Моя любимая БД',
       creating: 'Создаем базу данных...',
+      finishing: 'Завершаем настройку базы данных...',
+      createdButNotFinished: 'База данных создана, но настройка не завершена. Причина: {{reason}}',
       complete: 'Завершить',
       backupType: {
         title: 'Выберите тип бекапа',
@@ -335,10 +356,7 @@ export const ru: typeof en = {
       lastBackupError: {
         title: 'Ошибка последнего бекапа',
         errorLabel: 'Ошибка:',
-        clearHint: 'Чтобы убрать эту ошибку, сделайте одно из двух:',
-        clearByTestingConnection:
-          '- проверьте подключение кнопкой ниже (даже если вы уже изменили настройки);',
-        clearByNextBackup: '- дождитесь следующего бекапа без ошибок;',
+        clearedByNextBackup: 'Ошибка исчезнет после следующего успешного бекапа.',
       },
       sections: {
         database: 'Настройки базы данных',
@@ -364,7 +382,6 @@ export const ru: typeof en = {
       replace: 'Заменить',
     },
     fields: {
-      databaseType: 'Тип базы данных',
       version: 'Версия {{engine}}',
       databaseName: 'Имя БД',
       sslMode: 'Режим SSL',
@@ -376,6 +393,8 @@ export const ru: typeof en = {
       serverCaCertificate: 'CA-сертификат сервера',
       includeSchemas: 'Включаемые схемы',
       excludeTables: 'Исключаемые таблицы',
+      excludeWholeTables: 'Исключать таблицы целиком',
+      excludeTableData: 'Исключать данные таблиц',
       skipUserMappings: 'Пропускать user mappings',
       excludeExtensions: 'Исключать расширения',
       restoreOwnership: 'Восстанавливать владельцев',
@@ -394,6 +413,7 @@ export const ru: typeof en = {
       connectionStringParsed: 'Поля заполнены из строки подключения',
       connectionStringParsedWithoutPassword:
         'Поля заполнены из строки подключения. Введите пароль вручную.',
+      connectionTestFailed: 'Не удалось подключиться к базе данных: {{error}}',
       connectionTestPassed: {
         title: 'Подключение проверено',
         description: 'Можно переходить к следующему шагу',
@@ -423,7 +443,10 @@ export const ru: typeof en = {
           '<docsLink>Прочитайте эту статью</docsLink>, чтобы узнать, как делать бекап базы данных Supabase',
         includeSchemasPlaceholder: 'Все схемы (по умолчанию)',
         excludeTablesTooltip:
-          "Таблицы, которые не попадут в бекап. Укажите 'tablename' или 'schema.tablename'. Поддерживаются glob-шаблоны (например, 'logs_*'). Можно вставить список через запятую или с новой строки.",
+          "Таблицы, которые совсем не попадут в бекап: после восстановления их не будет. Укажите 'tablename' или 'schema.tablename'. Имя без схемы находит только таблицы из search_path по умолчанию, обычно из 'public', а '*.tablename' ищет во всех схемах. Поддерживаются glob-шаблоны (например, 'logs_*'). Можно вставить список через запятую или с новой строки.",
+        excludeTableDataTooltip:
+          "Таблицы, которые попадут в бекап без строк: после восстановления они будут пустыми, но сохранят структуру, индексы и ограничения. Укажите 'tablename' или 'schema.tablename'. Имя без схемы находит только таблицы из search_path по умолчанию, обычно из 'public', а '*.tablename' ищет во всех схемах. Поддерживаются glob-шаблоны (например, 'logs_*'). Таблица, указанная в обоих полях, исключается целиком. Партиции секционированной таблицы нужно указать отдельно или шаблоном, например 'events_*'. Если другая таблица из бекапа ссылается внешним ключом на строки опустевшей таблицы, при восстановлении этот внешний ключ не создастся. Можно вставить список через запятую или с новой строки.",
+        excludeTableDataPlaceholder: 'Данные всех таблиц сохраняются',
         skipUserMappingsTooltip:
           'Не восстанавливать user mappings (команды CREATE USER MAPPING). Включите, если роль для бекапа не может прочитать их учетные данные: иначе они попадут в дамп без параметров и сломают восстановление для FDW вроде oracle_fdw.',
         excludeExtensionsTooltip:
@@ -554,7 +577,7 @@ export const ru: typeof en = {
         transferExisting: 'Перенести вместе с текущим хранилищем',
         selectFromTarget: 'Выбрать хранилище в целевом рабочем пространстве',
         blocked:
-          'Баз данных с этим хранилищем: {{count}}. Перенос заблокирован, потому что от хранилища зависят другие базы данных.',
+          'Это хранилище используют и другие базы данных, поэтому его нельзя перенести вместе с этой базой.',
         canTransfer: 'Хранилище можно перенести',
         selectPlaceholder: 'Выберите хранилище',
         createNew: 'Создать хранилище',
@@ -743,14 +766,14 @@ export const ru: typeof en = {
       notifyWhenUnavailable: 'Уведомлять о недоступности',
       checkIntervalMinutes: 'Интервал проверки (мин)',
       attemptsBeforeDown: 'Попыток до недоступности',
-      storeAttemptsDays: 'Хранить историю (дней)',
+      attemptRetentionDays: 'Хранить историю (дней)',
       tooltips: {
         enable: 'Включает или выключает проверку доступности этой базы данных',
         notifyWhenUnavailable: 'Отправлять уведомления, когда база данных становится недоступной',
         checkIntervalMinutes: 'Как часто проверять доступность базы данных (в минутах)',
         attemptsBeforeDown:
           'Сколько неудачных попыток нужно, чтобы база данных считалась недоступной',
-        storeAttemptsDays: 'Сколько дней хранить историю проверок доступности',
+        attemptRetentionDays: 'Сколько дней хранить историю проверок доступности',
       },
     },
   },
@@ -835,6 +858,7 @@ export const ru: typeof en = {
         description:
           'Этого пользователя пока нет в системе, но он уже приглашен в рабочее пространство. После регистрации с этим адресом он автоматически станет участником.',
       },
+      invitedMark: 'Приглашен',
       roleChanged: 'Роль участника изменена',
       remove: {
         tooltip: 'Удалить участника',
@@ -876,6 +900,7 @@ export const ru: typeof en = {
       newPassword: 'Новый пароль',
     },
     validation: {
+      emailInvalid: 'Введите корректный адрес электронной почты',
       nameRequired: 'Укажите имя',
       emailRequired: 'Укажите email',
       passwordTooShort: 'Пароль слишком короткий. Минимальная длина: {{minLength}}',
@@ -948,12 +973,12 @@ export const ru: typeof en = {
         passwordsDoNotMatch: 'Новые пароли не совпадают',
         changing: 'Меняем пароль...',
         submit: 'Сменить пароль',
-        signedInWithNewPassword: 'Вы вошли с новым паролем',
+        signInRequired: 'Пароль изменён. Войдите снова с новым паролем.',
       },
     },
     list: {
       title: 'Пользователи Databasus',
-      loadedOfTotal: 'Пользователей: {{loaded}} из {{total}}',
+      loaded: 'Загружено пользователей: {{count}}',
       searchPlaceholder: 'Поиск по email или имени...',
       empty: 'Пользователи не найдены.',
       allLoaded: 'Все пользователи загружены (всего {{count}})',
@@ -977,6 +1002,7 @@ export const ru: typeof en = {
   },
   verification: {
     triggers: {
+      afterBackup: 'После резервного копирования',
       manual: 'Вручную',
       scheduled: 'По расписанию',
     },
@@ -992,18 +1018,6 @@ export const ru: typeof en = {
       afterBackup: 'После бекапа',
       afterBackupHint:
         'Запускается автоматически после каждого успешного бекапа. Если в очереди уже есть ожидающие проверки, они отменяются, чтобы очередь не росла бесконечно, когда бекапы делаются быстрее проверок.',
-      weekday: 'День недели проверки',
-      dayOfMonth: 'День месяца проверки',
-      timeOfDay: 'Время проверки',
-      cron: {
-        expression: 'Cron-выражение (UTC)',
-        format: 'Формат cron: минута, час, день, месяц, день недели (UTC)',
-        examples: 'Примеры:',
-        exampleEverySunday: '- {{expression}} — каждое воскресенье в 4:00 UTC',
-        exampleEverySixHours: '- {{expression}} — каждые 6 часов',
-        nextRun: 'Следующий запуск: {{dateTime}}<lineBreak/>({{relativeTime}})',
-        invalid: 'Некорректное cron-выражение',
-      },
       notifications: 'Уведомления',
       noNotifications: 'Нет',
     },
@@ -1030,7 +1044,6 @@ export const ru: typeof en = {
       },
       details: {
         title: 'Подробности проверки восстановления',
-        loadFailed: 'Не удалось загрузить подробности проверки.',
         cancellationReason: 'Причина отмены',
         failure: 'Ошибка',
         sections: {
@@ -1069,7 +1082,7 @@ export const ru: typeof en = {
       },
       capacity: {
         cpu: '{{count}} CPU',
-        ram: '{{count}} GB RAM',
+        ram: '{{size}} RAM',
         disk: 'диск {{count}} GB',
         jobs: 'задач: {{count}}',
         notReported: 'данных пока нет',
@@ -1162,7 +1175,6 @@ export const ru: typeof en = {
       hasSendError: 'Есть ошибка отправки',
     },
     create: {
-      title: 'Добавить канал уведомлений',
       namePlaceholder: 'Мой чат',
     },
     config: {
@@ -1177,11 +1189,11 @@ export const ru: typeof en = {
         clearByNextNotification: '- дождитесь следующего уведомления, отправленного без ошибок;',
       },
       removeConfirmation: 'Удалить этот канал уведомлений? Это действие нельзя отменить.',
-      removeBlockedByDatabases:
-        'Канал уведомлений используется базами данных. Сначала уберите его из этих баз данных.',
     },
+    secretKeptPlaceholder: 'Сохранено — оставьте пустым, чтобы не менять',
     testNotification: {
       send: 'Отправить тестовое уведомление',
+      notDelivered: 'Тестовое сообщение не доставлено: {{error}}',
       sent: {
         title: 'Тестовое уведомление отправлено',
         description: 'Уведомление успешно отправлено',
@@ -1205,6 +1217,11 @@ export const ru: typeof en = {
       skipTls: 'Не проверять TLS',
     },
     email: {
+      validation: {
+        targetEmail: 'Укажите корректный адрес электронной почты',
+        smtpHost: 'Укажите SMTP-сервер',
+        smtpPort: 'Укажите порт от 1 до 65535',
+      },
       targetEmail: 'Email получателя',
       targetEmailTooltip: 'Адрес, на который будут приходить уведомления',
       smtpHost: 'SMTP-хост',
@@ -1271,9 +1288,12 @@ export const ru: typeof en = {
       customHeaders: 'Пользовательские заголовки',
       customHeadersTooltip:
         'Дополнительные HTTP-заголовки для запроса к вебхуку (например, Authorization, X-API-Key)',
-      savedHeadersHidden: '*Сохраненные заголовки скрыты из соображений безопасности',
+      savedHeadersHidden:
+        '*Значения сохранённых заголовков скрыты. Оставьте значение пустым, чтобы не менять его',
       headers: 'Заголовки',
       headerNamePlaceholder: 'Имя заголовка',
+      headerNameInvalid:
+        "Используйте только латинские буквы, цифры и символы !#$%&'*+-.^_`|~. Пробелы недопустимы.",
       headerValuePlaceholder: 'Значение заголовка',
       addHeader: 'Добавить заголовок',
       hiddenHeaderValue: '(скрыто)',
@@ -1312,8 +1332,6 @@ export const ru: typeof en = {
       powerAutomateUrlLabel: 'URL Power Automate:',
       powerAutomateUrlTooltip:
         'HTTP-адрес из вашего потока Power Automate (триггер When an HTTP request is received)',
-      showFullUrl: 'Показать',
-      hideFullUrl: 'Скрыть',
     },
     mattermost: {
       howToConnect: 'Как подключить Mattermost?',
@@ -1351,6 +1369,16 @@ export const ru: typeof en = {
     },
   },
   backups: {
+    cleanup: {
+      pending: 'Удаляем старые файлы. Осталось: {{count}}.',
+      retrying: 'Повторим удаление файлов: {{count}}.',
+      retryStatus: 'Обновить статус',
+    },
+    storageSwitch: {
+      warning:
+        'Смена хранилища сразу удалит старую историю резервных копий и активирует новое хранилище. Старые файлы удаляются в фоне. Недоступность хранилища задерживает очистку. Явное удаление старого хранилища остановит автоматическую очистку, и оставшиеся файлы придётся удалить вручную. Новые физические копии начнутся с FULL.',
+      confirm: 'Сменить хранилище и удалить историю',
+    },
     encryption: {
       none: 'Нет',
       encrypted: 'Включено',
@@ -1381,6 +1409,7 @@ export const ru: typeof en = {
       },
     },
     filters: {
+      toggle: 'Фильтры',
       allTypes: 'Все типы',
       allStatuses: 'Все статусы',
       before: 'До',
@@ -1393,27 +1422,9 @@ export const ru: typeof en = {
       addStorageTitle: 'Добавить хранилище',
       storageDescription:
         'Хранилище — это место, где хранятся бекапы (локальный диск, S3, Google Drive и т. д.)',
-      storageChangeWarning: 'Если сменить хранилище, все бекапы в этом хранилище будут удалены.',
-      storageChangeAcknowledge: 'Понятно',
       encryption: 'Шифрование',
       notifications: 'Уведомления',
       noNotifications: 'Нет',
-      schedule: {
-        weekday: 'День недели',
-        dayOfMonth: 'День месяца',
-        cronExpression: 'Cron-выражение (UTC)',
-        timeOfDay: 'Время',
-        nextRun: 'Следующий запуск: {{time}}',
-        invalidCron: 'Некорректное cron-выражение',
-        cronHelp: {
-          format: 'Формат cron: минута, час, день, месяц, день недели (UTC)',
-          examples: 'Примеры:',
-          dailyAt2am: 'Ежедневно в 2:00 UTC',
-          every6Hours: 'Каждые 6 часов',
-          mondaysAt3am: 'Каждый понедельник в 3:00 UTC',
-          twiceAMonth: '1-го и 15-го числа в 4:30 UTC',
-        },
-      },
       gfs: {
         hourly: 'Ежечасных: {{count}}',
         daily: 'Ежедневных: {{count}}',
@@ -1424,6 +1435,19 @@ export const ru: typeof en = {
       },
     },
     logical: {
+      retentionPeriods: {
+        day: '1 день',
+        week: '1 неделя',
+        month: '1 месяц',
+        threeMonths: '3 месяца',
+        sixMonths: '6 месяцев',
+        year: '1 год',
+        twoYears: '2 года',
+        threeYears: '3 года',
+        fourYears: '4 года',
+        fiveYears: '5 лет',
+        forever: 'Бессрочно',
+      },
       retentionPolicyTypes: {
         gfs: 'GFS (хранить последние N ежечасных, ежедневных, еженедельных, ежемесячных и ежегодных бекапов)',
         timePeriod: 'За период (последние N дней)',
@@ -1466,9 +1490,6 @@ export const ru: typeof en = {
       },
       config: {
         interval: 'Интервал бекапов',
-        weekday: 'День недели',
-        dayOfMonth: 'День месяца',
-        timeOfDay: 'Время бекапа',
         encryptionTooltip:
           'Зашифрованные файлы бекапов в хранилище (S3, локальном и т. д.) нельзя использовать напрямую. Восстановить бекапы можно через Databasus, а скачать в расшифрованном виде — кнопкой «Скачать».',
         retentionPolicy: 'Политика хранения',
@@ -1527,6 +1548,8 @@ export const ru: typeof en = {
       list: {
         totalUsage: 'Занято всего: {{size}}',
         backUpNow: 'Сделать бекап',
+        startRequirement:
+          'Чтобы запустить бекап, включите бекапы и выберите хранилище в настройках бекапов.',
         fullBackup: 'Полный бекап',
         incrementalBackup: 'Инкрементальный бекап',
         restore: 'Восстановить',
@@ -1587,7 +1610,9 @@ export const ru: typeof en = {
       restore: {
         errorHints: {
           downloadInProgress:
-            'Для этой базы данных уже идет загрузка для восстановления. Дождитесь ее окончания и попробуйте еще раз.',
+            'У вас уже скачивается бекап или выполняется загрузка для восстановления. Дождитесь её окончания и попробуйте ещё раз.',
+          noRestorableBackup:
+            'Запустите полный бекап, дождитесь его завершения и попробуйте ещё раз.',
           targetTimeUnreachable:
             'До выбранного момента времени восстановиться нельзя: в WAL есть разрыв или время выходит за доступный диапазон. Выберите другое время или восстановите последнюю доступную точку.',
         },
@@ -1602,6 +1627,7 @@ export const ru: typeof en = {
           'Ссылка на скачивание одноразовая и действует 15 минут. Если команда завершилась ошибкой 401, откройте это окно заново, чтобы получить новую ссылку.',
         copied: 'Скопировано',
         methods: {
+          label: 'Способ восстановления',
           script: 'Через скрипт',
           manual: 'Вручную',
         },
@@ -1668,9 +1694,293 @@ export const ru: typeof en = {
             'Базовый бекап копирует только каталог данных. Если исходный PostgreSQL хранит конфигурацию вне его (так устроены Debian и Ubuntu: <configDir/>), то <code>postgresql.conf</code>, <code>pg_hba.conf</code> и <code>pg_ident.conf</code> в бекап не попадают и сервер не запустится. Узнайте их настоящие пути на исходном сервере командой <code>psql -Atc "SHOW config_file"</code>, скопируйте все три файла, затем закомментируйте <code>data_directory</code>, <code>hba_file</code>, <code>ident_file</code>, <code>external_pid_file</code> и строки <code>ssl</code> / <code>ssl_*</code>, создайте <code>conf.d</code>, а для контейнера задайте <code>listen_addresses = \'*\'</code>. Если эти файлы на месте, а ошибка та же, значит, неверно смонтирован каталог, а не конфигурация.',
         },
       },
+      monitoring: {
+        periods: {
+          hour: 'Последний час',
+          day: 'Последние сутки',
+          week: 'Последняя неделя',
+        },
+        levels: {
+          notStreaming: 'Непрерывное сохранение изменений выключено',
+          collectingData: 'Собираем данные',
+          broken: 'Что-то сломано',
+          needsAttention: 'Что-то требует внимания',
+          healthy: 'Все в порядке',
+        },
+        reasonLevels: {
+          broken: 'Сломано',
+          needsAttention: 'Требует внимания',
+          info: 'Для информации',
+        },
+        banner: {
+          collectingDataDescription: 'Стриминг запущен, первые цифры появятся в течение минуты.',
+          notStreamingDescription:
+            'Бекапы выключены или не выбрано хранилище. Включить можно в <configLink>настройках</configLink>.',
+          cannotConfirm: 'Не удается подтвердить текущее состояние',
+          cannotConfirmDescription: 'Последнее известное состояние: {{level}}, {{duration}} назад.',
+          measuredAgo: 'Замер {{duration}} назад',
+          healthyHeadline: 'Все изменения сохраняются',
+          restoreUpTo: 'Базу можно восстановить на любой момент до {{moment}} ({{age}} назад).',
+          restoreOnlyUpTo:
+            'Пока не завершится новый полный бекап, базу можно восстановить только до {{moment}} ({{age}} назад).',
+          restoreFromUpTo:
+            'Базу можно восстановить на любой момент с {{from}} до {{moment}} ({{age}} назад).',
+          restoreFromUpToWithoutAge:
+            'Базу можно восстановить на любой момент с {{from}} до {{moment}}.',
+          restoreUpToWithoutAge: 'Базу можно восстановить на любой момент до {{moment}}.',
+          restoreOnlyUpToWithoutAge:
+            'Пока не завершится новый полный бекап, базу можно восстановить только до {{moment}}.',
+          restoreNothingPending:
+            'Восстановить ничего не получится, пока не завершится первый полный бекап. Он уже запрошен.',
+          restoreNothing: 'Восстанавливать пока нечего: ни один полный бекап еще не завершился.',
+          startFullBackup: 'Запустить полный бекап',
+          fullBackupRequested: 'Полный бекап запрошен.',
+          notMeasuredYet: 'Замеров еще нет',
+          refreshFailed:
+            'Не удалось обновить данные. На экране остаются последние полученные цифры, следующая попытка через 30 секунд.',
+        },
+        keepingUp: {
+          keepingUp:
+            'Databasus сохраняет изменения так же быстро, как база их пишет: запись {{writeRate}}, сохранение {{archiveRate}}.',
+          fallingBehind:
+            'База пишет изменения быстрее, чем Databasus успевает их сохранять, примерно на {{differenceRate}}: {{writeRate}} против {{archiveRate}}.',
+          fallingBehindBacklog:
+            'Еще не сохранено {{unsavedAmount}}, и этот объем растет примерно на {{growthPerHour}} в час.',
+          catchingUp:
+            'Databasus сохраняет накопившиеся изменения: осталось {{unsavedAmount}}, это займет около {{duration}}.',
+          catchingUpWithoutEstimate:
+            'Databasus сохраняет накопившиеся изменения: осталось {{unsavedAmount}}.',
+          idle: 'База почти ничего не пишет, новые изменения попадают в хранилище в течение нескольких минут.',
+          rebuildConsequence:
+            'Если так пойдет дальше, примерно через {{duration}} Databasus начнет новую цепочку бекапов с полного бекапа.',
+          limitConsequence:
+            'Если так пойдет дальше, примерно через {{duration}} база удалит изменения, которые Databasus еще не получил.',
+        },
+        reasons: {
+          streamingStopped: {
+            title: 'Сохранение остановилось',
+            whatHappened: 'Databasus перестал получать изменения {{duration}} назад.',
+            whatToDo:
+              'Databasus сам повторяет попытки. Если это затянется, посмотрите логи Databasus.',
+          },
+          sourceUnreachable: {
+            title: 'База недоступна',
+            whatHappened: 'Databasus не может подключиться к базе уже {{duration}}.',
+            whatToDo: 'Проверьте, что сервер базы работает и доступен из Databasus.',
+          },
+          walChainBroken: {
+            title: 'Между бекапами потерялись изменения',
+            whatHappened:
+              'Часть истории изменений не дошла до хранилища, поэтому изменения после неё восстановить нельзя.',
+            whatToDo: 'Запустите полный бекап на вкладке «Бекапы».',
+            whatToDoPending:
+              'Новый полный бекап уже в работе, за ним можно следить на вкладке «Бекапы».',
+          },
+          slotMissing: {
+            title: 'База перестала хранить изменения',
+            whatHappened:
+              'База больше не хранит изменения для Databasus: резерв, который Databasus создал на ней, пропал.',
+            whatToDo:
+              'Databasus восстановит резерв, когда стриминг перезапустится, но изменения за это время потеряны. Запустите полный бекап на вкладке «Бекапы» и проверьте, что резерв на базе никто не удаляет.',
+            whatToDoPending:
+              'Databasus восстановит резерв, когда стриминг перезапустится, а новый полный бекап уже в работе. Проверьте, что резерв на базе никто не удаляет.',
+          },
+          slotLost: {
+            title: 'База удалила несохраненные изменения',
+            whatHappened: 'База удалила изменения, которые Databasus еще не получил.',
+            whatToDo:
+              'Databasus сам начнет заново с нового полного бекапа. Чтобы это не повторилось, ускорьте сохранение или разрешите базе хранить больше изменений.',
+          },
+          archiveNotAdvancing: {
+            title: 'Изменения не доходят до хранилища',
+            whatHappened:
+              'Новые изменения не попадают в хранилище уже {{duration}}, хотя база продолжает писать.',
+            whatToDo: 'Проверьте, что хранилище доступно и на нем есть свободное место.',
+          },
+          archiveSlowerThanSource: {
+            title: 'Сохранение слишком медленное',
+            whatHappened:
+              'База пишет быстрее, чем Databasus сохраняет: за 10 минут несохраненный объем вырос на {{amount}}.',
+            whatToDo:
+              'Проверьте скорость сети до хранилища или перенесите хранилище ближе к Databasus.',
+          },
+          slotKeepsExtraWal: {
+            title: 'База хранит лишние изменения',
+            whatHappened:
+              'Уже {{duration}} база держит для Databasus больше журнала изменений, чем обычно, и объем продолжает расти.',
+            whatToDo: 'Убедитесь, что на сервере базы есть свободное место на диске.',
+          },
+          slotLimitApproaching: {
+            title: 'Скоро база удалит несохраненные изменения',
+            whatHappened:
+              'Если так пойдет дальше, примерно через {{duration}} база удалит изменения, которые Databasus еще не получил.',
+            whatToDo:
+              'Ускорьте сохранение или увеличьте <code>max_slot_wal_keep_size</code> на базе.',
+          },
+          nearSlotRebuild: {
+            title: 'Скоро придется начать заново',
+            whatHappened:
+              'Изменений, еще не полученных Databasus, накопилось {{amount}} из {{limit}}. При этом объеме Databasus начинает заново с полного бекапа.',
+            whatToDo: 'Ускорьте сохранение или поднимите порог в настройках бекапов.',
+          },
+          localQueueFilling: {
+            title: 'Буфер Databasus заполняется',
+            whatHappened: 'В буфере Databasus {{amount}} из {{limit}}.',
+            whatToDo:
+              'Когда буфер заполнится, Databasus сам приостановит прием. Проверьте скорость хранилища.',
+          },
+          frequentRestarts: {
+            title: 'Прием часто перезапускается',
+            whatHappened: 'Перезапусков приема за последний час: {{count}}.',
+            whatToDo: 'Причину ищите в логах Databasus.',
+          },
+          forcedRotationRefused: {
+            title: 'Изменения из тихих периодов приходят с опозданием',
+            whatHappened:
+              'База отказывается вовремя закрывать файл изменений, поэтому в тихие периоды изменения попадают в хранилище позже.',
+            whatToDo: 'Дайте пользователю бекапов право запускать <code>pg_switch_wal()</code>.',
+          },
+        },
+        notices: {
+          noSlotWalLimit: {
+            title: 'Нет предела для хранимых изменений',
+            whatHappened: 'База хранит изменения для Databasus без ограничения.',
+            whatToDo:
+              'Предел защищает диск сервера базы, если Databasus надолго остановится. Цена — новый полный бекап, когда предел будет достигнут. Задается параметром <code>max_slot_wal_keep_size</code>.',
+          },
+          slotKeepsExtraWalSteadily: {
+            title: 'База хранит лишние изменения',
+            whatHappened: 'База держит для Databasus больше журнала изменений, чем обычно.',
+            whatToDo:
+              'При высокой нагрузке это нормально. Пока объем не растет, делать ничего не нужно.',
+          },
+          noFullBackupYet: {
+            title: 'Полного бекапа еще нет',
+            whatHappened:
+              'Первый полный бекап еще не завершился, поэтому сохраненные изменения пока нельзя восстановить.',
+            whatToDo: 'Дождитесь его или запустите на вкладке «Бекапы».',
+          },
+        },
+        figures: {
+          lastSaved: 'Последнее изменение сохранено',
+          waitingToBeSaved: 'Ждет сохранения',
+          notMeasured: 'Еще не измерено',
+          averageHint: 'в среднем за 10 мин',
+        },
+        restoreTimeline: {
+          title: 'Что можно восстановить',
+          restorable: 'Можно восстановить',
+          lost: 'Нельзя восстановить',
+          notSavedYet: 'Ещё не сохранено в хранилище',
+          lostSentence:
+            'Базу нельзя восстановить на моменты между {{from}} и {{to}}: эти изменения не дошли до хранилища.',
+          moreLost: 'Других промежутков, на которые нельзя восстановить: {{count}}.',
+          range: '{{from}} – {{to}}',
+        },
+        technicalDetails: {
+          title: 'Технические подробности',
+        },
+        path: {
+          database: 'База',
+          databasus: 'Databasus',
+          storage: 'Хранилище',
+          notReceivedYet: 'Еще не получено Databasus',
+          rebuildLimit: 'При {{amount}} Databasus начнет новую цепочку с полного бекапа',
+          allowanceLeft: 'Запас, пока база не начнет удалять изменения: {{amount}}',
+          nothingWaiting: 'Ничего не ждёт',
+          ratesCaption:
+            'Скорости — средние за последние 10 минут, объёмы — на текущий момент. Если база пишет пачками, скорость есть, а ждать нечему.',
+          waitingInBuffer: 'Ждет в буфере',
+          pauseLimit: 'Прием приостанавливается при {{amount}}',
+          receivingPaused: 'Прием приостановлен',
+          nothingSavedYet: 'Пока ничего не сохранено',
+          overLimit: 'Сверх предела',
+          ofLimit: '{{amount}} из {{limit}}',
+          notSavedYetAmount: 'Ещё не сохранено в хранилище: {{amount}}',
+          unknownAmount: 'Неизвестно',
+        },
+        tooltips: {
+          notSavedYet:
+            'Изменения, которые база уже записала, но которых ещё нет в хранилище: то, что Databasus ещё не получил, и то, что ждёт в его буфере. Технически это неархивированный WAL.',
+          notReceivedYet:
+            'Изменения, которые база держит для Databasus, потому что Databasus их еще не получил. Технически это отставание слота репликации.',
+          rebuildLimit:
+            'Когда объем превысит этот порог, Databasus удалит слот репликации и начнет новую цепочку бекапов, чтобы не переполнить диск сервера базы. Технически это порог WAL lag.',
+          allowanceLeft:
+            'Сколько база еще может записать, прежде чем удалит изменения, которые Databasus не получил. Технически это safe_wal_size, его ограничивает max_slot_wal_keep_size.',
+          waitingInBuffer:
+            'Изменения, которые Databasus получил, но еще не сохранил в хранилище. Технически это локальная очередь WAL.',
+          pauseLimit:
+            'Когда буфер дорастает до этого размера, Databasus приостанавливает прием, пока буфер не освободится. Технически это верхняя граница back pressure.',
+          lastSaved:
+            'Когда в хранилище попал самый свежий файл изменений. Технически это последний заархивированный сегмент WAL.',
+          writeRate:
+            'С какой скоростью база пишет изменения, в среднем за последние 10 минут. Технически это скорость записи WAL.',
+          saveRate:
+            'С какой скоростью Databasus сохраняет изменения в хранилище, в среднем за последние 10 минут. Технически это скорость архивации WAL.',
+        },
+        charts: {
+          keepingUpTitle: 'Успевает ли Databasus?',
+          unsavedTitle: 'Сколько еще не сохранено?',
+          unsavedSubtitle: 'Сюда входит и то, что Databasus еще не получил',
+          bufferTitle: 'Буфер Databasus',
+          databaseWrites: 'Запись в базе',
+          savedToStorage: 'Сохранено в хранилище',
+          notSavedYet: 'Еще не в хранилище',
+          notReceivedYet: 'Еще не получено Databasus',
+          waitingInBuffer: 'Ждет в буфере',
+          pauseLimit: 'Здесь прием приостанавливается',
+          restarts: 'Перезапуски',
+          pauses: 'Паузы',
+          notEnoughData:
+            'Для этого периода данных пока мало. Для периода покороче график, возможно, уже есть.',
+          dataSince: 'Данные с {{time}}',
+          noMeasurements: 'Нет измерений с {{from}} до {{to}}.',
+          perSecond: '{{amount}}/с',
+        },
+        details: {
+          slotStatus: 'Статус слота (wal_status)',
+          allowance: 'Оставшийся запас (safe_wal_size)',
+          noLimit: 'Без предела',
+          averageSegmentWrite: 'Средняя запись сегмента',
+          longestSegmentWrite: 'Самая долгая запись сегмента',
+          uploadConcurrency: 'Загрузок одновременно',
+          walToStoredRatio: 'Отношение WAL к сохраненному объему',
+          walSegmentSize: 'Размер сегмента WAL',
+          sessionStart: 'Начало сессии стриминга',
+          streamerState: 'Состояние стримера',
+          sourceState: 'Состояние источника',
+          restartsLastHour: 'Перезапуски за последний час',
+          milliseconds: '{{value}} мс',
+          notAvailable: 'Нет данных',
+          streamerStates: {
+            running: 'Работает',
+            notRunning: 'Не работает',
+            notStarted: 'Еще не запускался',
+          },
+          sourceStates: {
+            reachable: 'Доступен',
+            unreachable: 'Недоступен',
+            slotMissing: 'Доступен, но слота репликации нет',
+          },
+        },
+        durations: {
+          seconds: '{{seconds}} с',
+          minutes: '{{minutes}} мин',
+          hoursMinutes: '{{hours}} ч {{minutes}} мин',
+          daysHours: '{{days}} дн. {{hours}} ч',
+        },
+      },
     },
   },
   storages: {
+    cleanup: {
+      title: 'Очистка ещё идёт',
+      warning:
+        'Удаляем из этого хранилища ненужные файлы бекапов. Обычно они остаются после удаления базы или выбора для нее другого хранилища. Дождитесь завершения очистки — как правило, это недолго. Если удалить хранилище сейчас, автоматическая очистка прекратится, а оставшиеся файлы бекапов придется удалить вручную.',
+      wait: 'Подождать',
+      deleteAnyway: 'Всё равно удалить',
+    },
     types: {
       local: 'Локальное хранилище',
       s3: 'S3',
@@ -1695,6 +2005,7 @@ export const ru: typeof en = {
       connectionString: 'Строка подключения',
     },
     sftpAuthMethods: {
+      both: 'Пароль и приватный ключ',
       password: 'Пароль',
       privateKey: 'Закрытый ключ',
     },
@@ -1714,23 +2025,13 @@ export const ru: typeof en = {
         sftp: 'Тип: SFTP',
         rclone: 'Тип: Rclone',
       },
-      hasSaveError: 'Есть ошибка сохранения',
     },
     config: {
       namePlaceholder: 'Введите название...',
       settingsTitle: 'Настройки хранилища',
-      lastSaveError: {
-        title: 'Ошибка сохранения',
-        errorLabel: 'Ошибка:',
-        clearHint: 'Чтобы убрать эту ошибку, сделайте одно из двух:',
-        clearByTestingConnection:
-          '- проверьте подключение кнопкой ниже (даже если вы уже изменили настройки);',
-        clearByNextSave: '- дождитесь, когда следующий бекап сохранится без ошибок;',
-      },
-      removeConfirmation:
-        'Удалить это хранилище? Это действие нельзя отменить. Бекапы, которые лежат в этом хранилище, тоже будут удалены.',
-      removeBlockedByDatabases:
-        'Хранилище используется базами данных. Сначала уберите его из настроек этих баз данных.',
+      removeConfirmation: 'Удалить это хранилище? Это действие нельзя отменить.',
+      removeBlockedByBackups:
+        'Хранилище указано в настройках бэкапов или в нём ещё лежат бэкапы. Сначала переключите эти настройки на другое хранилище и удалите его бэкапы.',
     },
     actions: {
       testConnection: 'Проверить подключение',
@@ -1739,6 +2040,7 @@ export const ru: typeof en = {
       title: 'Подключение работает',
       description: 'Подключение к хранилищу проверено',
     },
+    connectionTestFailed: 'Не удалось подключиться к хранилищу: {{error}}',
     transfer: {
       title: 'Перенос хранилища в другое рабочее пространство',
       blockedByDatabases:
@@ -1810,6 +2112,23 @@ export const ru: typeof en = {
       googleDrive: {
         guideLink: 'Как подключить Google Drive?',
         authorize: 'Авторизоваться',
+        authorized: 'Авторизовано',
+        waiting: 'Ожидаем авторизацию Google...',
+        exchanging: 'Обмениваем код авторизации...',
+        cancel: 'Отменить авторизацию',
+        restart: 'Начать авторизацию заново',
+        reconnect: 'Подключить заново',
+        reconnectHelp:
+          'Для повторного подключения введите секрет клиента. При ошибке сохранённые учётные данные останутся прежними.',
+        expired: 'Срок авторизации истёк. Начните заново.',
+        refused: 'В авторизации Google отказано. Можно попробовать снова.',
+        exchangeFailed: 'Не удалось обменять код авторизации. Начните заново.',
+        missingRefreshToken:
+          'Google не вернул refresh token. Повторите авторизацию и разрешите доступ в автономном режиме.',
+        popupBlocked:
+          'Окно авторизации заблокировано. Разрешите всплывающие окна и попробуйте снова.',
+        unavailable:
+          'Авторизация недоступна в этом браузере. Проверьте поддержку BroadcastChannel и попробуйте снова.',
       },
       nas: {
         shareWithSlashWarning:
@@ -1834,6 +2153,10 @@ export const ru: typeof en = {
           'Не проверять TLS-сертификат. Включите, если FTP-сервер использует самоподписанный сертификат. Внимание: это снижает безопасность.',
       },
       sftp: {
+        savedPassword: 'Пароль сохранён. Оставьте поле пустым, чтобы сохранить его.',
+        savedPrivateKey: 'Приватный ключ сохранён. Оставьте поле пустым, чтобы сохранить его.',
+        requiredPassword: 'Введите пароль для этого способа входа.',
+        requiredPrivateKey: 'Введите приватный ключ для этого способа входа.',
         privateKeyTooltip:
           'Вставьте закрытый SSH-ключ в формате PEM. Поддерживаются ключи RSA, DSA, ECDSA и Ed25519.',
         skipHostKeyVerification: 'Не проверять ключ хоста',

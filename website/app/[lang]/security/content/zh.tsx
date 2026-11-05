@@ -286,9 +286,9 @@ export default function SecurityPage() {
 
               <p>
                 静态分析分几个独立环节运行。CodeQL 扫描整个代码库的安全
-                问题。CodeRabbit 审查每个 PR，并内联运行{" "}
-                <strong>gitleaks</strong> 扫描机密、运行{" "}
-                <strong>semgrep</strong> 检查安全规则。Dockerfile 和 CI
+                问题。每个 PR 都会运行{" "}
+                <strong>gitleaks</strong> 扫描泄露的机密，并用{" "}
+                <strong>semgrep</strong> 按安全规则检查代码。Dockerfile 和 CI
                 工作流还有额外的专属规则（固定 action 引用、最小权限、
                 可疑基础镜像），不安全的写法在合并之前就会被标记出来。
               </p>
@@ -311,16 +311,14 @@ export default function SecurityPage() {
               </p>
 
               <p>
-                <strong>Dependency Review Action</strong> 会直接拦下任何引入
-                新的 <strong>HIGH</strong> 或 <strong>CRITICAL</strong> CVE 的
-                PR。
+                <strong>Dependency Review Action</strong> 会让任何引入新的 <strong>HIGH</strong> 或 <strong>CRITICAL</strong> CVE 的 PR 检查失败。
               </p>
 
               <h3 id="container-and-ci-hardening">容器与 CI 加固</h3>
 
               <ul>
                 <li>
-                  每次构建都用 <strong>Trivy</strong> 扫描容器镜像。
+                  发布前，应用镜像会在两种架构上都用 <strong>Trivy</strong> 扫描。
                 </li>
                 <li>
                   另有一轮 Trivy 检查 Dockerfile，把配置错误挡在镜像 之外。
@@ -349,8 +347,7 @@ export default function SecurityPage() {
 
               <p>
                 CI/CD 流水线的其余部分在每个 PR 上运行 lint、类型检查、
-                完整测试套件、镜像冒烟测试和多架构构建。全部通过，版本
-                才会发布。
+                完整测试套件、镜像冒烟测试和多架构构建。只有这些检查和安全扫描全部通过，且没有未处理的 CodeQL 严重告警，版本才会发布。
               </p>
 
               <h3 id="reporting-a-vulnerability">报告漏洞</h3>
