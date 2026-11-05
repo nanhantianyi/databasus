@@ -20,7 +20,7 @@ const hasWeekdayAboveServerMaximum = (weekdayField: string): boolean => {
 
 const parseNextRun = (expression: string): Date | null => {
   try {
-    return CronExpressionParser.parse(expression, { tz: 'UTC' }).next().toDate();
+    return CronExpressionParser.parse(expression).next().toDate();
   } catch {
     return null;
   }
