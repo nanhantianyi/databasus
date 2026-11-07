@@ -49,8 +49,8 @@ The repository's skills live in `.agents/skills/`, which Codex reads directly; C
 | `mise run run` | Start the app locally: dev database, test fixtures, WAL backup source with its load generator, backend and frontend; seeds a dev account with databases and restarts the backend when its code changes |
 | `mise run test` | Check the work: the backend packages without the end-to-end ones and the frontend tests |
 | `mise run test-full` | Run all tests for the usual Docker development environment; [testing.md](docs/testing.md#checking-work) lists the included suites and the Podman/filesystem exceptions |
-| `mise run lint` | Check every module without changing files; `mise run backend:lint` and `frontend:lint` check one |
-| `mise run format` | Format every module; `backend:format` and `frontend:format` format one |
+| `mise run lint` | Check every module without changing files; `backend:lint`, `frontend:lint` and `python:lint` check one area |
+| `mise run format` | Format every module; `backend:format`, `frontend:format` and `python:format` format one area |
 | `mise run doctor` | Check review tools and whether Codex project hooks are enabled and trusted |
 | `mise run review [<change>]` | Manually rerun parallel AI reviews of a finished OpenSpec change when hooks did not run or another review is needed |
 | `goose -dir backend/migrations create <name> sql` | Create a migration |
@@ -103,7 +103,7 @@ When you start the app or look at its pages, load the [run-app skill](.agents/sk
 
 **English only in code, comments, identifiers, log messages, API strings, test assertions, and commit messages.** No other language inside `backend/` at all, and none inside `frontend/src/` outside the interface dictionaries named below — not even for user-facing fallback copy or error messages.
 
-Translated end-user content is allowed in five places and nowhere else: the website page copies (`website/app/[lang]/*/content/<locale>.tsx`), the README translations (`assets/readme/README.<locale>.md`), the six language-switcher labels in the root `README.md`, the frontend interface dictionaries (`frontend/src/shared/i18n/locales/<locale>.ts`), and the quoted example pairs in the [how-to-communicate skill](.agents/skills/humanizer/SKILL.md), which model conversation output rather than documentation prose. Even there, file names (locale codes aside), identifiers, dictionary keys and commit messages stay English.
+Translated end-user content is allowed in six places and nowhere else: the website page copies (`website/app/[lang]/*/content/<locale>.tsx`), the README translations (`assets/readme/README.<locale>.md`), the six language-switcher labels in the root `README.md`, the frontend interface dictionaries (`frontend/src/shared/i18n/locales/<locale>.ts`), the shared website locale maps listed in [`website/AGENTS.md` - Language exception](website/AGENTS.md#language-exception), and the quoted example pairs in the [how-to-communicate skill](.agents/skills/humanizer/SKILL.md), which model conversation output rather than documentation prose. Even there, file names (locale codes aside), identifiers, dictionary keys and commit messages stay English.
 
 The dictionaries are the only target-language text anywhere under `frontend/`, `index.html` included. Every other file there stays English, fallback copy and error messages included: a component renders a translation by looking up a key, never by holding the translated string itself.
 
@@ -164,6 +164,8 @@ Short names stay where the convention is well established: Go receivers (`s *Not
 
 ## Functions, methods and types
 
+Python named functions and methods declare parameter and return types, including tests, fixtures and callbacks. Use concrete collection values and structured records; validate external dynamic values before exposing their typed shape. Do not bypass checking with unrestricted dynamic annotations or blanket suppressions. A necessary suppression names a specific rule and explains the external limitation. [Python quality checks](docs/testing.md#python-quality-checks) describes verification.
+
 - Getters take a `Get` prefix and name the entity, even though Go idiom omits it: `GetWorkspace`, not `Workspace`. Constructors stay `New...`, and a getter that returns a bool is a predicate.
 - A predicate reads as a question: `IsAborted(id)`, not `AbortedContains(id)`.
 - The name states everything the unit does, or the unit is split: `repairAndSaveConfigForBackupType`, not `saveConfigForBackupType` for a method that also repairs the row.
@@ -213,7 +215,7 @@ Databasus handles sensitive data, so security is a layered defence. When working
 - Keep Dockerfiles free of secrets, floating base-image tags and unjustified root. If root-at-start is required (PUID/PGID remap, volume chown, initdb), drop privileges with `gosu` before `exec`-ing the app.
 - Never log secrets, tokens or credentials. Redact at the logger layer, not at call sites.
 
-The README's `🛡️ Security & reliability engineering` section is the public-facing version of these practices — keep both consistent if substance changes. That section, like the rest of `README.md`, exists in 6 languages: a substantive edit lands in the English file and in all five `assets/readme/README.<locale>.md` copies.
+The README's `🛡️ Security & reliability engineering` section is the public-facing version of these practices — keep both consistent if substance changes. That section, like the rest of `README.md`, exists in 7 languages: a substantive edit lands in the English file and in all six `assets/readme/README.<locale>.md` copies.
 
 ---
 

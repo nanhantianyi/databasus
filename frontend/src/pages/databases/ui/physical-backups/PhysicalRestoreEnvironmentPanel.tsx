@@ -2,7 +2,6 @@ import { Alert, Input } from 'antd';
 import { type JSX, useId } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 
-import { InlineCodeComponent } from '../../../../shared/ui';
 import {
   type RestoreEnvironment,
   buildChownCommand,
@@ -13,10 +12,11 @@ import {
   containerVolumeDir,
   debianConfigDir,
   defaultPgBinDir,
-} from '../../lib/physical-backups/restoreCommands';
-import { PhysicalRestoreCommands } from './PhysicalRestoreCommands';
-import type { PhysicalRestoreMethod } from './PhysicalRestoreMethod';
-import { useCopiedCommand } from './useCopiedCommand';
+} from '@/pages/databases/lib/physical-backups/restoreCommands';
+import { PhysicalRestoreCommands } from '@/pages/databases/ui/physical-backups/PhysicalRestoreCommands';
+import type { PhysicalRestoreMethod } from '@/pages/databases/ui/physical-backups/PhysicalRestoreMethod';
+import { useCopiedCommand } from '@/pages/databases/ui/physical-backups/useCopiedCommand';
+import { InlineCodeComponent } from '@/shared/ui';
 
 interface Props {
   environment: RestoreEnvironment;
@@ -188,7 +188,9 @@ export const PhysicalRestoreEnvironmentPanel = ({
                   i18nKey="backups.physical.restore.afterItFinishes.host.start"
                   components={{
                     command: (
-                      <InlineCodeComponent>{buildPgCtlStartCommand(dataDir)}</InlineCodeComponent>
+                      <InlineCodeComponent>
+                        {buildPgCtlStartCommand({ dataDir, pgBin })}
+                      </InlineCodeComponent>
                     ),
                   }}
                 />
@@ -224,7 +226,7 @@ export const PhysicalRestoreEnvironmentPanel = ({
                     {buildDockerRunCommand({
                       hostDir: outputDir,
                       containerDir: containerVolumeDir(pgVersion),
-                      pgVersion,
+                      image: dockerImage,
                     })}
                   </InlineCodeComponent>
                 </li>
@@ -243,7 +245,7 @@ export const PhysicalRestoreEnvironmentPanel = ({
                     {buildDockerRunCommand({
                       hostDir: dataDir,
                       containerDir: containerDataDir(pgVersion),
-                      pgVersion,
+                      image: dockerImage,
                     })}
                   </InlineCodeComponent>
                 </li>

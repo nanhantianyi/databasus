@@ -3,27 +3,23 @@ import { App, Button, Dropdown, type MenuProps, Modal, Spin } from 'antd';
 import { type JSX, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import {
-  type Database,
-  DatabaseType,
-  PhysicalDatabaseBackupType,
-} from '../../../../entities/databases';
-import { usePersistentState, usePolledPagedList } from '../../../../shared/hooks';
-import { translateApiError, useLocale } from '../../../../shared/i18n';
-import { ConfirmationComponent, LoadFailure } from '../../../../shared/ui';
-import { type TriggerPhysicalBackupType, physicalBackupsApi } from '../../api/physicalBackupsApi';
-import { formatBackupSize } from '../../lib/formatBackupSize';
-import { type PhysicalBackupListItem } from '../../model/physical-backups/PhysicalBackupListItem';
-import { type PhysicalBackupsFilters } from '../../model/physical-backups/PhysicalBackupsFilters';
-import { PhysicalBackupType } from '../../model/physical-backups/PhysicalBackupType';
-import { BackupConfigNotice } from '../backup-config/BackupConfigNotice';
-import { useBackupConfigLoad } from '../backup-config/useBackupConfigLoad';
-import type { PhysicalBackupRowActions } from './PhysicalBackupActions';
-import { PhysicalBackupCards } from './PhysicalBackupCards';
-import { PhysicalBackupsFiltersPanelComponent } from './PhysicalBackupsFiltersPanelComponent';
-import { PhysicalBackupsTable } from './PhysicalBackupsTable';
-import { PhysicalRestoreComponent } from './PhysicalRestoreComponent';
-import { usePhysicalBackupActions } from './usePhysicalBackupActions';
+import { type Database, DatabaseType, PhysicalDatabaseBackupType } from '@/entities/databases';
+import { physicalBackupsApi } from '@/pages/databases/api/physicalBackupsApi';
+import { formatBackupSize } from '@/pages/databases/lib/formatBackupSize';
+import { type PhysicalBackupListItem } from '@/pages/databases/model/physical-backups/PhysicalBackupListItem';
+import { type PhysicalBackupsFilters } from '@/pages/databases/model/physical-backups/PhysicalBackupsFilters';
+import { PhysicalBackupType } from '@/pages/databases/model/physical-backups/PhysicalBackupType';
+import { BackupConfigNotice } from '@/pages/databases/ui/backup-config/BackupConfigNotice';
+import { useBackupConfigLoad } from '@/pages/databases/ui/backup-config/useBackupConfigLoad';
+import type { PhysicalBackupRowActions } from '@/pages/databases/ui/physical-backups/PhysicalBackupActions';
+import { PhysicalBackupCards } from '@/pages/databases/ui/physical-backups/PhysicalBackupCards';
+import { PhysicalBackupsFiltersPanelComponent } from '@/pages/databases/ui/physical-backups/PhysicalBackupsFiltersPanelComponent';
+import { PhysicalBackupsTable } from '@/pages/databases/ui/physical-backups/PhysicalBackupsTable';
+import { PhysicalRestoreComponent } from '@/pages/databases/ui/physical-backups/PhysicalRestoreComponent';
+import { usePhysicalBackupActions } from '@/pages/databases/ui/physical-backups/usePhysicalBackupActions';
+import { usePersistentState, usePolledPagedList } from '@/shared/hooks';
+import { translateApiError, useLocale } from '@/shared/i18n';
+import { ConfirmationComponent, LoadFailure } from '@/shared/ui';
 
 const BACKUPS_PAGE_SIZE = 50;
 const BACKUPS_REFRESH_MS = 1_000;
@@ -112,14 +108,16 @@ export const PhysicalBackupsComponent = ({
 
   const backupNowMenu: MenuProps = {
     items: [
-      { key: 'full', label: t('backups.physical.list.fullBackup') },
+      { key: 'FULL', label: t('backups.physical.list.fullBackup') },
       {
-        key: 'incremental',
+        key: 'INCREMENTAL',
         label: t('backups.physical.list.incrementalBackup'),
         disabled: !isIncrementalAllowed,
       },
     ],
-    onClick: ({ key }) => void backupActions.startBackup(key as TriggerPhysicalBackupType),
+    onClick: ({ key }) => {
+      if (key === 'FULL' || key === 'INCREMENTAL') void backupActions.startBackup(key);
+    },
   };
 
   const rowActions: PhysicalBackupRowActions = {

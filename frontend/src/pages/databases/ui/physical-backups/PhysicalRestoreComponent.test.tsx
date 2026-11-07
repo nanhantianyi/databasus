@@ -6,23 +6,19 @@ import { HttpResponse, http } from 'msw';
 import { useState } from 'react';
 import { describe, expect, it, vi } from 'vitest';
 
-import {
-  type Database,
-  DatabaseType,
-  createDefaultDatabaseSettings,
-} from '../../../../entities/databases';
-import { API_BASE_PATH } from '../../../../shared/api';
-import { DICTIONARIES, useLocale } from '../../../../shared/i18n';
-import { buildProblem, mockApi, setUpMockApi } from '../../../../shared/lib/test/mockApi';
-import { createPendingApiResponse } from '../../../../shared/lib/test/pendingApiResponse';
-import { releaseAndSettle } from '../../../../shared/lib/test/releaseAndSettle';
-import { renderScreen } from '../../../../shared/lib/test/renderScreen';
-import { stubClipboardWrite } from '../../../../shared/lib/test/stubClipboard';
-import { physicalBackupsApi } from '../../api/physicalBackupsApi';
-import { type PhysicalBackupListItem } from '../../model/physical-backups/PhysicalBackupListItem';
-import { PhysicalBackupStatus } from '../../model/physical-backups/PhysicalBackupStatus';
-import { PhysicalBackupType } from '../../model/physical-backups/PhysicalBackupType';
-import { PhysicalRestoreComponent } from './PhysicalRestoreComponent';
+import { type Database, DatabaseType, createDefaultDatabaseSettings } from '@/entities/databases';
+import { physicalBackupsApi } from '@/pages/databases/api/physicalBackupsApi';
+import { type PhysicalBackupListItem } from '@/pages/databases/model/physical-backups/PhysicalBackupListItem';
+import { PhysicalBackupStatus } from '@/pages/databases/model/physical-backups/PhysicalBackupStatus';
+import { PhysicalBackupType } from '@/pages/databases/model/physical-backups/PhysicalBackupType';
+import { PhysicalRestoreComponent } from '@/pages/databases/ui/physical-backups/PhysicalRestoreComponent';
+import { API_BASE_PATH } from '@/shared/api';
+import { DICTIONARIES, useLocale } from '@/shared/i18n';
+import { buildProblem, mockApi, setUpMockApi } from '@/shared/lib/test/mockApi';
+import { createPendingApiResponse } from '@/shared/lib/test/pendingApiResponse';
+import { releaseAndSettle } from '@/shared/lib/test/releaseAndSettle';
+import { renderScreen } from '@/shared/lib/test/renderScreen';
+import { stubClipboardWrite } from '@/shared/lib/test/stubClipboard';
 
 // main.tsx registers the plugin for the application; the screen sends and shows times through it.
 dayjs.extend(utc);
@@ -426,6 +422,44 @@ describe('PhysicalRestoreComponent commands', () => {
       target: { value },
     });
   };
+
+  it('uses edited paths and tools in Host preparation and startup instructions', async () => {
+    await renderIssuedRestore(buildDatabaseOfVersion('18'));
+
+    await editField(restoreCopy.fields.restoreDirectory, './host restore');
+    await editField(restoreCopy.fields.pgBinPath, '/opt/pg tools');
+
+    expect(getShownCommands()[0]).toContain('--pg-bin "/opt/pg tools"');
+    expect(getShownCommands()[0]).toContain('"./host restore"');
+    expect(screen.getByRole('tabpanel').textContent).toContain(
+      'chown -R postgres:postgres "./host restore/18/docker"',
+    );
+    expect(screen.getByRole('tabpanel').textContent).toContain(
+      '"/opt/pg tools/pg_ctl" -D "./host restore/18/docker" start',
+    );
+  });
+
+  it.each(['17', '18'] as const)(
+    'uses the edited absolute path and image for Docker preparation and startup on PostgreSQL %s',
+    async (version) => {
+      await renderIssuedRestore(buildDatabaseOfVersion(version));
+      switchToDocker();
+      const image = `postgres:${version}@sha256:abcdef`;
+
+      await editField(restoreCopy.fields.restoreDirectory, '/restore-work/docker restore');
+      await editField(restoreCopy.fields.pgImage, image);
+
+      expect(getShownCommands()[0]).toContain(`--combine-image "${image}"`);
+      expect(getShownCommands()[0]).toContain('"/restore-work/docker restore"');
+      const mount =
+        version === '18'
+          ? '/restore-work/docker restore:/var/lib/postgresql'
+          : '/restore-work/docker restore/data:/var/lib/postgresql/data';
+      expect(screen.getByRole('tabpanel').textContent).toContain(
+        `docker run -e POSTGRES_PASSWORD=... -v "${mount}" "${image}"`,
+      );
+    },
+  );
 
   it('replaces the host script with the image script after switching to Docker', async () => {
     await renderIssuedRestore();
