@@ -19,42 +19,48 @@ import (
 
 // Defines values for ProblemCode.
 const (
-	ProblemCodeAdminEmailMissing        ProblemCode = "admin_email_missing"
-	ProblemCodeAlreadyMember            ProblemCode = "already_member"
-	ProblemCodeAlreadyRunning           ProblemCode = "already_running"
-	ProblemCodeBackupNotCompleted       ProblemCode = "backup_not_completed"
-	ProblemCodeCannotChangeOwnRole      ProblemCode = "cannot_change_own_role"
-	ProblemCodeCleanupPending           ProblemCode = "cleanup_pending"
-	ProblemCodeDatabaseConnectionFailed ProblemCode = "database_connection_failed"
-	ProblemCodeEmailNotConfigured       ProblemCode = "email_not_configured"
-	ProblemCodeEmailTaken               ProblemCode = "email_taken"
-	ProblemCodeHumanVerificationFailed  ProblemCode = "human_verification_failed"
-	ProblemCodeInUse                    ProblemCode = "in_use"
-	ProblemCodeInstanceUnhealthy        ProblemCode = "instance_unhealthy"
-	ProblemCodeInsufficientDiskSpace    ProblemCode = "insufficient_disk_space"
-	ProblemCodeInternal                 ProblemCode = "internal"
-	ProblemCodeInvalidCredentials       ProblemCode = "invalid_credentials"
-	ProblemCodeInvalidRequest           ProblemCode = "invalid_request"
-	ProblemCodeInvalidResetCode         ProblemCode = "invalid_reset_code"
-	ProblemCodeNoExtendableChain        ProblemCode = "no_extendable_chain"
-	ProblemCodeNoRestorableBackup       ProblemCode = "no_restorable_backup"
-	ProblemCodeNotFound                 ProblemCode = "not_found"
-	ProblemCodeNotRunning               ProblemCode = "not_running"
-	ProblemCodeOauthFailed              ProblemCode = "oauth_failed"
-	ProblemCodeOauthNotConfigured       ProblemCode = "oauth_not_configured"
-	ProblemCodeOwnerRequiresTransfer    ProblemCode = "owner_requires_transfer"
-	ProblemCodePendingSignInNotUsable   ProblemCode = "pending_sign_in_not_usable"
-	ProblemCodePermissionDenied         ProblemCode = "permission_denied"
-	ProblemCodeRateLimited              ProblemCode = "rate_limited"
-	ProblemCodeRegistrationClosed       ProblemCode = "registration_closed"
-	ProblemCodeSignInCodeIncorrect      ProblemCode = "sign_in_code_incorrect"
-	ProblemCodeSignInCodeNotSent        ProblemCode = "sign_in_code_not_sent"
-	ProblemCodeSignInCodeResentTooSoon  ProblemCode = "sign_in_code_resent_too_soon"
-	ProblemCodeTargetTimeUnreachable    ProblemCode = "target_time_unreachable"
-	ProblemCodeTooManySignInCodes       ProblemCode = "too_many_sign_in_codes"
-	ProblemCodeUnauthenticated          ProblemCode = "unauthenticated"
-	ProblemCodeUserDeactivated          ProblemCode = "user_deactivated"
-	ProblemCodeWorkspaceNotEmpty        ProblemCode = "workspace_not_empty"
+	ProblemCodeAdminEmailMissing          ProblemCode = "admin_email_missing"
+	ProblemCodeAlreadyMember              ProblemCode = "already_member"
+	ProblemCodeAlreadyRunning             ProblemCode = "already_running"
+	ProblemCodeBackupNotCompleted         ProblemCode = "backup_not_completed"
+	ProblemCodeCannotChangeOwnRole        ProblemCode = "cannot_change_own_role"
+	ProblemCodeCleanupPending             ProblemCode = "cleanup_pending"
+	ProblemCodeDatabaseConnectionFailed   ProblemCode = "database_connection_failed"
+	ProblemCodeEmailNotConfigured         ProblemCode = "email_not_configured"
+	ProblemCodeEmailNotFound              ProblemCode = "email_not_found"
+	ProblemCodeEmailTaken                 ProblemCode = "email_taken"
+	ProblemCodeHumanVerificationFailed    ProblemCode = "human_verification_failed"
+	ProblemCodeInUse                      ProblemCode = "in_use"
+	ProblemCodeInstanceUnhealthy          ProblemCode = "instance_unhealthy"
+	ProblemCodeInsufficientDiskSpace      ProblemCode = "insufficient_disk_space"
+	ProblemCodeInternal                   ProblemCode = "internal"
+	ProblemCodeInvalidRequest             ProblemCode = "invalid_request"
+	ProblemCodeInvalidResetCode           ProblemCode = "invalid_reset_code"
+	ProblemCodeNoExtendableChain          ProblemCode = "no_extendable_chain"
+	ProblemCodeNoRestorableBackup         ProblemCode = "no_restorable_backup"
+	ProblemCodeNotFound                   ProblemCode = "not_found"
+	ProblemCodeNotRunning                 ProblemCode = "not_running"
+	ProblemCodeOauthFailed                ProblemCode = "oauth_failed"
+	ProblemCodeOauthNotConfigured         ProblemCode = "oauth_not_configured"
+	ProblemCodeOwnerRequiresTransfer      ProblemCode = "owner_requires_transfer"
+	ProblemCodePasswordIncorrect          ProblemCode = "password_incorrect"
+	ProblemCodePasswordNotSet             ProblemCode = "password_not_set"
+	ProblemCodePasswordNotSetGithub       ProblemCode = "password_not_set_github"
+	ProblemCodePasswordNotSetGoogle       ProblemCode = "password_not_set_google"
+	ProblemCodePasswordNotSetGoogleGithub ProblemCode = "password_not_set_google_github"
+	ProblemCodePendingSignInNotUsable     ProblemCode = "pending_sign_in_not_usable"
+	ProblemCodePermissionDenied           ProblemCode = "permission_denied"
+	ProblemCodeRateLimited                ProblemCode = "rate_limited"
+	ProblemCodeRegistrationClosed         ProblemCode = "registration_closed"
+	ProblemCodeRegistrationIncomplete     ProblemCode = "registration_incomplete"
+	ProblemCodeSignInCodeIncorrect        ProblemCode = "sign_in_code_incorrect"
+	ProblemCodeSignInCodeNotSent          ProblemCode = "sign_in_code_not_sent"
+	ProblemCodeSignInCodeResentTooSoon    ProblemCode = "sign_in_code_resent_too_soon"
+	ProblemCodeTargetTimeUnreachable      ProblemCode = "target_time_unreachable"
+	ProblemCodeTooManySignInCodes         ProblemCode = "too_many_sign_in_codes"
+	ProblemCodeUnauthenticated            ProblemCode = "unauthenticated"
+	ProblemCodeUserDeactivated            ProblemCode = "user_deactivated"
+	ProblemCodeWorkspaceNotEmpty          ProblemCode = "workspace_not_empty"
 )
 
 // Valid indicates whether the value is a known member of the ProblemCode enum.
@@ -76,6 +82,8 @@ func (e ProblemCode) Valid() bool {
 		return true
 	case ProblemCodeEmailNotConfigured:
 		return true
+	case ProblemCodeEmailNotFound:
+		return true
 	case ProblemCodeEmailTaken:
 		return true
 	case ProblemCodeHumanVerificationFailed:
@@ -87,8 +95,6 @@ func (e ProblemCode) Valid() bool {
 	case ProblemCodeInsufficientDiskSpace:
 		return true
 	case ProblemCodeInternal:
-		return true
-	case ProblemCodeInvalidCredentials:
 		return true
 	case ProblemCodeInvalidRequest:
 		return true
@@ -108,6 +114,16 @@ func (e ProblemCode) Valid() bool {
 		return true
 	case ProblemCodeOwnerRequiresTransfer:
 		return true
+	case ProblemCodePasswordIncorrect:
+		return true
+	case ProblemCodePasswordNotSet:
+		return true
+	case ProblemCodePasswordNotSetGithub:
+		return true
+	case ProblemCodePasswordNotSetGoogle:
+		return true
+	case ProblemCodePasswordNotSetGoogleGithub:
+		return true
 	case ProblemCodePendingSignInNotUsable:
 		return true
 	case ProblemCodePermissionDenied:
@@ -115,6 +131,8 @@ func (e ProblemCode) Valid() bool {
 	case ProblemCodeRateLimited:
 		return true
 	case ProblemCodeRegistrationClosed:
+		return true
+	case ProblemCodeRegistrationIncomplete:
 		return true
 	case ProblemCodeSignInCodeIncorrect:
 		return true
@@ -2822,7 +2840,7 @@ func (sh *strictHandler) SignInWithGitHub(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SignInWithGitHub(ctx, request.(SignInWithGitHubRequestObject))
+		return sh.ssi.SignInWithGitHub(ctx.Request.Context(), request.(SignInWithGitHubRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "SignInWithGitHub")
@@ -2853,7 +2871,7 @@ func (sh *strictHandler) SignInWithGoogle(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SignInWithGoogle(ctx, request.(SignInWithGoogleRequestObject))
+		return sh.ssi.SignInWithGoogle(ctx.Request.Context(), request.(SignInWithGoogleRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "SignInWithGoogle")
@@ -2877,7 +2895,7 @@ func (sh *strictHandler) GetInstanceSettings(ctx *gin.Context) {
 	var request GetInstanceSettingsRequestObject
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetInstanceSettings(ctx, request.(GetInstanceSettingsRequestObject))
+		return sh.ssi.GetInstanceSettings(ctx.Request.Context(), request.(GetInstanceSettingsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "GetInstanceSettings")
@@ -2908,7 +2926,7 @@ func (sh *strictHandler) UpdateInstanceSettings(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.UpdateInstanceSettings(ctx, request.(UpdateInstanceSettingsRequestObject))
+		return sh.ssi.UpdateInstanceSettings(ctx.Request.Context(), request.(UpdateInstanceSettingsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "UpdateInstanceSettings")
@@ -2939,7 +2957,7 @@ func (sh *strictHandler) CompletePasswordReset(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CompletePasswordReset(ctx, request.(CompletePasswordResetRequestObject))
+		return sh.ssi.CompletePasswordReset(ctx.Request.Context(), request.(CompletePasswordResetRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "CompletePasswordReset")
@@ -2970,7 +2988,7 @@ func (sh *strictHandler) RequestPasswordReset(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.RequestPasswordReset(ctx, request.(RequestPasswordResetRequestObject))
+		return sh.ssi.RequestPasswordReset(ctx.Request.Context(), request.(RequestPasswordResetRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "RequestPasswordReset")
@@ -3003,7 +3021,7 @@ func (sh *strictHandler) ResendSignInCode(ctx *gin.Context, pendingSignInId Pend
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ResendSignInCode(ctx, request.(ResendSignInCodeRequestObject))
+		return sh.ssi.ResendSignInCode(ctx.Request.Context(), request.(ResendSignInCodeRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "ResendSignInCode")
@@ -3036,7 +3054,7 @@ func (sh *strictHandler) VerifySignInCode(ctx *gin.Context, pendingSignInId Pend
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.VerifySignInCode(ctx, request.(VerifySignInCodeRequestObject))
+		return sh.ssi.VerifySignInCode(ctx.Request.Context(), request.(VerifySignInCodeRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "VerifySignInCode")
@@ -3067,7 +3085,7 @@ func (sh *strictHandler) SignIn(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SignIn(ctx, request.(SignInRequestObject))
+		return sh.ssi.SignIn(ctx.Request.Context(), request.(SignInRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "SignIn")
@@ -3091,7 +3109,7 @@ func (sh *strictHandler) GetSignInOptions(ctx *gin.Context) {
 	var request GetSignInOptionsRequestObject
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetSignInOptions(ctx, request.(GetSignInOptionsRequestObject))
+		return sh.ssi.GetSignInOptions(ctx.Request.Context(), request.(GetSignInOptionsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "GetSignInOptions")
@@ -3115,7 +3133,7 @@ func (sh *strictHandler) SendTestEmail(ctx *gin.Context) {
 	var request SendTestEmailRequestObject
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SendTestEmail(ctx, request.(SendTestEmailRequestObject))
+		return sh.ssi.SendTestEmail(ctx.Request.Context(), request.(SendTestEmailRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "SendTestEmail")
@@ -3141,7 +3159,7 @@ func (sh *strictHandler) ListUsers(ctx *gin.Context, params ListUsersParams) {
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ListUsers(ctx, request.(ListUsersRequestObject))
+		return sh.ssi.ListUsers(ctx.Request.Context(), request.(ListUsersRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "ListUsers")
@@ -3172,7 +3190,7 @@ func (sh *strictHandler) SignUp(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.SignUp(ctx, request.(SignUpRequestObject))
+		return sh.ssi.SignUp(ctx.Request.Context(), request.(SignUpRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "SignUp")
@@ -3198,7 +3216,7 @@ func (sh *strictHandler) GetUser(ctx *gin.Context, userId UserId) {
 	request.UserId = userId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetUser(ctx, request.(GetUserRequestObject))
+		return sh.ssi.GetUser(ctx.Request.Context(), request.(GetUserRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "GetUser")
@@ -3231,7 +3249,7 @@ func (sh *strictHandler) UpdateUser(ctx *gin.Context, userId UserId) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.UpdateUser(ctx, request.(UpdateUserRequestObject))
+		return sh.ssi.UpdateUser(ctx.Request.Context(), request.(UpdateUserRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "UpdateUser")
@@ -3257,7 +3275,7 @@ func (sh *strictHandler) ActivateUser(ctx *gin.Context, userId UserId) {
 	request.UserId = userId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ActivateUser(ctx, request.(ActivateUserRequestObject))
+		return sh.ssi.ActivateUser(ctx.Request.Context(), request.(ActivateUserRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "ActivateUser")
@@ -3283,7 +3301,7 @@ func (sh *strictHandler) DeactivateUser(ctx *gin.Context, userId UserId) {
 	request.UserId = userId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DeactivateUser(ctx, request.(DeactivateUserRequestObject))
+		return sh.ssi.DeactivateUser(ctx.Request.Context(), request.(DeactivateUserRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "DeactivateUser")
@@ -3316,7 +3334,7 @@ func (sh *strictHandler) ChangeUserPassword(ctx *gin.Context, userId UserId) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ChangeUserPassword(ctx, request.(ChangeUserPasswordRequestObject))
+		return sh.ssi.ChangeUserPassword(ctx.Request.Context(), request.(ChangeUserPasswordRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "ChangeUserPassword")
@@ -3349,7 +3367,7 @@ func (sh *strictHandler) ChangeUserRole(ctx *gin.Context, userId UserId) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ChangeUserRole(ctx, request.(ChangeUserRoleRequestObject))
+		return sh.ssi.ChangeUserRole(ctx.Request.Context(), request.(ChangeUserRoleRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "ChangeUserRole")

@@ -5,22 +5,14 @@ import unittest
 from pathlib import Path
 
 from pattern_match import get_required_match
+from workflow_jobs import get_jobs
 
 ROOT = Path(__file__).resolve().parents[1]
 DOWNLOAD_ATTEMPTS_ALLOWED_TO_FAIL = [
-    "Download the storage candidate",
-    "Download the storage candidate (attempt 2)",
+    "Download artifact",
+    "Download artifact (attempt 2)",
 ]
 E2E_TASKS = ("e2e:browser", "e2e:unit", "e2e:lifecycle")
-
-
-def get_job(workflow: str, name: str) -> str:
-    match = re.search(
-        rf"^  {re.escape(name)}:\n(.*?)(?=^  [a-zA-Z0-9_-]+:|\Z)", workflow, re.M | re.S
-    )
-    if match is None:
-        raise AssertionError(f"Missing workflow job: {name}")
-    return match.group(1)
 
 
 def get_step_names_allowed_to_fail(job: str) -> list[str]:
@@ -31,9 +23,10 @@ def get_step_names_allowed_to_fail(job: str) -> list[str]:
 
 
 def check_frontend_toolchain(workflow: str) -> None:
+    jobs = get_jobs(workflow)
     actions = []
     for name in ("lint-frontend", "test-frontend", "test-frontend-browser-ui"):
-        job = get_job(workflow, name)
+        job = jobs[name]
         action = re.search(r"uses: (jdx/mise-action@[a-f0-9]{40})", job)
         tools = re.search(r"install_args:\s*['\"]?([^'\"\n]+)", job)
 
@@ -48,11 +41,12 @@ def check_frontend_toolchain(workflow: str) -> None:
 
     if len(set(actions)) != 1:
         raise AssertionError("Frontend jobs must use the same pinned mise action")
-    if "mise run frontend:lint" not in get_job(
-        workflow, "lint-frontend"
-    ) or "pnpm build" not in get_job(workflow, "lint-frontend"):
+    if (
+        "mise run frontend:lint" not in jobs["lint-frontend"]
+        or "pnpm build" not in jobs["lint-frontend"]
+    ):
         raise AssertionError("Frontend lint and build must stay in the toolchain job")
-    if "pnpm test" not in get_job(workflow, "test-frontend"):
+    if "pnpm test" not in jobs["test-frontend"]:
         raise AssertionError("Frontend tests must run in their toolchain job")
 
 
@@ -71,7 +65,7 @@ class FrontendCiTest(unittest.TestCase):
         self.assertEqual(package["packageManager"], f"pnpm@{configuration['tools']['pnpm']}")
 
     def test_script_suite_installs_its_frontend_tools_before_discovery(self) -> None:
-        job = get_job(self.workflow, "test-scripts")
+        job = get_jobs(self.workflow)["test-scripts"]
         tools = re.search(r"install_args:\s*['\"]?([^'\"\n]+)", job)
 
         assert tools is not None
@@ -96,9 +90,9 @@ class FrontendCiTest(unittest.TestCase):
         ):
             with self.subTest(command=command):
                 self.assertIn(command, commands)
-        self.assertNotRegex(get_job(self.workflow, "test-frontend"), r"(?m)^    needs:")
+        self.assertNotRegex(get_jobs(self.workflow)["test-frontend"], r"(?m)^    needs:")
 
-        release = get_job(self.workflow, "determine-version")
+        release = get_jobs(self.workflow)["determine-version"]
         prerequisites = re.findall(
             r"[a-zA-Z0-9_-]+", get_required_match(r"needs:\s*\[([^]]+)\]", release).group(1)
         )
@@ -110,6 +104,7 @@ class FrontendCiTest(unittest.TestCase):
                 "test-frontend",
                 "test-frontend-browser-ui",
                 "test-e2e-browser",
+                "test-e2e-browser-lifecycle",
                 "test-verification-agent",
                 "e2e-verification-agent-podman",
                 "test-filesystems",
@@ -128,8 +123,11 @@ class FrontendCiTest(unittest.TestCase):
         )
 
     def test_browser_job_uses_the_local_command_and_keeps_failure_artifacts(self) -> None:
-        job = get_job(self.workflow, "test-frontend-browser-ui")
-        self.assertIn("pnpm --dir frontend test:browser --project=ui", job)
+        job = get_jobs(self.workflow)["test-frontend-browser-ui"]
+        self.assertIn(
+            "pnpm --dir frontend test:browser --project=ui --shard=${{ matrix.shard }}/3", job
+        )
+        self.assertIn("name: frontend-browser-ui-${{ matrix.arch }}-${{ matrix.shard }}-of-3", job)
         self.assertIn("if: failure()", job)
         self.assertIn("path: frontend/browser-results/", job)
 
@@ -151,7 +149,7 @@ class FrontendCiTest(unittest.TestCase):
     def test_browser_end_to_end_suite_runs_on_the_candidate_image_and_is_required_before_release(
         self,
     ) -> None:
-        job = get_job(self.workflow, "test-e2e-browser")
+        job = get_jobs(self.workflow)["test-e2e-browser"]
         self.assertIn("needs: [build-storage-image]", job)
         self.assertNotRegex(job, r"(?m)^    if:")
         self.assertIn("install_args: 'python uv'", job)
@@ -160,15 +158,28 @@ class FrontendCiTest(unittest.TestCase):
             job.count(
                 "DATABASUS_IMAGE: databasus-storage-test:${{ github.sha }}-${{ matrix.arch }}"
             ),
-            2,
+            1,
         )
         self.assertLess(
             job.index("run: mise run e2e:unit\n"), job.index("run: mise run e2e:browser\n")
         )
-        self.assertLess(
-            job.index("run: mise run e2e:browser\n"), job.index("run: mise run e2e:lifecycle\n")
+        self.assertNotIn("run: mise run e2e:lifecycle", job)
+        lifecycle = get_jobs(self.workflow)["test-e2e-browser-lifecycle"]
+        self.assertIn("needs: [build-storage-image]", lifecycle)
+        self.assertNotRegex(lifecycle, r"(?m)^    if:")
+        self.assertIn("install_args: 'python uv'", lifecycle)
+        self.assertIn("run: mise run e2e:lifecycle ${{ matrix.group }}", lifecycle)
+        self.assertNotIn("run: mise run e2e:browser", lifecycle)
+        self.assertNotIn("run: mise run e2e:unit", lifecycle)
+        self.assertEqual(
+            lifecycle.count(
+                "DATABASUS_IMAGE: databasus-storage-test:${{ github.sha }}-${{ matrix.arch }}"
+            ),
+            1,
         )
-        self.assertIn("run: mise run e2e:lifecycle\n", job)
+        self.assertEqual(
+            get_step_names_allowed_to_fail(lifecycle), DOWNLOAD_ATTEMPTS_ALLOWED_TO_FAIL
+        )
         self.assertNotIn("upload-artifact", job)
         self.assertNotIn("backend-db-test", job)
         self.assertNotIn("--project=e2e", job)
@@ -179,8 +190,9 @@ class FrontendCiTest(unittest.TestCase):
         for action in re.findall(r"uses: ([^\s]+)", job):
             self.assertRegex(action, r"@[a-f0-9]{40}$")
 
-        release = get_job(self.workflow, "determine-version")
+        release = get_jobs(self.workflow)["determine-version"]
         self.assertIn("test-e2e-browser,", release)
+        self.assertIn("test-e2e-browser-lifecycle,", release)
         self.assertNotIn("always()", release)
         self.assertNotIn("failure()", release)
         self.assertNotIn("continue-on-error", release)
@@ -213,14 +225,19 @@ class FrontendCiTest(unittest.TestCase):
         self.assertEqual(tasks["test"]["run"], "scripts/test.sh")
 
     def test_detects_runtime_drift_and_mutable_dependency_installs(self) -> None:
-        for changed in (
-            re.sub(
-                r"install_args: ['\"]node pnpm['\"]", 'node-version: "20"', self.workflow, count=1
-            ),
-            self.workflow.replace("pnpm install --frozen-lockfile", "pnpm install", 1),
-            self.workflow.replace("pnpm build", "pnpm unrelated-script", 1),
+        for mutation_index, changed in enumerate(
+            (
+                re.sub(
+                    r"install_args: ['\"]node pnpm['\"]",
+                    'node-version: "20"',
+                    self.workflow,
+                    count=1,
+                ),
+                self.workflow.replace("pnpm install --frozen-lockfile", "pnpm install", 1),
+                self.workflow.replace("pnpm build", "pnpm unrelated-script", 1),
+            )
         ):
-            with self.subTest(workflow=changed):
+            with self.subTest(mutation=mutation_index):
                 with self.assertRaises(AssertionError):
                     check_frontend_toolchain(changed)
 

@@ -5,7 +5,20 @@ export const en = {
     nativeName: 'English',
   },
   common: {
+    calendar: {
+      monthLevelControl: 'Choose month',
+      yearLevelControl: 'Choose year',
+      nextMonth: 'Next month',
+      previousMonth: 'Previous month',
+      nextYear: 'Next year',
+      previousYear: 'Previous year',
+      nextDecade: 'Next decade',
+      previousDecade: 'Previous decade',
+      seconds: 'Seconds',
+    },
     actions: {
+      clear: 'Clear',
+      togglePasswordVisibility: 'Toggle password visibility',
       back: 'Back',
       cancel: 'Cancel',
       close: 'Close',
@@ -148,7 +161,14 @@ export const en = {
     unauthenticated: 'Your session has ended. Sign in again.',
     permissionDenied: 'You do not have permission to do this.',
     humanVerificationFailed: 'The human verification failed. Complete the check and try again.',
-    invalidCredentials: 'The email or password is incorrect.',
+    emailNotFound: 'No account was found with this email address. Check the address.',
+    passwordIncorrect: 'The password is incorrect.',
+    registrationIncomplete:
+      'Registration is not complete. Sign up with this email address to accept your invitation.',
+    passwordNotSet: 'This account has no password.',
+    passwordNotSetGoogle: 'This account has no password. Sign in with Google.',
+    passwordNotSetGithub: 'This account has no password. Sign in with GitHub.',
+    passwordNotSetGoogleGithub: 'This account has no password. Sign in with Google or GitHub.',
     userDeactivated: 'This account is deactivated. Ask an administrator to activate it.',
     registrationClosed:
       'Registration is closed on this instance. Ask an administrator for an invitation.',
@@ -201,6 +221,9 @@ export const en = {
     },
   },
   schedules: {
+    hours: 'Hours',
+    minutes: 'Minutes',
+    timePeriod: 'AM or PM',
     types: {
       hourly: 'Hourly',
       daily: 'Daily',
@@ -912,6 +935,9 @@ export const en = {
       submit: 'Sign in',
       noAccount: "Don't have an account? <signUpLink>Sign up</signUpLink>",
       forgotPassword: 'Forgot password?',
+      setPassword: 'Set a password',
+      passwordRecoveryHint: 'Use password recovery to set a password.',
+      contactAdministratorHint: 'Contact your administrator to restore access.',
     },
     signInCode: {
       title: 'Enter the code',
@@ -1388,6 +1414,7 @@ export const en = {
       encrypted: 'Encrypt backup files',
     },
     list: {
+      totalUsage: 'Total usage: {{size}}',
       title: 'Backups',
       scheduledBackupsDisabled:
         'Scheduled backups are disabled (you can enable it back in the backup configuration)',
@@ -1449,7 +1476,7 @@ export const en = {
         forever: 'Forever',
       },
       retentionPolicyTypes: {
-        gfs: 'GFS (keep last N hourly, daily, weekly, monthly and yearly backups)',
+        gfs: 'GFS (calendar retention)',
         timePeriod: 'Time period (last N days)',
         count: 'Count (N last backups)',
       },
@@ -1503,10 +1530,15 @@ export const en = {
           countValue: 'Most recent backups: {{count}}',
           showGfsHint: 'What is GFS (Grandfather-Father-Son)?',
           hideGfsHint: 'Hide',
-          gfsHint:
-            'GFS (Grandfather-Father-Son) rotation: keep the last N hourly, daily, weekly, monthly and yearly backups. This allows keeping backups over long periods of time within a reasonable storage space.',
+          gfsHint: {
+            summary: 'GFS keeps recent backups and saves some older ones for longer.',
+            selection:
+              '<strong>Choose how many backups to keep</strong> by hour, day, week, month and year. Only successful backups count.',
+            fileCount:
+              '<strong>One backup can count toward several settings</strong>, so the total number of files may vary.',
+          },
           gfsTooltip:
-            'Grandfather-Father-Son rotation: keep the last N hourly, daily, weekly, monthly and yearly backups.',
+            'GFS: recent calendar hours/days and completed weeks/months/years, plus a protected current candidate.',
           gfsFields: {
             hourly: 'Hourly backups',
             daily: 'Daily backups',
@@ -1547,7 +1579,6 @@ export const en = {
         walGap: 'WAL gap',
       },
       list: {
-        totalUsage: 'Total usage: {{size}}',
         backUpNow: 'Back up now',
         startRequirement:
           'To start a backup, turn on backups and choose a storage in the backup configuration.',
@@ -1605,8 +1636,17 @@ export const en = {
         chainsKept: 'Chains kept',
         fullBackupsKept: 'Full backups kept',
         fullBackupsCountValue: 'Most recent: {{count}}',
+        gfsHint: {
+          summary: 'GFS keeps recent full backups and saves some older ones for longer.',
+          selection:
+            '<strong>Choose how many backups to keep</strong> by hour, day, week, month and year. Only successful backups count.',
+          fileCount:
+            '<strong>One backup can count toward several settings</strong>, so the total number of files may vary.',
+          scope:
+            '<strong>GFS applies only to full backups.</strong> Incremental backups and WAL are managed separately.',
+        },
         gfsTooltip:
-          'Grandfather-Father-Son rotation: keep the last N hourly, daily, weekly, monthly and yearly full backups.',
+          'GFS: successful full backups for recent calendar hours/days and completed weeks/months/years, plus a protected current candidate.',
       },
       restore: {
         errorHints: {
@@ -1969,6 +2009,7 @@ export const en = {
     },
   },
   storages: {
+    usageUnavailable: 'Could not refresh backup usage.',
     cleanup: {
       title: 'Cleanup is still running',
       warning:
@@ -2005,6 +2046,8 @@ export const en = {
       privateKey: 'Private key',
     },
     list: {
+      searchPlaceholder: 'Search storages...',
+      noSearchResults: 'No storages found matching "{{query}}"',
       addStorage: 'Add storage',
       description: 'Storage - is a place where backups will be stored (local disk, S3, etc.)',
       backToList: '← Back to storages',

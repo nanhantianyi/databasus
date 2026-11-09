@@ -18,42 +18,48 @@ import (
 
 // Defines values for ProblemCode.
 const (
-	ProblemCodeAdminEmailMissing        ProblemCode = "admin_email_missing"
-	ProblemCodeAlreadyMember            ProblemCode = "already_member"
-	ProblemCodeAlreadyRunning           ProblemCode = "already_running"
-	ProblemCodeBackupNotCompleted       ProblemCode = "backup_not_completed"
-	ProblemCodeCannotChangeOwnRole      ProblemCode = "cannot_change_own_role"
-	ProblemCodeCleanupPending           ProblemCode = "cleanup_pending"
-	ProblemCodeDatabaseConnectionFailed ProblemCode = "database_connection_failed"
-	ProblemCodeEmailNotConfigured       ProblemCode = "email_not_configured"
-	ProblemCodeEmailTaken               ProblemCode = "email_taken"
-	ProblemCodeHumanVerificationFailed  ProblemCode = "human_verification_failed"
-	ProblemCodeInUse                    ProblemCode = "in_use"
-	ProblemCodeInstanceUnhealthy        ProblemCode = "instance_unhealthy"
-	ProblemCodeInsufficientDiskSpace    ProblemCode = "insufficient_disk_space"
-	ProblemCodeInternal                 ProblemCode = "internal"
-	ProblemCodeInvalidCredentials       ProblemCode = "invalid_credentials"
-	ProblemCodeInvalidRequest           ProblemCode = "invalid_request"
-	ProblemCodeInvalidResetCode         ProblemCode = "invalid_reset_code"
-	ProblemCodeNoExtendableChain        ProblemCode = "no_extendable_chain"
-	ProblemCodeNoRestorableBackup       ProblemCode = "no_restorable_backup"
-	ProblemCodeNotFound                 ProblemCode = "not_found"
-	ProblemCodeNotRunning               ProblemCode = "not_running"
-	ProblemCodeOauthFailed              ProblemCode = "oauth_failed"
-	ProblemCodeOauthNotConfigured       ProblemCode = "oauth_not_configured"
-	ProblemCodeOwnerRequiresTransfer    ProblemCode = "owner_requires_transfer"
-	ProblemCodePendingSignInNotUsable   ProblemCode = "pending_sign_in_not_usable"
-	ProblemCodePermissionDenied         ProblemCode = "permission_denied"
-	ProblemCodeRateLimited              ProblemCode = "rate_limited"
-	ProblemCodeRegistrationClosed       ProblemCode = "registration_closed"
-	ProblemCodeSignInCodeIncorrect      ProblemCode = "sign_in_code_incorrect"
-	ProblemCodeSignInCodeNotSent        ProblemCode = "sign_in_code_not_sent"
-	ProblemCodeSignInCodeResentTooSoon  ProblemCode = "sign_in_code_resent_too_soon"
-	ProblemCodeTargetTimeUnreachable    ProblemCode = "target_time_unreachable"
-	ProblemCodeTooManySignInCodes       ProblemCode = "too_many_sign_in_codes"
-	ProblemCodeUnauthenticated          ProblemCode = "unauthenticated"
-	ProblemCodeUserDeactivated          ProblemCode = "user_deactivated"
-	ProblemCodeWorkspaceNotEmpty        ProblemCode = "workspace_not_empty"
+	ProblemCodeAdminEmailMissing          ProblemCode = "admin_email_missing"
+	ProblemCodeAlreadyMember              ProblemCode = "already_member"
+	ProblemCodeAlreadyRunning             ProblemCode = "already_running"
+	ProblemCodeBackupNotCompleted         ProblemCode = "backup_not_completed"
+	ProblemCodeCannotChangeOwnRole        ProblemCode = "cannot_change_own_role"
+	ProblemCodeCleanupPending             ProblemCode = "cleanup_pending"
+	ProblemCodeDatabaseConnectionFailed   ProblemCode = "database_connection_failed"
+	ProblemCodeEmailNotConfigured         ProblemCode = "email_not_configured"
+	ProblemCodeEmailNotFound              ProblemCode = "email_not_found"
+	ProblemCodeEmailTaken                 ProblemCode = "email_taken"
+	ProblemCodeHumanVerificationFailed    ProblemCode = "human_verification_failed"
+	ProblemCodeInUse                      ProblemCode = "in_use"
+	ProblemCodeInstanceUnhealthy          ProblemCode = "instance_unhealthy"
+	ProblemCodeInsufficientDiskSpace      ProblemCode = "insufficient_disk_space"
+	ProblemCodeInternal                   ProblemCode = "internal"
+	ProblemCodeInvalidRequest             ProblemCode = "invalid_request"
+	ProblemCodeInvalidResetCode           ProblemCode = "invalid_reset_code"
+	ProblemCodeNoExtendableChain          ProblemCode = "no_extendable_chain"
+	ProblemCodeNoRestorableBackup         ProblemCode = "no_restorable_backup"
+	ProblemCodeNotFound                   ProblemCode = "not_found"
+	ProblemCodeNotRunning                 ProblemCode = "not_running"
+	ProblemCodeOauthFailed                ProblemCode = "oauth_failed"
+	ProblemCodeOauthNotConfigured         ProblemCode = "oauth_not_configured"
+	ProblemCodeOwnerRequiresTransfer      ProblemCode = "owner_requires_transfer"
+	ProblemCodePasswordIncorrect          ProblemCode = "password_incorrect"
+	ProblemCodePasswordNotSet             ProblemCode = "password_not_set"
+	ProblemCodePasswordNotSetGithub       ProblemCode = "password_not_set_github"
+	ProblemCodePasswordNotSetGoogle       ProblemCode = "password_not_set_google"
+	ProblemCodePasswordNotSetGoogleGithub ProblemCode = "password_not_set_google_github"
+	ProblemCodePendingSignInNotUsable     ProblemCode = "pending_sign_in_not_usable"
+	ProblemCodePermissionDenied           ProblemCode = "permission_denied"
+	ProblemCodeRateLimited                ProblemCode = "rate_limited"
+	ProblemCodeRegistrationClosed         ProblemCode = "registration_closed"
+	ProblemCodeRegistrationIncomplete     ProblemCode = "registration_incomplete"
+	ProblemCodeSignInCodeIncorrect        ProblemCode = "sign_in_code_incorrect"
+	ProblemCodeSignInCodeNotSent          ProblemCode = "sign_in_code_not_sent"
+	ProblemCodeSignInCodeResentTooSoon    ProblemCode = "sign_in_code_resent_too_soon"
+	ProblemCodeTargetTimeUnreachable      ProblemCode = "target_time_unreachable"
+	ProblemCodeTooManySignInCodes         ProblemCode = "too_many_sign_in_codes"
+	ProblemCodeUnauthenticated            ProblemCode = "unauthenticated"
+	ProblemCodeUserDeactivated            ProblemCode = "user_deactivated"
+	ProblemCodeWorkspaceNotEmpty          ProblemCode = "workspace_not_empty"
 )
 
 // Valid indicates whether the value is a known member of the ProblemCode enum.
@@ -75,6 +81,8 @@ func (e ProblemCode) Valid() bool {
 		return true
 	case ProblemCodeEmailNotConfigured:
 		return true
+	case ProblemCodeEmailNotFound:
+		return true
 	case ProblemCodeEmailTaken:
 		return true
 	case ProblemCodeHumanVerificationFailed:
@@ -86,8 +94,6 @@ func (e ProblemCode) Valid() bool {
 	case ProblemCodeInsufficientDiskSpace:
 		return true
 	case ProblemCodeInternal:
-		return true
-	case ProblemCodeInvalidCredentials:
 		return true
 	case ProblemCodeInvalidRequest:
 		return true
@@ -107,6 +113,16 @@ func (e ProblemCode) Valid() bool {
 		return true
 	case ProblemCodeOwnerRequiresTransfer:
 		return true
+	case ProblemCodePasswordIncorrect:
+		return true
+	case ProblemCodePasswordNotSet:
+		return true
+	case ProblemCodePasswordNotSetGithub:
+		return true
+	case ProblemCodePasswordNotSetGoogle:
+		return true
+	case ProblemCodePasswordNotSetGoogleGithub:
+		return true
 	case ProblemCodePendingSignInNotUsable:
 		return true
 	case ProblemCodePermissionDenied:
@@ -114,6 +130,8 @@ func (e ProblemCode) Valid() bool {
 	case ProblemCodeRateLimited:
 		return true
 	case ProblemCodeRegistrationClosed:
+		return true
+	case ProblemCodeRegistrationIncomplete:
 		return true
 	case ProblemCodeSignInCodeIncorrect:
 		return true
@@ -2022,7 +2040,7 @@ func (sh *strictHandler) GetVerificationAgentCount(ctx *gin.Context) {
 	var request GetVerificationAgentCountRequestObject
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetVerificationAgentCount(ctx, request.(GetVerificationAgentCountRequestObject))
+		return sh.ssi.GetVerificationAgentCount(ctx.Request.Context(), request.(GetVerificationAgentCountRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "GetVerificationAgentCount")
@@ -2048,7 +2066,7 @@ func (sh *strictHandler) ListVerificationAgents(ctx *gin.Context, params ListVer
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ListVerificationAgents(ctx, request.(ListVerificationAgentsRequestObject))
+		return sh.ssi.ListVerificationAgents(ctx.Request.Context(), request.(ListVerificationAgentsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "ListVerificationAgents")
@@ -2079,7 +2097,7 @@ func (sh *strictHandler) CreateVerificationAgent(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CreateVerificationAgent(ctx, request.(CreateVerificationAgentRequestObject))
+		return sh.ssi.CreateVerificationAgent(ctx.Request.Context(), request.(CreateVerificationAgentRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "CreateVerificationAgent")
@@ -2105,7 +2123,7 @@ func (sh *strictHandler) DeleteVerificationAgent(ctx *gin.Context, agentId opena
 	request.AgentId = agentId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DeleteVerificationAgent(ctx, request.(DeleteVerificationAgentRequestObject))
+		return sh.ssi.DeleteVerificationAgent(ctx.Request.Context(), request.(DeleteVerificationAgentRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "DeleteVerificationAgent")
@@ -2131,7 +2149,7 @@ func (sh *strictHandler) RotateVerificationAgentToken(ctx *gin.Context, agentId 
 	request.AgentId = agentId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.RotateVerificationAgentToken(ctx, request.(RotateVerificationAgentTokenRequestObject))
+		return sh.ssi.RotateVerificationAgentToken(ctx.Request.Context(), request.(RotateVerificationAgentTokenRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "RotateVerificationAgentToken")
@@ -2157,7 +2175,7 @@ func (sh *strictHandler) GetVerificationConfig(ctx *gin.Context, databaseId open
 	request.DatabaseId = databaseId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetVerificationConfig(ctx, request.(GetVerificationConfigRequestObject))
+		return sh.ssi.GetVerificationConfig(ctx.Request.Context(), request.(GetVerificationConfigRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "GetVerificationConfig")
@@ -2190,7 +2208,7 @@ func (sh *strictHandler) UpdateVerificationConfig(ctx *gin.Context, databaseId o
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.UpdateVerificationConfig(ctx, request.(UpdateVerificationConfigRequestObject))
+		return sh.ssi.UpdateVerificationConfig(ctx.Request.Context(), request.(UpdateVerificationConfigRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "UpdateVerificationConfig")
@@ -2216,7 +2234,7 @@ func (sh *strictHandler) ListVerifications(ctx *gin.Context, params ListVerifica
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ListVerifications(ctx, request.(ListVerificationsRequestObject))
+		return sh.ssi.ListVerifications(ctx.Request.Context(), request.(ListVerificationsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "ListVerifications")
@@ -2247,7 +2265,7 @@ func (sh *strictHandler) StartVerification(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.StartVerification(ctx, request.(StartVerificationRequestObject))
+		return sh.ssi.StartVerification(ctx.Request.Context(), request.(StartVerificationRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "StartVerification")
@@ -2273,7 +2291,7 @@ func (sh *strictHandler) GetVerification(ctx *gin.Context, verificationId openap
 	request.VerificationId = verificationId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetVerification(ctx, request.(GetVerificationRequestObject))
+		return sh.ssi.GetVerification(ctx.Request.Context(), request.(GetVerificationRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "GetVerification")
@@ -2299,7 +2317,7 @@ func (sh *strictHandler) CancelVerification(ctx *gin.Context, verificationId ope
 	request.VerificationId = verificationId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CancelVerification(ctx, request.(CancelVerificationRequestObject))
+		return sh.ssi.CancelVerification(ctx.Request.Context(), request.(CancelVerificationRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "CancelVerification")

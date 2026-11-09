@@ -398,42 +398,48 @@ func (e PostgresqlSslMode) Valid() bool {
 
 // Defines values for ProblemCode.
 const (
-	ProblemCodeAdminEmailMissing        ProblemCode = "admin_email_missing"
-	ProblemCodeAlreadyMember            ProblemCode = "already_member"
-	ProblemCodeAlreadyRunning           ProblemCode = "already_running"
-	ProblemCodeBackupNotCompleted       ProblemCode = "backup_not_completed"
-	ProblemCodeCannotChangeOwnRole      ProblemCode = "cannot_change_own_role"
-	ProblemCodeCleanupPending           ProblemCode = "cleanup_pending"
-	ProblemCodeDatabaseConnectionFailed ProblemCode = "database_connection_failed"
-	ProblemCodeEmailNotConfigured       ProblemCode = "email_not_configured"
-	ProblemCodeEmailTaken               ProblemCode = "email_taken"
-	ProblemCodeHumanVerificationFailed  ProblemCode = "human_verification_failed"
-	ProblemCodeInUse                    ProblemCode = "in_use"
-	ProblemCodeInstanceUnhealthy        ProblemCode = "instance_unhealthy"
-	ProblemCodeInsufficientDiskSpace    ProblemCode = "insufficient_disk_space"
-	ProblemCodeInternal                 ProblemCode = "internal"
-	ProblemCodeInvalidCredentials       ProblemCode = "invalid_credentials"
-	ProblemCodeInvalidRequest           ProblemCode = "invalid_request"
-	ProblemCodeInvalidResetCode         ProblemCode = "invalid_reset_code"
-	ProblemCodeNoExtendableChain        ProblemCode = "no_extendable_chain"
-	ProblemCodeNoRestorableBackup       ProblemCode = "no_restorable_backup"
-	ProblemCodeNotFound                 ProblemCode = "not_found"
-	ProblemCodeNotRunning               ProblemCode = "not_running"
-	ProblemCodeOauthFailed              ProblemCode = "oauth_failed"
-	ProblemCodeOauthNotConfigured       ProblemCode = "oauth_not_configured"
-	ProblemCodeOwnerRequiresTransfer    ProblemCode = "owner_requires_transfer"
-	ProblemCodePendingSignInNotUsable   ProblemCode = "pending_sign_in_not_usable"
-	ProblemCodePermissionDenied         ProblemCode = "permission_denied"
-	ProblemCodeRateLimited              ProblemCode = "rate_limited"
-	ProblemCodeRegistrationClosed       ProblemCode = "registration_closed"
-	ProblemCodeSignInCodeIncorrect      ProblemCode = "sign_in_code_incorrect"
-	ProblemCodeSignInCodeNotSent        ProblemCode = "sign_in_code_not_sent"
-	ProblemCodeSignInCodeResentTooSoon  ProblemCode = "sign_in_code_resent_too_soon"
-	ProblemCodeTargetTimeUnreachable    ProblemCode = "target_time_unreachable"
-	ProblemCodeTooManySignInCodes       ProblemCode = "too_many_sign_in_codes"
-	ProblemCodeUnauthenticated          ProblemCode = "unauthenticated"
-	ProblemCodeUserDeactivated          ProblemCode = "user_deactivated"
-	ProblemCodeWorkspaceNotEmpty        ProblemCode = "workspace_not_empty"
+	ProblemCodeAdminEmailMissing          ProblemCode = "admin_email_missing"
+	ProblemCodeAlreadyMember              ProblemCode = "already_member"
+	ProblemCodeAlreadyRunning             ProblemCode = "already_running"
+	ProblemCodeBackupNotCompleted         ProblemCode = "backup_not_completed"
+	ProblemCodeCannotChangeOwnRole        ProblemCode = "cannot_change_own_role"
+	ProblemCodeCleanupPending             ProblemCode = "cleanup_pending"
+	ProblemCodeDatabaseConnectionFailed   ProblemCode = "database_connection_failed"
+	ProblemCodeEmailNotConfigured         ProblemCode = "email_not_configured"
+	ProblemCodeEmailNotFound              ProblemCode = "email_not_found"
+	ProblemCodeEmailTaken                 ProblemCode = "email_taken"
+	ProblemCodeHumanVerificationFailed    ProblemCode = "human_verification_failed"
+	ProblemCodeInUse                      ProblemCode = "in_use"
+	ProblemCodeInstanceUnhealthy          ProblemCode = "instance_unhealthy"
+	ProblemCodeInsufficientDiskSpace      ProblemCode = "insufficient_disk_space"
+	ProblemCodeInternal                   ProblemCode = "internal"
+	ProblemCodeInvalidRequest             ProblemCode = "invalid_request"
+	ProblemCodeInvalidResetCode           ProblemCode = "invalid_reset_code"
+	ProblemCodeNoExtendableChain          ProblemCode = "no_extendable_chain"
+	ProblemCodeNoRestorableBackup         ProblemCode = "no_restorable_backup"
+	ProblemCodeNotFound                   ProblemCode = "not_found"
+	ProblemCodeNotRunning                 ProblemCode = "not_running"
+	ProblemCodeOauthFailed                ProblemCode = "oauth_failed"
+	ProblemCodeOauthNotConfigured         ProblemCode = "oauth_not_configured"
+	ProblemCodeOwnerRequiresTransfer      ProblemCode = "owner_requires_transfer"
+	ProblemCodePasswordIncorrect          ProblemCode = "password_incorrect"
+	ProblemCodePasswordNotSet             ProblemCode = "password_not_set"
+	ProblemCodePasswordNotSetGithub       ProblemCode = "password_not_set_github"
+	ProblemCodePasswordNotSetGoogle       ProblemCode = "password_not_set_google"
+	ProblemCodePasswordNotSetGoogleGithub ProblemCode = "password_not_set_google_github"
+	ProblemCodePendingSignInNotUsable     ProblemCode = "pending_sign_in_not_usable"
+	ProblemCodePermissionDenied           ProblemCode = "permission_denied"
+	ProblemCodeRateLimited                ProblemCode = "rate_limited"
+	ProblemCodeRegistrationClosed         ProblemCode = "registration_closed"
+	ProblemCodeRegistrationIncomplete     ProblemCode = "registration_incomplete"
+	ProblemCodeSignInCodeIncorrect        ProblemCode = "sign_in_code_incorrect"
+	ProblemCodeSignInCodeNotSent          ProblemCode = "sign_in_code_not_sent"
+	ProblemCodeSignInCodeResentTooSoon    ProblemCode = "sign_in_code_resent_too_soon"
+	ProblemCodeTargetTimeUnreachable      ProblemCode = "target_time_unreachable"
+	ProblemCodeTooManySignInCodes         ProblemCode = "too_many_sign_in_codes"
+	ProblemCodeUnauthenticated            ProblemCode = "unauthenticated"
+	ProblemCodeUserDeactivated            ProblemCode = "user_deactivated"
+	ProblemCodeWorkspaceNotEmpty          ProblemCode = "workspace_not_empty"
 )
 
 // Valid indicates whether the value is a known member of the ProblemCode enum.
@@ -455,6 +461,8 @@ func (e ProblemCode) Valid() bool {
 		return true
 	case ProblemCodeEmailNotConfigured:
 		return true
+	case ProblemCodeEmailNotFound:
+		return true
 	case ProblemCodeEmailTaken:
 		return true
 	case ProblemCodeHumanVerificationFailed:
@@ -466,8 +474,6 @@ func (e ProblemCode) Valid() bool {
 	case ProblemCodeInsufficientDiskSpace:
 		return true
 	case ProblemCodeInternal:
-		return true
-	case ProblemCodeInvalidCredentials:
 		return true
 	case ProblemCodeInvalidRequest:
 		return true
@@ -487,6 +493,16 @@ func (e ProblemCode) Valid() bool {
 		return true
 	case ProblemCodeOwnerRequiresTransfer:
 		return true
+	case ProblemCodePasswordIncorrect:
+		return true
+	case ProblemCodePasswordNotSet:
+		return true
+	case ProblemCodePasswordNotSetGithub:
+		return true
+	case ProblemCodePasswordNotSetGoogle:
+		return true
+	case ProblemCodePasswordNotSetGoogleGithub:
+		return true
 	case ProblemCodePendingSignInNotUsable:
 		return true
 	case ProblemCodePermissionDenied:
@@ -494,6 +510,8 @@ func (e ProblemCode) Valid() bool {
 	case ProblemCodeRateLimited:
 		return true
 	case ProblemCodeRegistrationClosed:
+		return true
+	case ProblemCodeRegistrationIncomplete:
 		return true
 	case ProblemCodeSignInCodeIncorrect:
 		return true
@@ -978,24 +996,24 @@ type FieldError struct {
 	Field string `json:"field"`
 }
 
-// FullBackupsRetention Which full backups are kept
+// FullBackupsRetention Which full backups are kept. GFS selects successful full backups using UTC calendar periods anchored to the creation time of the newest successful full backup. Weeks start on Monday. Hourly and daily counts include the current period; weekly, monthly and yearly counts reserve completed periods and also protect the current period's newest successful candidate. One full backup can represent several levels. This selection does not preserve its incrementals or WAL. A zero count disables its level and candidate. Empty periods are not filled with older full backups.
 type FullBackupsRetention struct {
 	// Count How many of the newest full backups `LAST_N` keeps; 0 with `GFS`
 	Count int `json:"count"`
 
-	// GfsDays For how many of the last days `GFS` keeps the newest full backup of each day
+	// GfsDays Number of UTC calendar days for which `GFS` keeps the newest successful full backup, including the current day
 	GfsDays int `json:"gfsDays"`
 
-	// GfsHours For how many of the last hours `GFS` keeps the newest full backup of each hour
+	// GfsHours Number of UTC calendar hours for which `GFS` keeps the newest successful full backup, including the current hour
 	GfsHours int `json:"gfsHours"`
 
-	// GfsMonths For how many of the last months `GFS` keeps the newest full backup of each month
+	// GfsMonths Number of completed UTC calendar months for which `GFS` keeps the newest successful full backup, plus the current month's candidate
 	GfsMonths int `json:"gfsMonths"`
 
-	// GfsWeeks For how many of the last weeks `GFS` keeps the newest full backup of each week
+	// GfsWeeks Number of completed UTC calendar weeks for which `GFS` keeps the newest successful full backup, plus the current week's candidate
 	GfsWeeks int `json:"gfsWeeks"`
 
-	// GfsYears For how many of the last years `GFS` keeps the newest full backup of each year
+	// GfsYears Number of completed UTC calendar years for which `GFS` keeps the newest successful full backup, plus the current year's candidate
 	GfsYears int `json:"gfsYears"`
 
 	// Policy `LAST_N` keeps the newest `count` full backups, and `GFS` keeps them by grandfather-father-son periods, at least one of them set
@@ -1048,6 +1066,9 @@ type LogicalBackupPage struct {
 
 	// NextCursor The `after` of the next page, absent on the last page
 	NextCursor *string `json:"nextCursor,omitempty"`
+
+	// TotalUsageMb Recorded stored size of all retained completed backups of the database in megabytes, independently of filters and pages
+	TotalUsageMb float64 `json:"totalUsageMb"`
 }
 
 // LogicalBackupSettings The settings of a logical backup, a dump of a PostgreSQL, MySQL, MariaDB or MongoDB database
@@ -1061,7 +1082,7 @@ type LogicalBackupSettings struct {
 	// NotificationTriggers The backup outcomes that send a notification through the database's notifiers
 	NotificationTriggers []LogicalNotificationTrigger `json:"notificationTriggers"`
 
-	// Retention Which logical backups are kept. `policy` picks the rule; the fields of the other rules keep their saved values.
+	// Retention Which logical backups are kept. `policy` picks the rule; the fields of the other rules keep their saved values. GFS selects successful backups using UTC calendar periods anchored to the creation time of the newest successful backup. Weeks start on Monday. Hourly and daily counts include the current period; weekly, monthly and yearly counts reserve completed periods and also protect the current period's newest successful candidate. A backup can represent several levels without duplicate files. A zero count disables its level and candidate. Empty periods are not filled with older backups.
 	Retention LogicalRetention `json:"retention"`
 
 	// Schedule When recurring work runs; times of day are in UTC
@@ -1089,24 +1110,24 @@ type LogicalBackupVerificationStatus string
 // LogicalNotificationTrigger A logical backup outcome that sends a notification, a failed or a successful backup
 type LogicalNotificationTrigger string
 
-// LogicalRetention Which logical backups are kept. `policy` picks the rule; the fields of the other rules keep their saved values.
+// LogicalRetention Which logical backups are kept. `policy` picks the rule; the fields of the other rules keep their saved values. GFS selects successful backups using UTC calendar periods anchored to the creation time of the newest successful backup. Weeks start on Monday. Hourly and daily counts include the current period; weekly, monthly and yearly counts reserve completed periods and also protect the current period's newest successful candidate. A backup can represent several levels without duplicate files. A zero count disables its level and candidate. Empty periods are not filled with older backups.
 type LogicalRetention struct {
 	// Count How many of the newest backups `COUNT` keeps; greater than 0 with it
 	Count int `json:"count"`
 
-	// GfsDays For how many of the last days `GFS` keeps the newest backup of each day
+	// GfsDays Number of UTC calendar days for which `GFS` keeps the newest successful backup, including the current day
 	GfsDays int `json:"gfsDays"`
 
-	// GfsHours For how many of the last hours `GFS` keeps the newest backup of each hour
+	// GfsHours Number of UTC calendar hours for which `GFS` keeps the newest successful backup, including the current hour
 	GfsHours int `json:"gfsHours"`
 
-	// GfsMonths For how many of the last months `GFS` keeps the newest backup of each month
+	// GfsMonths Number of completed UTC calendar months for which `GFS` keeps the newest successful backup, plus the current month's candidate
 	GfsMonths int `json:"gfsMonths"`
 
-	// GfsWeeks For how many of the last weeks `GFS` keeps the newest backup of each week
+	// GfsWeeks Number of completed UTC calendar weeks for which `GFS` keeps the newest successful backup, plus the current week's candidate
 	GfsWeeks int `json:"gfsWeeks"`
 
-	// GfsYears For how many of the last years `GFS` keeps the newest backup of each year
+	// GfsYears Number of completed UTC calendar years for which `GFS` keeps the newest successful backup, plus the current year's candidate
 	GfsYears int `json:"gfsYears"`
 
 	// Period How long the `TIME_PERIOD` retention keeps a backup
@@ -1565,6 +1586,12 @@ type SshTunnelSettings struct {
 
 	// Username The user name on the bastion
 	Username *string `json:"username,omitempty"`
+}
+
+// StorageBackupUsage Backup and committed WAL stored sizes recorded in the catalog for one storage
+type StorageBackupUsage struct {
+	// TotalUsageMb Total recorded stored size in megabytes, zero when no eligible records remain
+	TotalUsageMb float64 `json:"totalUsageMb"`
 }
 
 // StorageMovedWithDatabase The database's storage moves to the target workspace too; no other database may back up into it
@@ -2627,6 +2654,9 @@ type ServerInterface interface {
 	// CancelRestore Cancel a running restore
 	// (POST /restores/{restoreId}/cancel)
 	CancelRestore(c *gin.Context, restoreId RestoreId)
+	// GetStorageBackupUsage Get the recorded backup usage of a storage
+	// (GET /storages/{storageId}/backup-usage)
+	GetStorageBackupUsage(c *gin.Context, storageId StorageId)
 	// GetWalStream Read the current values of a WAL stream
 	// (GET /wal-streams/{databaseId})
 	GetWalStream(c *gin.Context, databaseId DatabaseId)
@@ -3255,6 +3285,31 @@ func (siw *ServerInterfaceWrapper) CancelRestore(c *gin.Context) {
 	siw.Handler.CancelRestore(c, restoreId)
 }
 
+// GetStorageBackupUsage operation middleware
+func (siw *ServerInterfaceWrapper) GetStorageBackupUsage(c *gin.Context) {
+
+	var err error
+	_ = err
+
+	// ------------- Path parameter "storageId" -------------
+	var storageId StorageId
+
+	err = runtime.BindStyledParameterWithOptions("simple", "storageId", c.Param("storageId"), &storageId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true, Type: "string", Format: "uuid", ValueIsUnescaped: true})
+	if err != nil {
+		siw.ErrorHandler(c, fmt.Errorf("Invalid format for parameter storageId: %w", err), http.StatusBadRequest)
+		return
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		middleware(c)
+		if c.IsAborted() {
+			return
+		}
+	}
+
+	siw.Handler.GetStorageBackupUsage(c, storageId)
+}
+
 // GetWalStream operation middleware
 func (siw *ServerInterfaceWrapper) GetWalStream(c *gin.Context) {
 
@@ -3343,6 +3398,7 @@ func RegisterHandlersWithOptions(router gin.IRouter, si ServerInterface, options
 		ErrorHandler:       errorHandler,
 	}
 
+	router.GET(options.BaseURL+"/storages/:storageId/backup-usage", wrapper.GetStorageBackupUsage)
 	router.POST(options.BaseURL+"/databases/:databaseId/transfer", wrapper.TransferDatabase)
 	router.GET(options.BaseURL+"/backup-configs", wrapper.ListBackupConfigs)
 	router.GET(options.BaseURL+"/backup-configs/:databaseId", wrapper.GetBackupConfig)
@@ -5481,6 +5537,117 @@ func (response CancelRestoredefaultApplicationProblemPlusJSONResponse) VisitCanc
 	return err
 }
 
+type GetStorageBackupUsageRequestObject struct {
+	StorageId StorageId `json:"storageId"`
+}
+
+type GetStorageBackupUsageResponseObject interface {
+	VisitGetStorageBackupUsageResponse(w http.ResponseWriter) error
+}
+
+type GetStorageBackupUsage200JSONResponse StorageBackupUsage
+
+func (response GetStorageBackupUsage200JSONResponse) VisitGetStorageBackupUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStorageBackupUsage400ApplicationProblemPlusJSONResponse struct {
+	ProblemApplicationProblemPlusJSONResponse
+}
+
+func (response GetStorageBackupUsage400ApplicationProblemPlusJSONResponse) VisitGetStorageBackupUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(400)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStorageBackupUsage401ApplicationProblemPlusJSONResponse Problem
+
+func (response GetStorageBackupUsage401ApplicationProblemPlusJSONResponse) VisitGetStorageBackupUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(401)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStorageBackupUsage403ApplicationProblemPlusJSONResponse Problem
+
+func (response GetStorageBackupUsage403ApplicationProblemPlusJSONResponse) VisitGetStorageBackupUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(403)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStorageBackupUsage404ApplicationProblemPlusJSONResponse Problem
+
+func (response GetStorageBackupUsage404ApplicationProblemPlusJSONResponse) VisitGetStorageBackupUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(404)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStorageBackupUsage500ApplicationProblemPlusJSONResponse Problem
+
+func (response GetStorageBackupUsage500ApplicationProblemPlusJSONResponse) VisitGetStorageBackupUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(500)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
+type GetStorageBackupUsagedefaultApplicationProblemPlusJSONResponse struct {
+	Body       Problem
+	StatusCode int
+}
+
+func (response GetStorageBackupUsagedefaultApplicationProblemPlusJSONResponse) VisitGetStorageBackupUsageResponse(w http.ResponseWriter) error {
+
+	var buf bytes.Buffer
+	if err := json.NewEncoder(&buf).Encode(response.Body); err != nil {
+		return err
+	}
+	w.Header().Set("Content-Type", "application/problem+json")
+	w.WriteHeader(response.StatusCode)
+	_, err := buf.WriteTo(w)
+	return err
+}
+
 type GetWalStreamRequestObject struct {
 	DatabaseId DatabaseId `json:"databaseId"`
 }
@@ -5716,6 +5883,9 @@ type StrictServerInterface interface {
 	// CancelRestore Cancel a running restore
 	// (POST /restores/{restoreId}/cancel)
 	CancelRestore(ctx context.Context, request CancelRestoreRequestObject) (CancelRestoreResponseObject, error)
+	// GetStorageBackupUsage Get the recorded backup usage of a storage
+	// (GET /storages/{storageId}/backup-usage)
+	GetStorageBackupUsage(ctx context.Context, request GetStorageBackupUsageRequestObject) (GetStorageBackupUsageResponseObject, error)
 	// GetWalStream Read the current values of a WAL stream
 	// (GET /wal-streams/{databaseId})
 	GetWalStream(ctx context.Context, request GetWalStreamRequestObject) (GetWalStreamResponseObject, error)
@@ -5788,7 +5958,7 @@ func (sh *strictHandler) ListBackupConfigs(ctx *gin.Context, params ListBackupCo
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ListBackupConfigs(ctx, request.(ListBackupConfigsRequestObject))
+		return sh.ssi.ListBackupConfigs(ctx.Request.Context(), request.(ListBackupConfigsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "ListBackupConfigs")
@@ -5814,7 +5984,7 @@ func (sh *strictHandler) GetBackupConfig(ctx *gin.Context, databaseId BackupConf
 	request.DatabaseId = databaseId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetBackupConfig(ctx, request.(GetBackupConfigRequestObject))
+		return sh.ssi.GetBackupConfig(ctx.Request.Context(), request.(GetBackupConfigRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "GetBackupConfig")
@@ -5847,7 +6017,7 @@ func (sh *strictHandler) UpdateBackupConfig(ctx *gin.Context, databaseId BackupC
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.UpdateBackupConfig(ctx, request.(UpdateBackupConfigRequestObject))
+		return sh.ssi.UpdateBackupConfig(ctx.Request.Context(), request.(UpdateBackupConfigRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "UpdateBackupConfig")
@@ -5880,7 +6050,7 @@ func (sh *strictHandler) TransferDatabase(ctx *gin.Context, databaseId DatabaseI
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.TransferDatabase(ctx, request.(TransferDatabaseRequestObject))
+		return sh.ssi.TransferDatabase(ctx.Request.Context(), request.(TransferDatabaseRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "TransferDatabase")
@@ -5911,7 +6081,7 @@ func (sh *strictHandler) CreateDownloadToken(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CreateDownloadToken(ctx, request.(CreateDownloadTokenRequestObject))
+		return sh.ssi.CreateDownloadToken(ctx.Request.Context(), request.(CreateDownloadTokenRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "CreateDownloadToken")
@@ -5937,7 +6107,7 @@ func (sh *strictHandler) ListLogicalBackups(ctx *gin.Context, params ListLogical
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ListLogicalBackups(ctx, request.(ListLogicalBackupsRequestObject))
+		return sh.ssi.ListLogicalBackups(ctx.Request.Context(), request.(ListLogicalBackupsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "ListLogicalBackups")
@@ -5968,7 +6138,7 @@ func (sh *strictHandler) StartLogicalBackup(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.StartLogicalBackup(ctx, request.(StartLogicalBackupRequestObject))
+		return sh.ssi.StartLogicalBackup(ctx.Request.Context(), request.(StartLogicalBackupRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "StartLogicalBackup")
@@ -5994,7 +6164,7 @@ func (sh *strictHandler) DeleteLogicalBackup(ctx *gin.Context, backupId BackupId
 	request.BackupId = backupId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DeleteLogicalBackup(ctx, request.(DeleteLogicalBackupRequestObject))
+		return sh.ssi.DeleteLogicalBackup(ctx.Request.Context(), request.(DeleteLogicalBackupRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "DeleteLogicalBackup")
@@ -6020,7 +6190,7 @@ func (sh *strictHandler) GetLogicalBackup(ctx *gin.Context, backupId BackupId) {
 	request.BackupId = backupId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetLogicalBackup(ctx, request.(GetLogicalBackupRequestObject))
+		return sh.ssi.GetLogicalBackup(ctx.Request.Context(), request.(GetLogicalBackupRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "GetLogicalBackup")
@@ -6046,7 +6216,7 @@ func (sh *strictHandler) CancelLogicalBackup(ctx *gin.Context, backupId BackupId
 	request.BackupId = backupId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CancelLogicalBackup(ctx, request.(CancelLogicalBackupRequestObject))
+		return sh.ssi.CancelLogicalBackup(ctx.Request.Context(), request.(CancelLogicalBackupRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "CancelLogicalBackup")
@@ -6073,7 +6243,7 @@ func (sh *strictHandler) DownloadLogicalBackup(ctx *gin.Context, backupId Backup
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DownloadLogicalBackup(ctx, request.(DownloadLogicalBackupRequestObject))
+		return sh.ssi.DownloadLogicalBackup(ctx.Request.Context(), request.(DownloadLogicalBackupRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "DownloadLogicalBackup")
@@ -6099,7 +6269,7 @@ func (sh *strictHandler) ListPhysicalBackups(ctx *gin.Context, params ListPhysic
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ListPhysicalBackups(ctx, request.(ListPhysicalBackupsRequestObject))
+		return sh.ssi.ListPhysicalBackups(ctx.Request.Context(), request.(ListPhysicalBackupsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "ListPhysicalBackups")
@@ -6130,7 +6300,7 @@ func (sh *strictHandler) StartPhysicalBackup(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.StartPhysicalBackup(ctx, request.(StartPhysicalBackupRequestObject))
+		return sh.ssi.StartPhysicalBackup(ctx.Request.Context(), request.(StartPhysicalBackupRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "StartPhysicalBackup")
@@ -6156,7 +6326,7 @@ func (sh *strictHandler) DeletePhysicalBackup(ctx *gin.Context, backupId Physica
 	request.BackupId = backupId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DeletePhysicalBackup(ctx, request.(DeletePhysicalBackupRequestObject))
+		return sh.ssi.DeletePhysicalBackup(ctx.Request.Context(), request.(DeletePhysicalBackupRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "DeletePhysicalBackup")
@@ -6182,7 +6352,7 @@ func (sh *strictHandler) CancelPhysicalBackup(ctx *gin.Context, backupId Physica
 	request.BackupId = backupId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CancelPhysicalBackup(ctx, request.(CancelPhysicalBackupRequestObject))
+		return sh.ssi.CancelPhysicalBackup(ctx.Request.Context(), request.(CancelPhysicalBackupRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "CancelPhysicalBackup")
@@ -6206,7 +6376,7 @@ func (sh *strictHandler) GetRecoveryScript(ctx *gin.Context) {
 	var request GetRecoveryScriptRequestObject
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetRecoveryScript(ctx, request.(GetRecoveryScriptRequestObject))
+		return sh.ssi.GetRecoveryScript(ctx.Request.Context(), request.(GetRecoveryScriptRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "GetRecoveryScript")
@@ -6232,7 +6402,7 @@ func (sh *strictHandler) DownloadPhysicalRestoreSet(ctx *gin.Context, params Dow
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.DownloadPhysicalRestoreSet(ctx, request.(DownloadPhysicalRestoreSetRequestObject))
+		return sh.ssi.DownloadPhysicalRestoreSet(ctx.Request.Context(), request.(DownloadPhysicalRestoreSetRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "DownloadPhysicalRestoreSet")
@@ -6263,7 +6433,7 @@ func (sh *strictHandler) CreatePhysicalRestoreToken(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CreatePhysicalRestoreToken(ctx, request.(CreatePhysicalRestoreTokenRequestObject))
+		return sh.ssi.CreatePhysicalRestoreToken(ctx.Request.Context(), request.(CreatePhysicalRestoreTokenRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "CreatePhysicalRestoreToken")
@@ -6289,7 +6459,7 @@ func (sh *strictHandler) ListRestores(ctx *gin.Context, params ListRestoresParam
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.ListRestores(ctx, request.(ListRestoresRequestObject))
+		return sh.ssi.ListRestores(ctx.Request.Context(), request.(ListRestoresRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "ListRestores")
@@ -6320,7 +6490,7 @@ func (sh *strictHandler) StartRestore(ctx *gin.Context) {
 	request.Body = &body
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.StartRestore(ctx, request.(StartRestoreRequestObject))
+		return sh.ssi.StartRestore(ctx.Request.Context(), request.(StartRestoreRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "StartRestore")
@@ -6346,7 +6516,7 @@ func (sh *strictHandler) GetRestore(ctx *gin.Context, restoreId RestoreId) {
 	request.RestoreId = restoreId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetRestore(ctx, request.(GetRestoreRequestObject))
+		return sh.ssi.GetRestore(ctx.Request.Context(), request.(GetRestoreRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "GetRestore")
@@ -6372,7 +6542,7 @@ func (sh *strictHandler) CancelRestore(ctx *gin.Context, restoreId RestoreId) {
 	request.RestoreId = restoreId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.CancelRestore(ctx, request.(CancelRestoreRequestObject))
+		return sh.ssi.CancelRestore(ctx.Request.Context(), request.(CancelRestoreRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "CancelRestore")
@@ -6391,6 +6561,32 @@ func (sh *strictHandler) CancelRestore(ctx *gin.Context, restoreId RestoreId) {
 	}
 }
 
+// GetStorageBackupUsage operation middleware
+func (sh *strictHandler) GetStorageBackupUsage(ctx *gin.Context, storageId StorageId) {
+	var request GetStorageBackupUsageRequestObject
+
+	request.StorageId = storageId
+
+	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
+		return sh.ssi.GetStorageBackupUsage(ctx.Request.Context(), request.(GetStorageBackupUsageRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetStorageBackupUsage")
+	}
+
+	response, err := handler(ctx, request)
+
+	if err != nil {
+		sh.options.HandlerErrorFunc(ctx, err)
+	} else if validResponse, ok := response.(GetStorageBackupUsageResponseObject); ok {
+		if err := validResponse.VisitGetStorageBackupUsageResponse(ctx.Writer); err != nil {
+			sh.options.ResponseErrorHandlerFunc(ctx, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(ctx, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // GetWalStream operation middleware
 func (sh *strictHandler) GetWalStream(ctx *gin.Context, databaseId DatabaseId) {
 	var request GetWalStreamRequestObject
@@ -6398,7 +6594,7 @@ func (sh *strictHandler) GetWalStream(ctx *gin.Context, databaseId DatabaseId) {
 	request.DatabaseId = databaseId
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetWalStream(ctx, request.(GetWalStreamRequestObject))
+		return sh.ssi.GetWalStream(ctx.Request.Context(), request.(GetWalStreamRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "GetWalStream")
@@ -6425,7 +6621,7 @@ func (sh *strictHandler) GetWalStreamStatistics(ctx *gin.Context, databaseId Dat
 	request.Params = params
 
 	handler := func(ctx *gin.Context, request interface{}) (interface{}, error) {
-		return sh.ssi.GetWalStreamStatistics(ctx, request.(GetWalStreamStatisticsRequestObject))
+		return sh.ssi.GetWalStreamStatistics(ctx.Request.Context(), request.(GetWalStreamStatisticsRequestObject))
 	}
 	for _, middleware := range sh.middlewares {
 		handler = middleware(handler, "GetWalStreamStatistics")

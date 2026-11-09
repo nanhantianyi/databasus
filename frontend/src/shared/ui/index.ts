@@ -10,4 +10,16 @@ export { LoadFailure } from '@/shared/ui/LoadFailure';
 export { StarButtonComponent } from '@/shared/ui/StarButtonComponent';
 export { ThemeToggleComponent } from '@/shared/ui/ThemeToggleComponent';
 export { ResourceListDetail } from '@/shared/ui/ResourceListDetail';
-export { WRAPPING_SELECT_CLASS_NAME } from '@/shared/ui/wrappingSelectClassName';
+export { ResourceCollectionList } from '@/shared/ui/ResourceCollectionList';
+export {
+  ResourceTransferDialog,
+  type TransferAvailability,
+} from '@/shared/ui/ResourceTransferDialog';
+export { WrappingSelect } from '@/shared/ui/WrappingSelect';
+export { Dialog } from '@/shared/ui/Dialog';
+export { closeOverlayOnEscape } from '@/shared/ui/closeOverlayOnEscape';
+export { OverlayFocusReturn } from '@/shared/ui/OverlayFocusReturn';
+
+export { AnchoredConfirmation } from '@/shared/ui/AnchoredConfirmation';
+
+export { ResourcePicker } from '@/shared/ui/ResourcePicker';

@@ -158,7 +158,7 @@ export interface paths {
         put?: never;
         /**
          * Sign in with an email address and a password
-         * @description Public, because it creates the session the caller does not have yet. A wrong password, an unknown address, a user who has not finished sign-up and a user without a password all get 401 `invalid_credentials`. A deactivated user gets 403 `user_deactivated` only after the correct password. When the instance requires the second factor, the answer names a pending sign-in and the code goes to the user's address.
+         * @description Public, because it creates the session the caller does not have yet. Refusals answer 401 with `email_not_found`, `password_incorrect`, `registration_incomplete` or `password_not_set`. Accounts without a password recommend linked, configured providers through `password_not_set_google`, `password_not_set_github` or `password_not_set_google_github`. A deactivated user gets 403 `user_deactivated` only after the correct password; otherwise its refusal matches an equivalent active account. Human verification and the per-address rate limit run before these refusals. When the instance requires the second factor, a successful password step names a pending sign-in and sends its code. A refused step sends no code, creates no new pending sign-in and leaves existing pending sign-ins unchanged.
          */
         post: operations["signIn"];
         delete?: never;
@@ -677,6 +677,29 @@ export interface paths {
          * @description Needs the role `WORKSPACE_MEMBER` or higher. A storage that a backup config uses or that still holds backups gets 409 `in_use`, even with explicit abandonment. Otherwise pending file cleanup returns 409 `cleanup_pending` unless shouldAbandonCleanup is true. Explicit abandonment atomically removes the storage and its queue, recording a bounded audit snapshot. This request never contacts the provider or deletes its bucket or directory. Outsiders get 404 `not_found`, viewers get 403 `permission_denied`; instance admins retain workspace access.
          */
         delete: operations["deleteStorage"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/storages/{storageId}/backup-usage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The ID of the storage */
+                storageId: components["parameters"]["StorageId"];
+            };
+            cookie?: never;
+        };
+        /**
+         * Get the recorded backup usage of a storage
+         * @description Needs WORKSPACE_VIEWER. Sums retained completed logical and physical backup stored sizes and committed archived WAL sizes recorded for this storage, counting each WAL segment once. This is catalog usage, not actual provider consumption; unfinished uploads, metadata sidecars and pending file deletions are excluded. No provider or source database is contacted. An outsider or missing storage gets 404 not_found; insufficient viewing permission gets 403 permission_denied. Existing administrator workspace privileges apply.
+         */
+        get: operations["getStorageBackupUsage"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1244,7 +1267,7 @@ export interface paths {
         };
         /**
          * List the logical backups of a database
-         * @description Ordered newest first by creation time, then by ID. `status` and `createdBefore` filter the list. A user who is not a member of the database's workspace gets 404 `not_found`. A cursor this list did not issue gets 400 `invalid_request`.
+         * @description Ordered newest first by creation time, then by ID. `status` and `createdBefore` filter the list. A user who is not a member of the database's workspace gets 404 `not_found`. A cursor this list did not issue gets 400 `invalid_request`. `totalUsageMb` sums the recorded stored sizes of every retained completed backup of the database independently of filters and pages, without contacting its source or storage provider.
          */
         get: operations["listLogicalBackups"];
         put?: never;
@@ -2408,6 +2431,14 @@ export interface components {
             name: string;
             settings: components["schemas"]["StorageSettings"];
         };
+        /** @description Backup and committed WAL stored sizes recorded in the catalog for one storage */
+        StorageBackupUsage: {
+            /**
+             * Format: double
+             * @description Total recorded stored size in megabytes, zero when no eligible records remain
+             */
+            totalUsageMb: number;
+        };
         /** @description One page of storages, ordered by name */
         StoragePage: {
             /** @description The storages on the page */
@@ -3059,7 +3090,7 @@ export interface components {
          * @description The cause of the error for programs; a value never changes its meaning
          * @enum {string}
          */
-        ProblemCode: "invalid_request" | "unauthenticated" | "permission_denied" | "not_found" | "rate_limited" | "human_verification_failed" | "invalid_credentials" | "user_deactivated" | "registration_closed" | "email_taken" | "invalid_reset_code" | "oauth_not_configured" | "oauth_failed" | "pending_sign_in_not_usable" | "sign_in_code_not_sent" | "too_many_sign_in_codes" | "sign_in_code_resent_too_soon" | "sign_in_code_incorrect" | "email_not_configured" | "admin_email_missing" | "already_member" | "cannot_change_own_role" | "owner_requires_transfer" | "workspace_not_empty" | "in_use" | "cleanup_pending" | "database_connection_failed" | "backup_not_completed" | "already_running" | "not_running" | "no_extendable_chain" | "no_restorable_backup" | "target_time_unreachable" | "insufficient_disk_space" | "instance_unhealthy" | "internal";
+        ProblemCode: "invalid_request" | "unauthenticated" | "permission_denied" | "not_found" | "rate_limited" | "human_verification_failed" | "email_not_found" | "password_incorrect" | "registration_incomplete" | "password_not_set" | "password_not_set_google" | "password_not_set_github" | "password_not_set_google_github" | "user_deactivated" | "registration_closed" | "email_taken" | "invalid_reset_code" | "oauth_not_configured" | "oauth_failed" | "pending_sign_in_not_usable" | "sign_in_code_not_sent" | "too_many_sign_in_codes" | "sign_in_code_resent_too_soon" | "sign_in_code_incorrect" | "email_not_configured" | "admin_email_missing" | "already_member" | "cannot_change_own_role" | "owner_requires_transfer" | "workspace_not_empty" | "in_use" | "cleanup_pending" | "database_connection_failed" | "backup_not_completed" | "already_running" | "not_running" | "no_extendable_chain" | "no_restorable_backup" | "target_time_unreachable" | "insufficient_disk_space" | "instance_unhealthy" | "internal";
         /** @description A field of the request that breaks the contract or a validation rule */
         FieldError: {
             /** @description The path of the field in the request, such as `name` or `settings.bucket` */
@@ -3176,21 +3207,21 @@ export interface components {
          * @enum {string}
          */
         ScheduleType: "HOURLY" | "DAILY" | "WEEKLY" | "MONTHLY" | "CRON";
-        /** @description Which logical backups are kept. `policy` picks the rule; the fields of the other rules keep their saved values. */
+        /** @description Which logical backups are kept. `policy` picks the rule; the fields of the other rules keep their saved values. GFS selects successful backups using UTC calendar periods anchored to the creation time of the newest successful backup. Weeks start on Monday. Hourly and daily counts include the current period; weekly, monthly and yearly counts reserve completed periods and also protect the current period's newest successful candidate. A backup can represent several levels without duplicate files. A zero count disables its level and candidate. Empty periods are not filled with older backups. */
         LogicalRetention: {
             policy: components["schemas"]["LogicalRetentionPolicy"];
             period: components["schemas"]["RetentionPeriod"];
             /** @description How many of the newest backups `COUNT` keeps; greater than 0 with it */
             count: number;
-            /** @description For how many of the last hours `GFS` keeps the newest backup of each hour */
+            /** @description Number of UTC calendar hours for which `GFS` keeps the newest successful backup, including the current hour */
             gfsHours: number;
-            /** @description For how many of the last days `GFS` keeps the newest backup of each day */
+            /** @description Number of UTC calendar days for which `GFS` keeps the newest successful backup, including the current day */
             gfsDays: number;
-            /** @description For how many of the last weeks `GFS` keeps the newest backup of each week */
+            /** @description Number of completed UTC calendar weeks for which `GFS` keeps the newest successful backup, plus the current week's candidate */
             gfsWeeks: number;
-            /** @description For how many of the last months `GFS` keeps the newest backup of each month */
+            /** @description Number of completed UTC calendar months for which `GFS` keeps the newest successful backup, plus the current month's candidate */
             gfsMonths: number;
-            /** @description For how many of the last years `GFS` keeps the newest backup of each year */
+            /** @description Number of completed UTC calendar years for which `GFS` keeps the newest successful backup, plus the current year's candidate */
             gfsYears: number;
         };
         /**
@@ -3216,20 +3247,20 @@ export interface components {
          * @enum {string}
          */
         PhysicalRetentionPolicy: "CHAINS" | "FULL_BACKUPS" | "CHAINS_AND_FULL_BACKUPS";
-        /** @description Which full backups are kept */
+        /** @description Which full backups are kept. GFS selects successful full backups using UTC calendar periods anchored to the creation time of the newest successful full backup. Weeks start on Monday. Hourly and daily counts include the current period; weekly, monthly and yearly counts reserve completed periods and also protect the current period's newest successful candidate. One full backup can represent several levels. This selection does not preserve its incrementals or WAL. A zero count disables its level and candidate. Empty periods are not filled with older full backups. */
         FullBackupsRetention: {
             policy: components["schemas"]["FullBackupsRetentionPolicy"];
             /** @description How many of the newest full backups `LAST_N` keeps; 0 with `GFS` */
             count: number;
-            /** @description For how many of the last hours `GFS` keeps the newest full backup of each hour */
+            /** @description Number of UTC calendar hours for which `GFS` keeps the newest successful full backup, including the current hour */
             gfsHours: number;
-            /** @description For how many of the last days `GFS` keeps the newest full backup of each day */
+            /** @description Number of UTC calendar days for which `GFS` keeps the newest successful full backup, including the current day */
             gfsDays: number;
-            /** @description For how many of the last weeks `GFS` keeps the newest full backup of each week */
+            /** @description Number of completed UTC calendar weeks for which `GFS` keeps the newest successful full backup, plus the current week's candidate */
             gfsWeeks: number;
-            /** @description For how many of the last months `GFS` keeps the newest full backup of each month */
+            /** @description Number of completed UTC calendar months for which `GFS` keeps the newest successful full backup, plus the current month's candidate */
             gfsMonths: number;
-            /** @description For how many of the last years `GFS` keeps the newest full backup of each year */
+            /** @description Number of completed UTC calendar years for which `GFS` keeps the newest successful full backup, plus the current year's candidate */
             gfsYears: number;
         };
         /**
@@ -3903,6 +3934,11 @@ export interface components {
         };
         /** @description One page of logical backups, newest first */
         LogicalBackupPage: {
+            /**
+             * Format: double
+             * @description Recorded stored size of all retained completed backups of the database in megabytes, independently of filters and pages
+             */
+            totalUsageMb: number;
             /** @description The backups on the page */
             items: components["schemas"]["LogicalBackup"][];
             /** @description The `after` of the next page, absent on the last page */
@@ -5390,6 +5426,35 @@ export interface operations {
             403: components["responses"]["Problem"];
             404: components["responses"]["Problem"];
             409: components["responses"]["Problem"];
+            default: components["responses"]["Problem"];
+        };
+    };
+    getStorageBackupUsage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The ID of the storage */
+                storageId: components["parameters"]["StorageId"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The catalog-recorded backup usage */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StorageBackupUsage"];
+                };
+            };
+            400: components["responses"]["Problem"];
+            401: components["responses"]["Problem"];
+            403: components["responses"]["Problem"];
+            404: components["responses"]["Problem"];
+            500: components["responses"]["Problem"];
             default: components["responses"]["Problem"];
         };
     };

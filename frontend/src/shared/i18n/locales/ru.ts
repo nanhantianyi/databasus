@@ -5,7 +5,20 @@ export const ru: typeof en = {
     nativeName: 'Русский',
   },
   common: {
+    calendar: {
+      monthLevelControl: 'Выбрать месяц',
+      yearLevelControl: 'Выбрать год',
+      nextMonth: 'Следующий месяц',
+      previousMonth: 'Предыдущий месяц',
+      nextYear: 'Следующий год',
+      previousYear: 'Предыдущий год',
+      nextDecade: 'Следующее десятилетие',
+      previousDecade: 'Предыдущее десятилетие',
+      seconds: 'Секунды',
+    },
     actions: {
+      clear: 'Очистить',
+      togglePasswordVisibility: 'Показать или скрыть пароль',
       back: 'Назад',
       cancel: 'Отмена',
       close: 'Закрыть',
@@ -150,7 +163,15 @@ export const ru: typeof en = {
     unauthenticated: 'Сессия завершилась. Войдите снова.',
     permissionDenied: 'У вас нет прав на это действие.',
     humanVerificationFailed: 'Проверка на робота не пройдена. Пройдите ее и попробуйте снова.',
-    invalidCredentials: 'Неверная почта или пароль.',
+    emailNotFound: 'Аккаунт с такой почтой не найден. Проверьте адрес.',
+    passwordIncorrect: 'Неверный пароль.',
+    registrationIncomplete:
+      'Регистрация не завершена. Зарегистрируйтесь с этой почтой, чтобы принять приглашение.',
+    passwordNotSet: 'Для этого аккаунта пароль не установлен.',
+    passwordNotSetGoogle: 'Для этого аккаунта пароль не установлен. Войдите через Google.',
+    passwordNotSetGithub: 'Для этого аккаунта пароль не установлен. Войдите через GitHub.',
+    passwordNotSetGoogleGithub:
+      'Для этого аккаунта пароль не установлен. Войдите через Google или GitHub.',
     userDeactivated: 'Аккаунт деактивирован. Попросите администратора активировать его.',
     registrationClosed:
       'Регистрация на этом сервере закрыта. Попросите администратора пригласить вас.',
@@ -203,6 +224,9 @@ export const ru: typeof en = {
     },
   },
   schedules: {
+    hours: 'Часы',
+    minutes: 'Минуты',
+    timePeriod: 'До или после полудня',
     types: {
       hourly: 'Ежечасно',
       daily: 'Ежедневно',
@@ -917,6 +941,9 @@ export const ru: typeof en = {
       submit: 'Войти',
       noAccount: 'Нет аккаунта? <signUpLink>Зарегистрируйтесь</signUpLink>',
       forgotPassword: 'Забыли пароль?',
+      setPassword: 'Задать пароль',
+      passwordRecoveryHint: 'Задайте пароль через восстановление доступа.',
+      contactAdministratorHint: 'Обратитесь к администратору, чтобы восстановить доступ.',
     },
     signInCode: {
       title: 'Введите код',
@@ -1395,6 +1422,7 @@ export const ru: typeof en = {
       encrypted: 'Шифровать файлы бекапов',
     },
     list: {
+      totalUsage: 'Занято всего: {{size}}',
       title: 'Бекапы',
       scheduledBackupsDisabled:
         'Бекапы по расписанию выключены (их можно снова включить в настройках бекапов)',
@@ -1456,7 +1484,7 @@ export const ru: typeof en = {
         forever: 'Бессрочно',
       },
       retentionPolicyTypes: {
-        gfs: 'GFS (хранить последние N ежечасных, ежедневных, еженедельных, ежемесячных и ежегодных бекапов)',
+        gfs: 'GFS (хранение по календарным периодам)',
         timePeriod: 'За период (последние N дней)',
         count: 'По количеству (N последних бекапов)',
       },
@@ -1509,10 +1537,15 @@ export const ru: typeof en = {
           countValue: 'Последних бекапов: {{count}}',
           showGfsHint: 'Что такое GFS (Grandfather-Father-Son)?',
           hideGfsHint: 'Скрыть',
-          gfsHint:
-            'Ротация GFS (Grandfather-Father-Son): хранятся последние N ежечасных, ежедневных, еженедельных, ежемесячных и ежегодных бекапов. Так бекапы можно хранить долго и не занимать лишнее место в хранилище.',
+          gfsHint: {
+            summary: 'GFS помогает хранить свежие бекапы и сохранять часть старых надолго.',
+            selection:
+              '<strong>Выберите, сколько бекапов хранить</strong> по часам, дням, неделям, месяцам и годам. Учитываются только успешные бекапы.',
+            fileCount:
+              '<strong>Один бекап может учитываться в нескольких настройках</strong>, поэтому число файлов может отличаться от суммы значений.',
+          },
           gfsTooltip:
-            'Ротация Grandfather-Father-Son: хранятся последние N ежечасных, ежедневных, еженедельных, ежемесячных и ежегодных бекапов.',
+            'GFS: последние календарные часы и дни, завершенные недели, месяцы и годы, а также защищенный кандидат текущего периода.',
           gfsFields: {
             hourly: 'Ежечасные бекапы',
             daily: 'Ежедневные бекапы',
@@ -1553,7 +1586,6 @@ export const ru: typeof en = {
         walGap: 'Разрыв в WAL',
       },
       list: {
-        totalUsage: 'Занято всего: {{size}}',
         backUpNow: 'Сделать бекап',
         startRequirement:
           'Чтобы запустить бекап, включите бекапы и выберите хранилище в настройках бекапов.',
@@ -1611,8 +1643,17 @@ export const ru: typeof en = {
         chainsKept: 'Хранится цепочек',
         fullBackupsKept: 'Хранится полных бекапов',
         fullBackupsCountValue: 'Последних: {{count}}',
+        gfsHint: {
+          summary: 'GFS помогает хранить свежие полные бекапы и сохранять часть старых надолго.',
+          selection:
+            '<strong>Выберите, сколько бекапов хранить</strong> по часам, дням, неделям, месяцам и годам. Учитываются только успешные бекапы.',
+          fileCount:
+            '<strong>Один бекап может учитываться в нескольких настройках</strong>, поэтому число файлов может отличаться от суммы значений.',
+          scope:
+            '<strong>GFS сохраняет только полные бекапы.</strong> Хранение инкрементальных бекапов и WAL настраивается отдельно.',
+        },
         gfsTooltip:
-          'Ротация Grandfather-Father-Son: хранятся последние N ежечасных, ежедневных, еженедельных, ежемесячных и ежегодных полных бекапов.',
+          'GFS: успешные полные бекапы за последние календарные часы и дни, завершенные недели, месяцы и годы, а также кандидат текущего периода.',
       },
       restore: {
         errorHints: {
@@ -1981,6 +2022,7 @@ export const ru: typeof en = {
     },
   },
   storages: {
+    usageUnavailable: 'Не удалось обновить объём бекапов.',
     cleanup: {
       title: 'Очистка ещё идёт',
       warning:
@@ -2017,6 +2059,8 @@ export const ru: typeof en = {
       privateKey: 'Закрытый ключ',
     },
     list: {
+      searchPlaceholder: 'Поиск хранилищ',
+      noSearchResults: 'Не найдено хранилищ по запросу «{{query}}»',
       addStorage: 'Добавить хранилище',
       description: 'Хранилище — это место, где хранятся бекапы (локальный диск, S3 и т. д.)',
       backToList: '← Назад к хранилищам',

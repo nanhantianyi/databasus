@@ -1,4 +1,4 @@
-import { Button, Modal, Spin } from 'antd';
+import { Button, Loader } from '@mantine/core';
 import { useEffect, useEffectEvent, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -9,8 +9,9 @@ import { StorageCardComponent } from '@/pages/storages/ui/StorageCardComponent';
 import { StorageComponent } from '@/pages/storages/ui/StorageComponent';
 import { ApiError } from '@/shared/api';
 import { useSessionGuard } from '@/shared/auth';
-import { useIsMobile, useRequestRevision, useScopedSelection } from '@/shared/hooks';
-import { ResourceListDetail, LoadFailure } from '@/shared/ui';
+import { useIsMobile, useResourceCollection, useScopedSelection } from '@/shared/hooks';
+import { Dialog } from '@/shared/ui';
+import { ResourceCollectionList, ResourceListDetail, LoadFailure } from '@/shared/ui';
 
 interface Props {
   workspace: Workspace;
@@ -19,49 +20,25 @@ interface Props {
 }
 
 export const StoragesComponent = ({ workspace, isCanManageStorages, onUnavailable }: Props) => {
-  const [collection, setCollection] = useState<{
-    items: Storage[];
-    isReady: boolean;
-  }>({ items: [], isReady: false });
-  const [loadError, setLoadError] = useState<unknown>();
-  const [isLoading, setIsLoading] = useState(true);
   const [isShowAddStorage, setIsShowAddStorage] = useState(false);
-
-  const loadStorages = (isSilent = false) => {
-    if (!isCurrent()) return;
-
-    const revision = loadRevision.Invalidate();
-
-    if (!isSilent) setIsLoading(true);
-    setLoadError(undefined);
-    storageApi
-      .listAllStorages(workspace.id)
-      .then((items) => {
-        if (!isCurrent() || !loadRevision.IsCurrent(revision)) return;
-        setCollection({ items, isReady: true });
-      })
-      .catch((error) => {
-        if (isCurrent() && loadRevision.IsCurrent(revision)) {
-          setLoadError(error);
-
-          if (error instanceof ApiError && [403, 404].includes(error.status ?? 0)) {
-            setCollection({ items: [], isReady: false });
-            onUnavailable?.(workspace.id);
-          }
-        }
-      })
-      .finally(() => {
-        if (isCurrent() && loadRevision.IsCurrent(revision)) setIsLoading(false);
-      });
-  };
+  const [searchQuery, setSearchQuery] = useState('');
+  const collection = useResourceCollection({
+    queryKey: ['storages', workspace.id],
+    read: (signal) => storageApi.listAllStorages(workspace.id, { signal }),
+    onError: (error) => {
+      if (error instanceof ApiError && [403, 404].includes(error.status ?? 0)) {
+        collection.clear();
+        onUnavailable?.(workspace.id);
+      }
+    },
+  });
+  const loadStorages = collection.reload;
+  const { loadError, isLoading } = collection;
 
   const acceptStorage = (resource: Storage) => {
     if (!isCurrent() || resource.workspaceId !== workspace.id) return;
 
-    setCollection((current) => ({
-      isReady: true,
-      items: [...current.items.filter((item) => item.id !== resource.id), resource],
-    }));
+    collection.accept(resource);
     loadStorages(true);
   };
 
@@ -69,17 +46,13 @@ export const StoragesComponent = ({ workspace, isCanManageStorages, onUnavailabl
     if (!selectedStorageId) return;
 
     selection.remove(selectedStorageId);
-    setCollection((current) => ({
-      ...current,
-      items: current.items.filter((item) => item.id !== selectedStorageId),
-    }));
+    collection.remove(selectedStorageId);
     loadStorages(true);
   };
 
   const { t } = useTranslation();
   const isMobile = useIsMobile();
   const isCurrent = useSessionGuard();
-  const loadRevision = useRequestRevision();
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const storages = collection.items;
   const selection = useScopedSelection({
@@ -90,14 +63,6 @@ export const StoragesComponent = ({ workspace, isCanManageStorages, onUnavailabl
     isMobile,
   });
   const selectedStorageId = selection.selectedItemId;
-
-  const startStoragesLoad = useEffectEvent(() => {
-    void loadStorages();
-  });
-
-  useEffect(() => {
-    startStoragesLoad();
-  }, []);
 
   // Read when the form closes, because the button can appear after the form opened.
   const returnFocusToButton = useEffectEvent(() => {
@@ -115,41 +80,49 @@ export const StoragesComponent = ({ workspace, isCanManageStorages, onUnavailabl
   const addButton = (
     <Button
       ref={addButtonRef}
-      type="primary"
-      className="mb-2 w-full"
+      variant="filled"
+      className="mb-2 !h-auto min-h-8 w-full !whitespace-normal"
       onClick={() => setIsShowAddStorage(true)}
     >
       {t('storages.list.addStorage')}
     </Button>
   );
   const list = (
-    <>
-      {storages.length >= 5 && isCanManageStorages && addButton}
-      {storages.map((resource) => (
+    <ResourceCollectionList
+      items={storages}
+      getKey={(resource) => resource.id}
+      getName={(resource) => resource.name}
+      renderCard={(resource) => (
         <StorageCardComponent
-          key={resource.id}
           storage={resource}
           selectedStorageId={selectedStorageId}
           setSelectedStorageId={selection.select}
         />
-      ))}
-      {storages.length < 5 && isCanManageStorages && addButton}
-      <div className="mx-3 text-center text-xs text-muted">{t('storages.list.description')}</div>
-    </>
+      )}
+      addAction={isCanManageStorages && addButton}
+      description={t('storages.list.description')}
+      searchLabel={t('storages.list.searchPlaceholder')}
+      searchQuery={searchQuery}
+      onSearchChange={setSearchQuery}
+      noSearchResults={(query) => t('storages.list.noSearchResults', { query })}
+    />
   );
 
   return (
     <div className="flex min-h-0 min-w-0 flex-1 flex-col">
       {loadError !== undefined && <LoadFailure error={loadError} onRetry={() => loadStorages()} />}
       {isLoading && !collection.isReady ? (
-        <Spin />
+        <Loader role="status" />
       ) : collection.isReady ? (
         <ResourceListDetail
           isMobile={isMobile}
           hasSelection={!!selectedStorageId}
           list={list}
           backAction={
-            <Button className="w-full" onClick={() => selection.select(undefined)}>
+            <Button
+              className="!h-auto min-h-8 w-full !whitespace-normal"
+              onClick={() => selection.select(undefined)}
+            >
               {t('storages.list.backToList')}
             </Button>
           }
@@ -169,12 +142,11 @@ export const StoragesComponent = ({ workspace, isCanManageStorages, onUnavailabl
         />
       ) : null}
       {isShowAddStorage && (
-        <Modal
+        <Dialog
           title={t('storages.list.addStorage')}
-          footer={null}
-          open
-          onCancel={() => setIsShowAddStorage(false)}
-          maskClosable={false}
+          opened
+          onClose={() => setIsShowAddStorage(false)}
+          closeOnClickOutside={false}
         >
           <p className="my-3 text-muted">{t('storages.list.description')}</p>
           <EditStorageComponent
@@ -189,7 +161,7 @@ export const StoragesComponent = ({ workspace, isCanManageStorages, onUnavailabl
               setIsShowAddStorage(false);
             }}
           />
-        </Modal>
+        </Dialog>
       )}
     </div>
   );

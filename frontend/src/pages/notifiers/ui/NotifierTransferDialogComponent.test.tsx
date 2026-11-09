@@ -1,15 +1,19 @@
 // @vitest-environment happy-dom
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react';
 import { HttpResponse, http } from 'msw';
 import { describe, expect, it, vi } from 'vitest';
 
 import { type Database, DatabaseType, createDefaultDatabaseSettings } from '@/entities/databases';
+import { databaseApi } from '@/entities/databases';
 import type { Notifier } from '@/entities/notifiers';
 import type { Workspace } from '@/entities/workspaces';
 import { NotifierTransferDialogComponent } from '@/pages/notifiers/ui/NotifierTransferDialogComponent';
 import { API_BASE_PATH, type ApiComponents } from '@/shared/api';
+import { finishApiResponse } from '@/shared/lib/test/finishApiResponse';
+import { finishCancelledApiResponse } from '@/shared/lib/test/finishCancelledApiResponse';
 import { inspectApiRequest } from '@/shared/lib/test/inspectApiRequest';
 import { buildProblem, mockApi, setUpMockApi } from '@/shared/lib/test/mockApi';
+import { createPendingApiResponse } from '@/shared/lib/test/pendingApiResponse';
 import { renderScreen } from '@/shared/lib/test/renderScreen';
 
 const mockServer = setUpMockApi();
@@ -121,12 +125,8 @@ describe('NotifierTransferDialogComponent', () => {
       />,
     );
 
-    fireEvent.mouseDown(await screen.findByRole('combobox', { name: 'Target workspace' }));
-    fireEvent.click(
-      await screen.findByText(targetWorkspace.name, {
-        selector: '.ant-select-item-option-content',
-      }),
-    );
+    fireEvent.click(await screen.findByRole('combobox', { name: 'Target workspace' }));
+    fireEvent.click(await screen.findByRole('option', { name: targetWorkspace.name }));
     await view.user.click(screen.getByRole('button', { name: /Transfer/ }));
 
     expect(
@@ -138,7 +138,9 @@ describe('NotifierTransferDialogComponent', () => {
     expect(screen.queryByText('in_use')).toBeNull();
     expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
     expect(
-      screen.getByText(targetWorkspace.name, { selector: '.ant-select-selection-item' }),
+      within(screen.getByRole('combobox', { name: 'Target workspace' })).getByText(
+        targetWorkspace.name,
+      ),
     ).toBeTruthy();
     expect(onTransferred).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
@@ -168,4 +170,200 @@ describe('NotifierTransferDialogComponent', () => {
       expect(inspectedTransfer.body).toEqual({ targetWorkspaceId: targetWorkspace.id });
     }
   });
+});
+
+const TransferDialog = ({
+  resourceId = transferredNotifier.id,
+  onClose,
+  onTransferred,
+}: {
+  resourceId?: string;
+  onClose: () => void;
+  onTransferred: () => void;
+}) => (
+  <NotifierTransferDialogComponent
+    notifier={{ ...transferredNotifier, id: resourceId }}
+    onClose={onClose}
+    onTransferred={onTransferred}
+  />
+);
+const usagePath = '/databases';
+const availableTargets = () =>
+  mockServer.use(
+    mockApi.get(usagePath, 200, { items: [] }),
+    mockApi.get('/workspaces', 200, { items: [sourceWorkspace, targetWorkspace] }),
+  );
+const chooseTarget = async () => {
+  fireEvent.click(await screen.findByRole('combobox', { name: 'Target workspace' }));
+
+  expect(screen.queryByRole('option', { name: sourceWorkspace.name })).toBeNull();
+
+  fireEvent.click(await screen.findByRole('option', { name: targetWorkspace.name }));
+};
+
+describe('Notifier transfer lifecycle', () => {
+  it('loads current targets when Strict Mode cancels its first setup', async () => {
+    const usageRead = vi.spyOn(databaseApi, 'listAllDatabases');
+    availableTargets();
+    renderScreen(<TransferDialog onClose={() => {}} onTransferred={() => {}} />, {
+      isStrictMode: true,
+    });
+    await screen.findByRole('combobox', { name: 'Target workspace' });
+    expect(usageRead.mock.calls.length).toBeGreaterThanOrEqual(2);
+    expect(usageRead.mock.calls[0][1]?.signal?.aborted).toBe(true);
+    expect(screen.queryByRole('button', { name: 'Retry' })).toBeNull();
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('submits once and calls the current completion handler when transfer options change while pending', async () => {
+    availableTargets();
+    const transfer = createPendingApiResponse();
+    let transfers = 0;
+    mockServer.use(
+      http.post(`*${API_BASE_PATH}/notifiers/:resourceId/transfer`, () => {
+        transfers++;
+        return transfer.response;
+      }),
+    );
+    const oldTransferred = vi.fn();
+    const currentTransferred = vi.fn();
+    const view = renderScreen(<TransferDialog onClose={() => {}} onTransferred={oldTransferred} />);
+
+    await chooseTarget();
+    const submit = screen.getByRole('button', { name: 'Transfer' });
+    act(() => {
+      submit.click();
+      submit.click();
+    });
+    await waitFor(() => expect(transfers).toBe(1));
+
+    view.rerender(<TransferDialog onClose={() => {}} onTransferred={currentTransferred} />);
+    transfer.respond(new HttpResponse(null, { status: 204 }));
+    await waitFor(() => expect(currentTransferred).toHaveBeenCalledTimes(1));
+
+    expect(oldTransferred).not.toHaveBeenCalled();
+    expect(transfers).toBe(1);
+  });
+
+  it.each([204, 409])(
+    'resets the target and ignores an obsolete HTTP %i transfer after the resource changes',
+    async (status) => {
+      availableTargets();
+      const transfer = createPendingApiResponse();
+      let transfers = 0;
+      mockServer.use(
+        http.post(`*${API_BASE_PATH}/notifiers/:resourceId/transfer`, () => {
+          transfers++;
+          return transfer.response;
+        }),
+      );
+      const onTransferred = vi.fn();
+      const view = renderScreen(
+        <TransferDialog onClose={() => {}} onTransferred={onTransferred} />,
+      );
+
+      await chooseTarget();
+      await view.user.click(screen.getByRole('button', { name: 'Transfer' }));
+      await waitFor(() => expect(transfers).toBe(1));
+
+      view.rerender(
+        <TransferDialog
+          resourceId="replacement-id"
+          onClose={() => {}}
+          onTransferred={onTransferred}
+        />,
+      );
+      await screen.findByRole('combobox', { name: 'Target workspace' });
+
+      expect(
+        within(screen.getByRole('combobox', { name: 'Target workspace' })).queryByText(
+          targetWorkspace.name,
+        ),
+      ).toBeNull();
+      expect((screen.getByRole('button', { name: 'Transfer' }) as HTMLButtonElement).disabled).toBe(
+        true,
+      );
+
+      await finishApiResponse(
+        mockServer,
+        `/api/v1/notifiers/${transferredNotifier.id}/transfer`,
+        () =>
+          transfer.respond(
+            status === 204
+              ? new HttpResponse(null, { status: 204 })
+              : HttpResponse.json(buildProblem('in_use', 409), { status: 409 }),
+          ),
+      );
+
+      expect(onTransferred).not.toHaveBeenCalled();
+      expect(screen.queryByRole('alert')).toBeNull();
+
+      await chooseTarget();
+
+      expect((screen.getByRole('button', { name: 'Transfer' }) as HTMLButtonElement).disabled).toBe(
+        false,
+      );
+    },
+  );
+
+  it.each([200, 500])(
+    'stops the target read and ignores HTTP %i usage results after closing',
+    async (status) => {
+      const usageRead = mockApi.pending('get', usagePath);
+      mockServer.use(usageRead.handler);
+      const onTransferred = vi.fn();
+      const onClose = vi.fn(() => view.rerender(<></>));
+      const view = renderScreen(<TransferDialog onClose={onClose} onTransferred={onTransferred} />);
+      await waitFor(() => expect(mockServer.getRequests()).toHaveLength(1));
+      await view.user.click(screen.getByRole('button', { name: 'Close' }));
+      await finishCancelledApiResponse(mockServer, `/api/v1${usagePath}`, () =>
+        usageRead.respond(
+          status === 200
+            ? HttpResponse.json({ items: [] })
+            : HttpResponse.json(buildProblem('internal', 500), { status: 500 }),
+        ),
+      );
+
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(onClose).toHaveBeenCalledTimes(1);
+      expect(onTransferred).not.toHaveBeenCalled();
+      expect(mockServer.getRequests()).toHaveLength(1);
+    },
+  );
+
+  it.each([204, 409])(
+    'ignores a pending HTTP %i transfer after closing the dialog',
+    async (status) => {
+      availableTargets();
+      const transfer = createPendingApiResponse();
+      mockServer.use(
+        http.post(`*${API_BASE_PATH}/notifiers/:resourceId/transfer`, () => transfer.response),
+      );
+      const onTransferred = vi.fn();
+      const onClose = vi.fn(() => view.rerender(<></>));
+      const view = renderScreen(<TransferDialog onClose={onClose} onTransferred={onTransferred} />);
+      await chooseTarget();
+      await view.user.click(screen.getByRole('button', { name: 'Transfer' }));
+      await waitFor(() =>
+        expect(
+          mockServer.getRequests().filter((request) => request.method === 'POST'),
+        ).toHaveLength(1),
+      );
+      await view.user.click(screen.getByRole('button', { name: 'Cancel' }));
+      await finishApiResponse(
+        mockServer,
+        `/api/v1/notifiers/${transferredNotifier.id}/transfer`,
+        () =>
+          transfer.respond(
+            status === 204
+              ? new HttpResponse(null, { status: 204 })
+              : HttpResponse.json(buildProblem('in_use', 409), { status: 409 }),
+          ),
+      );
+
+      expect(screen.queryByRole('dialog')).toBeNull();
+      expect(onTransferred).not.toHaveBeenCalled();
+      expect(onClose).toHaveBeenCalledTimes(1);
+    },
+  );
 });

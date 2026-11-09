@@ -30,10 +30,6 @@ import (
 )
 
 type (
-	// Role is the global role of a user.
-	Role = identity.Role
-	// Status is the state of a user: invited and not signed up yet, active, or deactivated.
-	Status = identity.Status
 	// Actor is the user a request runs for: the user ID and the global role.
 	Actor = identity.Actor
 	// User is a user as other modules see it, without the password or the identity provider IDs.
@@ -51,9 +47,7 @@ const (
 	RoleAdmin  = identity.RoleAdmin
 	RoleMember = identity.RoleMember
 
-	StatusInvited  = identity.StatusInvited
-	StatusActive   = identity.StatusActive
-	StatusInactive = identity.StatusInactive
+	StatusInvited = identity.StatusInvited
 )
 
 func WithActor(ctx context.Context, actor Actor) context.Context {
@@ -62,6 +56,10 @@ func WithActor(ctx context.Context, actor Actor) context.Context {
 
 func GetActor(ctx context.Context) (Actor, bool) {
 	return identity.GetActor(ctx)
+}
+
+func RequireActor(ctx context.Context) (Actor, error) {
+	return identity.RequireActor(ctx)
 }
 
 type Module interface {
@@ -90,6 +88,26 @@ type Module interface {
 	// DisableTwoFactorAuth reports false when the second factor was already off.
 	DisableTwoFactorAuth(ctx context.Context) (bool, error)
 	RenderAdminListing(ctx context.Context) (string, error)
+}
+
+type DevSeedAccount = accounts.DevSeedAccount
+
+type DevSeedAdmin interface {
+	EnsureBootstrapAdmin(ctx context.Context, account DevSeedAccount) (bool, error)
+}
+
+type DevSeedAdminDeps struct {
+	DB         *gorm.DB
+	Transactor *database.Transactor
+	AuditLog   *audit.Log
+}
+
+func NewDevSeedAdmin(deps DevSeedAdminDeps) DevSeedAdmin {
+	return accounts.NewDevSeedAdmin(accounts.DevSeedAdminDeps{
+		Repositories: accounts.NewRepositories(deps.DB),
+		Transactor:   deps.Transactor,
+		AuditLog:     deps.AuditLog,
+	})
 }
 
 type Deps struct {

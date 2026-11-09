@@ -1053,42 +1053,48 @@ func (e PostgresqlVersion) Valid() bool {
 
 // Defines values for ProblemCode.
 const (
-	ProblemCodeAdminEmailMissing        ProblemCode = "admin_email_missing"
-	ProblemCodeAlreadyMember            ProblemCode = "already_member"
-	ProblemCodeAlreadyRunning           ProblemCode = "already_running"
-	ProblemCodeBackupNotCompleted       ProblemCode = "backup_not_completed"
-	ProblemCodeCannotChangeOwnRole      ProblemCode = "cannot_change_own_role"
-	ProblemCodeCleanupPending           ProblemCode = "cleanup_pending"
-	ProblemCodeDatabaseConnectionFailed ProblemCode = "database_connection_failed"
-	ProblemCodeEmailNotConfigured       ProblemCode = "email_not_configured"
-	ProblemCodeEmailTaken               ProblemCode = "email_taken"
-	ProblemCodeHumanVerificationFailed  ProblemCode = "human_verification_failed"
-	ProblemCodeInUse                    ProblemCode = "in_use"
-	ProblemCodeInstanceUnhealthy        ProblemCode = "instance_unhealthy"
-	ProblemCodeInsufficientDiskSpace    ProblemCode = "insufficient_disk_space"
-	ProblemCodeInternal                 ProblemCode = "internal"
-	ProblemCodeInvalidCredentials       ProblemCode = "invalid_credentials"
-	ProblemCodeInvalidRequest           ProblemCode = "invalid_request"
-	ProblemCodeInvalidResetCode         ProblemCode = "invalid_reset_code"
-	ProblemCodeNoExtendableChain        ProblemCode = "no_extendable_chain"
-	ProblemCodeNoRestorableBackup       ProblemCode = "no_restorable_backup"
-	ProblemCodeNotFound                 ProblemCode = "not_found"
-	ProblemCodeNotRunning               ProblemCode = "not_running"
-	ProblemCodeOauthFailed              ProblemCode = "oauth_failed"
-	ProblemCodeOauthNotConfigured       ProblemCode = "oauth_not_configured"
-	ProblemCodeOwnerRequiresTransfer    ProblemCode = "owner_requires_transfer"
-	ProblemCodePendingSignInNotUsable   ProblemCode = "pending_sign_in_not_usable"
-	ProblemCodePermissionDenied         ProblemCode = "permission_denied"
-	ProblemCodeRateLimited              ProblemCode = "rate_limited"
-	ProblemCodeRegistrationClosed       ProblemCode = "registration_closed"
-	ProblemCodeSignInCodeIncorrect      ProblemCode = "sign_in_code_incorrect"
-	ProblemCodeSignInCodeNotSent        ProblemCode = "sign_in_code_not_sent"
-	ProblemCodeSignInCodeResentTooSoon  ProblemCode = "sign_in_code_resent_too_soon"
-	ProblemCodeTargetTimeUnreachable    ProblemCode = "target_time_unreachable"
-	ProblemCodeTooManySignInCodes       ProblemCode = "too_many_sign_in_codes"
-	ProblemCodeUnauthenticated          ProblemCode = "unauthenticated"
-	ProblemCodeUserDeactivated          ProblemCode = "user_deactivated"
-	ProblemCodeWorkspaceNotEmpty        ProblemCode = "workspace_not_empty"
+	ProblemCodeAdminEmailMissing          ProblemCode = "admin_email_missing"
+	ProblemCodeAlreadyMember              ProblemCode = "already_member"
+	ProblemCodeAlreadyRunning             ProblemCode = "already_running"
+	ProblemCodeBackupNotCompleted         ProblemCode = "backup_not_completed"
+	ProblemCodeCannotChangeOwnRole        ProblemCode = "cannot_change_own_role"
+	ProblemCodeCleanupPending             ProblemCode = "cleanup_pending"
+	ProblemCodeDatabaseConnectionFailed   ProblemCode = "database_connection_failed"
+	ProblemCodeEmailNotConfigured         ProblemCode = "email_not_configured"
+	ProblemCodeEmailNotFound              ProblemCode = "email_not_found"
+	ProblemCodeEmailTaken                 ProblemCode = "email_taken"
+	ProblemCodeHumanVerificationFailed    ProblemCode = "human_verification_failed"
+	ProblemCodeInUse                      ProblemCode = "in_use"
+	ProblemCodeInstanceUnhealthy          ProblemCode = "instance_unhealthy"
+	ProblemCodeInsufficientDiskSpace      ProblemCode = "insufficient_disk_space"
+	ProblemCodeInternal                   ProblemCode = "internal"
+	ProblemCodeInvalidRequest             ProblemCode = "invalid_request"
+	ProblemCodeInvalidResetCode           ProblemCode = "invalid_reset_code"
+	ProblemCodeNoExtendableChain          ProblemCode = "no_extendable_chain"
+	ProblemCodeNoRestorableBackup         ProblemCode = "no_restorable_backup"
+	ProblemCodeNotFound                   ProblemCode = "not_found"
+	ProblemCodeNotRunning                 ProblemCode = "not_running"
+	ProblemCodeOauthFailed                ProblemCode = "oauth_failed"
+	ProblemCodeOauthNotConfigured         ProblemCode = "oauth_not_configured"
+	ProblemCodeOwnerRequiresTransfer      ProblemCode = "owner_requires_transfer"
+	ProblemCodePasswordIncorrect          ProblemCode = "password_incorrect"
+	ProblemCodePasswordNotSet             ProblemCode = "password_not_set"
+	ProblemCodePasswordNotSetGithub       ProblemCode = "password_not_set_github"
+	ProblemCodePasswordNotSetGoogle       ProblemCode = "password_not_set_google"
+	ProblemCodePasswordNotSetGoogleGithub ProblemCode = "password_not_set_google_github"
+	ProblemCodePendingSignInNotUsable     ProblemCode = "pending_sign_in_not_usable"
+	ProblemCodePermissionDenied           ProblemCode = "permission_denied"
+	ProblemCodeRateLimited                ProblemCode = "rate_limited"
+	ProblemCodeRegistrationClosed         ProblemCode = "registration_closed"
+	ProblemCodeRegistrationIncomplete     ProblemCode = "registration_incomplete"
+	ProblemCodeSignInCodeIncorrect        ProblemCode = "sign_in_code_incorrect"
+	ProblemCodeSignInCodeNotSent          ProblemCode = "sign_in_code_not_sent"
+	ProblemCodeSignInCodeResentTooSoon    ProblemCode = "sign_in_code_resent_too_soon"
+	ProblemCodeTargetTimeUnreachable      ProblemCode = "target_time_unreachable"
+	ProblemCodeTooManySignInCodes         ProblemCode = "too_many_sign_in_codes"
+	ProblemCodeUnauthenticated            ProblemCode = "unauthenticated"
+	ProblemCodeUserDeactivated            ProblemCode = "user_deactivated"
+	ProblemCodeWorkspaceNotEmpty          ProblemCode = "workspace_not_empty"
 )
 
 // Valid indicates whether the value is a known member of the ProblemCode enum.
@@ -1110,6 +1116,8 @@ func (e ProblemCode) Valid() bool {
 		return true
 	case ProblemCodeEmailNotConfigured:
 		return true
+	case ProblemCodeEmailNotFound:
+		return true
 	case ProblemCodeEmailTaken:
 		return true
 	case ProblemCodeHumanVerificationFailed:
@@ -1121,8 +1129,6 @@ func (e ProblemCode) Valid() bool {
 	case ProblemCodeInsufficientDiskSpace:
 		return true
 	case ProblemCodeInternal:
-		return true
-	case ProblemCodeInvalidCredentials:
 		return true
 	case ProblemCodeInvalidRequest:
 		return true
@@ -1142,6 +1148,16 @@ func (e ProblemCode) Valid() bool {
 		return true
 	case ProblemCodeOwnerRequiresTransfer:
 		return true
+	case ProblemCodePasswordIncorrect:
+		return true
+	case ProblemCodePasswordNotSet:
+		return true
+	case ProblemCodePasswordNotSetGithub:
+		return true
+	case ProblemCodePasswordNotSetGoogle:
+		return true
+	case ProblemCodePasswordNotSetGoogleGithub:
+		return true
 	case ProblemCodePendingSignInNotUsable:
 		return true
 	case ProblemCodePermissionDenied:
@@ -1149,6 +1165,8 @@ func (e ProblemCode) Valid() bool {
 	case ProblemCodeRateLimited:
 		return true
 	case ProblemCodeRegistrationClosed:
+		return true
+	case ProblemCodeRegistrationIncomplete:
 		return true
 	case ProblemCodeSignInCodeIncorrect:
 		return true
@@ -2287,24 +2305,24 @@ type FtpStorageSettings struct {
 // FtpStorageSettingsType Always `FTP`
 type FtpStorageSettingsType string
 
-// FullBackupsRetention Which full backups are kept
+// FullBackupsRetention Which full backups are kept. GFS selects successful full backups using UTC calendar periods anchored to the creation time of the newest successful full backup. Weeks start on Monday. Hourly and daily counts include the current period; weekly, monthly and yearly counts reserve completed periods and also protect the current period's newest successful candidate. One full backup can represent several levels. This selection does not preserve its incrementals or WAL. A zero count disables its level and candidate. Empty periods are not filled with older full backups.
 type FullBackupsRetention struct {
 	// Count How many of the newest full backups `LAST_N` keeps; 0 with `GFS`
 	Count int `json:"count"`
 
-	// GfsDays For how many of the last days `GFS` keeps the newest full backup of each day
+	// GfsDays Number of UTC calendar days for which `GFS` keeps the newest successful full backup, including the current day
 	GfsDays int `json:"gfsDays"`
 
-	// GfsHours For how many of the last hours `GFS` keeps the newest full backup of each hour
+	// GfsHours Number of UTC calendar hours for which `GFS` keeps the newest successful full backup, including the current hour
 	GfsHours int `json:"gfsHours"`
 
-	// GfsMonths For how many of the last months `GFS` keeps the newest full backup of each month
+	// GfsMonths Number of completed UTC calendar months for which `GFS` keeps the newest successful full backup, plus the current month's candidate
 	GfsMonths int `json:"gfsMonths"`
 
-	// GfsWeeks For how many of the last weeks `GFS` keeps the newest full backup of each week
+	// GfsWeeks Number of completed UTC calendar weeks for which `GFS` keeps the newest successful full backup, plus the current week's candidate
 	GfsWeeks int `json:"gfsWeeks"`
 
-	// GfsYears For how many of the last years `GFS` keeps the newest full backup of each year
+	// GfsYears Number of completed UTC calendar years for which `GFS` keeps the newest successful full backup, plus the current year's candidate
 	GfsYears int `json:"gfsYears"`
 
 	// Policy `LAST_N` keeps the newest `count` full backups, and `GFS` keeps them by grandfather-father-son periods, at least one of them set
@@ -2596,6 +2614,9 @@ type LogicalBackupPage struct {
 
 	// NextCursor The `after` of the next page, absent on the last page
 	NextCursor *string `json:"nextCursor,omitempty"`
+
+	// TotalUsageMb Recorded stored size of all retained completed backups of the database in megabytes, independently of filters and pages
+	TotalUsageMb float64 `json:"totalUsageMb"`
 }
 
 // LogicalBackupSettings The settings of a logical backup, a dump of a PostgreSQL, MySQL, MariaDB or MongoDB database
@@ -2609,7 +2630,7 @@ type LogicalBackupSettings struct {
 	// NotificationTriggers The backup outcomes that send a notification through the database's notifiers
 	NotificationTriggers []LogicalNotificationTrigger `json:"notificationTriggers"`
 
-	// Retention Which logical backups are kept. `policy` picks the rule; the fields of the other rules keep their saved values.
+	// Retention Which logical backups are kept. `policy` picks the rule; the fields of the other rules keep their saved values. GFS selects successful backups using UTC calendar periods anchored to the creation time of the newest successful backup. Weeks start on Monday. Hourly and daily counts include the current period; weekly, monthly and yearly counts reserve completed periods and also protect the current period's newest successful candidate. A backup can represent several levels without duplicate files. A zero count disables its level and candidate. Empty periods are not filled with older backups.
 	Retention LogicalRetention `json:"retention"`
 
 	// Schedule When recurring work runs; times of day are in UTC
@@ -2637,24 +2658,24 @@ type LogicalBackupVerificationStatus string
 // LogicalNotificationTrigger A logical backup outcome that sends a notification, a failed or a successful backup
 type LogicalNotificationTrigger string
 
-// LogicalRetention Which logical backups are kept. `policy` picks the rule; the fields of the other rules keep their saved values.
+// LogicalRetention Which logical backups are kept. `policy` picks the rule; the fields of the other rules keep their saved values. GFS selects successful backups using UTC calendar periods anchored to the creation time of the newest successful backup. Weeks start on Monday. Hourly and daily counts include the current period; weekly, monthly and yearly counts reserve completed periods and also protect the current period's newest successful candidate. A backup can represent several levels without duplicate files. A zero count disables its level and candidate. Empty periods are not filled with older backups.
 type LogicalRetention struct {
 	// Count How many of the newest backups `COUNT` keeps; greater than 0 with it
 	Count int `json:"count"`
 
-	// GfsDays For how many of the last days `GFS` keeps the newest backup of each day
+	// GfsDays Number of UTC calendar days for which `GFS` keeps the newest successful backup, including the current day
 	GfsDays int `json:"gfsDays"`
 
-	// GfsHours For how many of the last hours `GFS` keeps the newest backup of each hour
+	// GfsHours Number of UTC calendar hours for which `GFS` keeps the newest successful backup, including the current hour
 	GfsHours int `json:"gfsHours"`
 
-	// GfsMonths For how many of the last months `GFS` keeps the newest backup of each month
+	// GfsMonths Number of completed UTC calendar months for which `GFS` keeps the newest successful backup, plus the current month's candidate
 	GfsMonths int `json:"gfsMonths"`
 
-	// GfsWeeks For how many of the last weeks `GFS` keeps the newest backup of each week
+	// GfsWeeks Number of completed UTC calendar weeks for which `GFS` keeps the newest successful backup, plus the current week's candidate
 	GfsWeeks int `json:"gfsWeeks"`
 
-	// GfsYears For how many of the last years `GFS` keeps the newest backup of each year
+	// GfsYears Number of completed UTC calendar years for which `GFS` keeps the newest successful backup, plus the current year's candidate
 	GfsYears int `json:"gfsYears"`
 
 	// Period How long the `TIME_PERIOD` retention keeps a backup
@@ -3788,6 +3809,12 @@ type Storage struct {
 
 	// WorkspaceId The workspace the storage belongs to
 	WorkspaceId openapi_types.UUID `json:"workspaceId"`
+}
+
+// StorageBackupUsage Backup and committed WAL stored sizes recorded in the catalog for one storage
+type StorageBackupUsage struct {
+	// TotalUsageMb Total recorded stored size in megabytes, zero when no eligible records remain
+	TotalUsageMb float64 `json:"totalUsageMb"`
 }
 
 // StorageCreate A new storage
@@ -6743,7 +6770,7 @@ type ClientInterface interface {
 
 	// ListLogicalBackups List the logical backups of a database
 	//
-	// Ordered newest first by creation time, then by ID. `status` and `createdBefore` filter the list. A user who is not a member of the database's workspace gets 404 `not_found`. A cursor this list did not issue gets 400 `invalid_request`.
+	// Ordered newest first by creation time, then by ID. `status` and `createdBefore` filter the list. A user who is not a member of the database's workspace gets 404 `not_found`. A cursor this list did not issue gets 400 `invalid_request`. `totalUsageMb` sums the recorded stored sizes of every retained completed backup of the database independently of filters and pages, without contacting its source or storage provider.
 	//
 	// Corresponds with GET /logical-backups (the `ListLogicalBackups` operationId).
 	ListLogicalBackups(ctx context.Context, params *ListLogicalBackupsParams, reqEditors ...RequestEditorFn) (*http.Response, error)
@@ -7078,7 +7105,7 @@ type ClientInterface interface {
 
 	// SignInWithBody Sign in with an email address and a password
 	//
-	// Public, because it creates the session the caller does not have yet. A wrong password, an unknown address, a user who has not finished sign-up and a user without a password all get 401 `invalid_credentials`. A deactivated user gets 403 `user_deactivated` only after the correct password. When the instance requires the second factor, the answer names a pending sign-in and the code goes to the user's address.
+	// Public, because it creates the session the caller does not have yet. Refusals answer 401 with `email_not_found`, `password_incorrect`, `registration_incomplete` or `password_not_set`. Accounts without a password recommend linked, configured providers through `password_not_set_google`, `password_not_set_github` or `password_not_set_google_github`. A deactivated user gets 403 `user_deactivated` only after the correct password; otherwise its refusal matches an equivalent active account. Human verification and the per-address rate limit run before these refusals. When the instance requires the second factor, a successful password step names a pending sign-in and sends its code. A refused step sends no code, creates no new pending sign-in and leaves existing pending sign-ins unchanged.
 	//
 	// Takes any type of body and a specified content type.
 	//
@@ -7087,7 +7114,7 @@ type ClientInterface interface {
 
 	// SignIn Sign in with an email address and a password
 	//
-	// Public, because it creates the session the caller does not have yet. A wrong password, an unknown address, a user who has not finished sign-up and a user without a password all get 401 `invalid_credentials`. A deactivated user gets 403 `user_deactivated` only after the correct password. When the instance requires the second factor, the answer names a pending sign-in and the code goes to the user's address.
+	// Public, because it creates the session the caller does not have yet. Refusals answer 401 with `email_not_found`, `password_incorrect`, `registration_incomplete` or `password_not_set`. Accounts without a password recommend linked, configured providers through `password_not_set_google`, `password_not_set_github` or `password_not_set_google_github`. A deactivated user gets 403 `user_deactivated` only after the correct password; otherwise its refusal matches an equivalent active account. Human verification and the per-address rate limit run before these refusals. When the instance requires the second factor, a successful password step names a pending sign-in and sends its code. A refused step sends no code, creates no new pending sign-in and leaves existing pending sign-ins unchanged.
 	//
 	// Takes a body of the `application/json` content type.
 	//
@@ -7175,6 +7202,13 @@ type ClientInterface interface {
 	//
 	// Corresponds with PUT /storages/{storageId} (the `UpdateStorage` operationId).
 	UpdateStorage(ctx context.Context, storageId StorageId, body UpdateStorageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetStorageBackupUsage Get the recorded backup usage of a storage
+	//
+	// Needs WORKSPACE_VIEWER. Sums retained completed logical and physical backup stored sizes and committed archived WAL sizes recorded for this storage, counting each WAL segment once. This is catalog usage, not actual provider consumption; unfinished uploads, metadata sidecars and pending file deletions are excluded. No provider or source database is contacted. An outsider or missing storage gets 404 not_found; insufficient viewing permission gets 403 permission_denied. Existing administrator workspace privileges apply.
+	//
+	// Corresponds with GET /storages/{storageId}/backup-usage (the `GetStorageBackupUsage` operationId).
+	GetStorageBackupUsage(ctx context.Context, storageId StorageId, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	// TestStorage Test the connection of a saved storage
 	//
@@ -8211,7 +8245,7 @@ func (c *Client) CreateLimitedUser(ctx context.Context, body CreateLimitedUserJS
 
 // ListLogicalBackups List the logical backups of a database
 //
-// Ordered newest first by creation time, then by ID. `status` and `createdBefore` filter the list. A user who is not a member of the database's workspace gets 404 `not_found`. A cursor this list did not issue gets 400 `invalid_request`.
+// Ordered newest first by creation time, then by ID. `status` and `createdBefore` filter the list. A user who is not a member of the database's workspace gets 404 `not_found`. A cursor this list did not issue gets 400 `invalid_request`. `totalUsageMb` sums the recorded stored sizes of every retained completed backup of the database independently of filters and pages, without contacting its source or storage provider.
 //
 // Corresponds with GET /logical-backups (the `ListLogicalBackups` operationId).
 func (c *Client) ListLogicalBackups(ctx context.Context, params *ListLogicalBackupsParams, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -8956,7 +8990,7 @@ func (c *Client) CancelRestore(ctx context.Context, restoreId RestoreId, reqEdit
 
 // SignInWithBody Sign in with an email address and a password
 //
-// Public, because it creates the session the caller does not have yet. A wrong password, an unknown address, a user who has not finished sign-up and a user without a password all get 401 `invalid_credentials`. A deactivated user gets 403 `user_deactivated` only after the correct password. When the instance requires the second factor, the answer names a pending sign-in and the code goes to the user's address.
+// Public, because it creates the session the caller does not have yet. Refusals answer 401 with `email_not_found`, `password_incorrect`, `registration_incomplete` or `password_not_set`. Accounts without a password recommend linked, configured providers through `password_not_set_google`, `password_not_set_github` or `password_not_set_google_github`. A deactivated user gets 403 `user_deactivated` only after the correct password; otherwise its refusal matches an equivalent active account. Human verification and the per-address rate limit run before these refusals. When the instance requires the second factor, a successful password step names a pending sign-in and sends its code. A refused step sends no code, creates no new pending sign-in and leaves existing pending sign-ins unchanged.
 //
 // Takes any type of body and a specified content type.
 //
@@ -8975,7 +9009,7 @@ func (c *Client) SignInWithBody(ctx context.Context, contentType string, body io
 
 // SignIn Sign in with an email address and a password
 //
-// Public, because it creates the session the caller does not have yet. A wrong password, an unknown address, a user who has not finished sign-up and a user without a password all get 401 `invalid_credentials`. A deactivated user gets 403 `user_deactivated` only after the correct password. When the instance requires the second factor, the answer names a pending sign-in and the code goes to the user's address.
+// Public, because it creates the session the caller does not have yet. Refusals answer 401 with `email_not_found`, `password_incorrect`, `registration_incomplete` or `password_not_set`. Accounts without a password recommend linked, configured providers through `password_not_set_google`, `password_not_set_github` or `password_not_set_google_github`. A deactivated user gets 403 `user_deactivated` only after the correct password; otherwise its refusal matches an equivalent active account. Human verification and the per-address rate limit run before these refusals. When the instance requires the second factor, a successful password step names a pending sign-in and sends its code. A refused step sends no code, creates no new pending sign-in and leaves existing pending sign-ins unchanged.
 //
 // Takes a body of the `application/json` content type.
 //
@@ -9164,6 +9198,23 @@ func (c *Client) UpdateStorageWithBody(ctx context.Context, storageId StorageId,
 // Corresponds with PUT /storages/{storageId} (the `UpdateStorage` operationId).
 func (c *Client) UpdateStorage(ctx context.Context, storageId StorageId, body UpdateStorageJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewUpdateStorageRequest(c.Server, storageId, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+// GetStorageBackupUsage Get the recorded backup usage of a storage
+//
+// Needs WORKSPACE_VIEWER. Sums retained completed logical and physical backup stored sizes and committed archived WAL sizes recorded for this storage, counting each WAL segment once. This is catalog usage, not actual provider consumption; unfinished uploads, metadata sidecars and pending file deletions are excluded. No provider or source database is contacted. An outsider or missing storage gets 404 not_found; insufficient viewing permission gets 403 permission_denied. Existing administrator workspace privileges apply.
+//
+// Corresponds with GET /storages/{storageId}/backup-usage (the `GetStorageBackupUsage` operationId).
+func (c *Client) GetStorageBackupUsage(ctx context.Context, storageId StorageId, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetStorageBackupUsageRequest(c.Server, storageId)
 	if err != nil {
 		return nil, err
 	}
@@ -12867,6 +12918,40 @@ func NewUpdateStorageRequestWithBody(server string, storageId StorageId, content
 	return req, nil
 }
 
+// NewGetStorageBackupUsageRequest constructs an http.Request for the GetStorageBackupUsage method
+func NewGetStorageBackupUsageRequest(server string, storageId StorageId) (*http.Request, error) {
+	var err error
+
+	var pathParam0 string
+
+	pathParam0, err = runtime.StyleParamWithOptions("simple", false, "storageId", storageId, runtime.StyleParamOptions{ParamLocation: runtime.ParamLocationPath, Type: "string", Format: "uuid"})
+	if err != nil {
+		return nil, err
+	}
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/storages/%s/backup-usage", pathParam0)
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest(http.MethodGet, queryURL.String(), nil)
+	if err != nil {
+		return nil, err
+	}
+
+	return req, nil
+}
+
 // NewTestStorageRequest constructs an http.Request for the TestStorage method
 func NewTestStorageRequest(server string, storageId StorageId) (*http.Request, error) {
 	var err error
@@ -14840,7 +14925,7 @@ type ClientWithResponsesInterface interface {
 
 	// ListLogicalBackupsWithResponse List the logical backups of a database
 	//
-	// Ordered newest first by creation time, then by ID. `status` and `createdBefore` filter the list. A user who is not a member of the database's workspace gets 404 `not_found`. A cursor this list did not issue gets 400 `invalid_request`.
+	// Ordered newest first by creation time, then by ID. `status` and `createdBefore` filter the list. A user who is not a member of the database's workspace gets 404 `not_found`. A cursor this list did not issue gets 400 `invalid_request`. `totalUsageMb` sums the recorded stored sizes of every retained completed backup of the database independently of filters and pages, without contacting its source or storage provider.
 	//
 	// Returns a wrapper object for the known response body format(s).
 	//
@@ -15209,7 +15294,7 @@ type ClientWithResponsesInterface interface {
 
 	// SignInWithBodyWithResponse Sign in with an email address and a password
 	//
-	// Public, because it creates the session the caller does not have yet. A wrong password, an unknown address, a user who has not finished sign-up and a user without a password all get 401 `invalid_credentials`. A deactivated user gets 403 `user_deactivated` only after the correct password. When the instance requires the second factor, the answer names a pending sign-in and the code goes to the user's address.
+	// Public, because it creates the session the caller does not have yet. Refusals answer 401 with `email_not_found`, `password_incorrect`, `registration_incomplete` or `password_not_set`. Accounts without a password recommend linked, configured providers through `password_not_set_google`, `password_not_set_github` or `password_not_set_google_github`. A deactivated user gets 403 `user_deactivated` only after the correct password; otherwise its refusal matches an equivalent active account. Human verification and the per-address rate limit run before these refusals. When the instance requires the second factor, a successful password step names a pending sign-in and sends its code. A refused step sends no code, creates no new pending sign-in and leaves existing pending sign-ins unchanged.
 	//
 	// Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 	//
@@ -15218,7 +15303,7 @@ type ClientWithResponsesInterface interface {
 
 	// SignInWithResponse Sign in with an email address and a password
 	//
-	// Public, because it creates the session the caller does not have yet. A wrong password, an unknown address, a user who has not finished sign-up and a user without a password all get 401 `invalid_credentials`. A deactivated user gets 403 `user_deactivated` only after the correct password. When the instance requires the second factor, the answer names a pending sign-in and the code goes to the user's address.
+	// Public, because it creates the session the caller does not have yet. Refusals answer 401 with `email_not_found`, `password_incorrect`, `registration_incomplete` or `password_not_set`. Accounts without a password recommend linked, configured providers through `password_not_set_google`, `password_not_set_github` or `password_not_set_google_github`. A deactivated user gets 403 `user_deactivated` only after the correct password; otherwise its refusal matches an equivalent active account. Human verification and the per-address rate limit run before these refusals. When the instance requires the second factor, a successful password step names a pending sign-in and sends its code. A refused step sends no code, creates no new pending sign-in and leaves existing pending sign-ins unchanged.
 	//
 	// Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 	//
@@ -15314,6 +15399,15 @@ type ClientWithResponsesInterface interface {
 	//
 	// Corresponds with PUT /storages/{storageId} (the `UpdateStorage` operationId).
 	UpdateStorageWithResponse(ctx context.Context, storageId StorageId, body UpdateStorageJSONRequestBody, reqEditors ...RequestEditorFn) (*UpdateStorageResponse, error)
+
+	// GetStorageBackupUsageWithResponse Get the recorded backup usage of a storage
+	//
+	// Needs WORKSPACE_VIEWER. Sums retained completed logical and physical backup stored sizes and committed archived WAL sizes recorded for this storage, counting each WAL segment once. This is catalog usage, not actual provider consumption; unfinished uploads, metadata sidecars and pending file deletions are excluded. No provider or source database is contacted. An outsider or missing storage gets 404 not_found; insufficient viewing permission gets 403 permission_denied. Existing administrator workspace privileges apply.
+	//
+	// Returns a wrapper object for the known response body format(s).
+	//
+	// Corresponds with GET /storages/{storageId}/backup-usage (the `GetStorageBackupUsage` operationId).
+	GetStorageBackupUsageWithResponse(ctx context.Context, storageId StorageId, reqEditors ...RequestEditorFn) (*GetStorageBackupUsageResponse, error)
 
 	// TestStorageWithResponse Test the connection of a saved storage
 	//
@@ -20097,6 +20191,89 @@ func (r UpdateStorageResponse) ContentType() string {
 	return ""
 }
 
+type GetStorageBackupUsageResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	// JSON200 the response for an HTTP 200 `application/json` response
+	JSON200 *StorageBackupUsage
+	// ApplicationproblemJSON400 the response for an HTTP 400 `application/problem+json` response
+	ApplicationproblemJSON400 *Problem
+	// ApplicationproblemJSON401 the response for an HTTP 401 `application/problem+json` response
+	ApplicationproblemJSON401 *Problem
+	// ApplicationproblemJSON403 the response for an HTTP 403 `application/problem+json` response
+	ApplicationproblemJSON403 *Problem
+	// ApplicationproblemJSON404 the response for an HTTP 404 `application/problem+json` response
+	ApplicationproblemJSON404 *Problem
+	// ApplicationproblemJSON500 the response for an HTTP 500 `application/problem+json` response
+	ApplicationproblemJSON500 *Problem
+	// ApplicationproblemJSONDefault the response for an HTTP default `application/problem+json` response
+	ApplicationproblemJSONDefault *Problem
+}
+
+// GetJSON200 returns the response for an HTTP 200 `application/json` response
+func (r GetStorageBackupUsageResponse) GetJSON200() *StorageBackupUsage {
+	return r.JSON200
+}
+
+// GetApplicationproblemJSON400 returns the response for an HTTP 400 `application/problem+json` response
+func (r GetStorageBackupUsageResponse) GetApplicationproblemJSON400() *Problem {
+	return r.ApplicationproblemJSON400
+}
+
+// GetApplicationproblemJSON401 returns the response for an HTTP 401 `application/problem+json` response
+func (r GetStorageBackupUsageResponse) GetApplicationproblemJSON401() *Problem {
+	return r.ApplicationproblemJSON401
+}
+
+// GetApplicationproblemJSON403 returns the response for an HTTP 403 `application/problem+json` response
+func (r GetStorageBackupUsageResponse) GetApplicationproblemJSON403() *Problem {
+	return r.ApplicationproblemJSON403
+}
+
+// GetApplicationproblemJSON404 returns the response for an HTTP 404 `application/problem+json` response
+func (r GetStorageBackupUsageResponse) GetApplicationproblemJSON404() *Problem {
+	return r.ApplicationproblemJSON404
+}
+
+// GetApplicationproblemJSON500 returns the response for an HTTP 500 `application/problem+json` response
+func (r GetStorageBackupUsageResponse) GetApplicationproblemJSON500() *Problem {
+	return r.ApplicationproblemJSON500
+}
+
+// GetApplicationproblemJSONDefault returns the response for an HTTP default `application/problem+json` response
+func (r GetStorageBackupUsageResponse) GetApplicationproblemJSONDefault() *Problem {
+	return r.ApplicationproblemJSONDefault
+}
+
+// GetBody returns the raw response body bytes
+func (r GetStorageBackupUsageResponse) GetBody() []byte {
+	return r.Body
+}
+
+// Status returns HTTPResponse.Status
+func (r GetStorageBackupUsageResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetStorageBackupUsageResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+// ContentType is a convenience method to retrieve the Content-Type value from the HTTP response headers
+func (r GetStorageBackupUsageResponse) ContentType() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Header.Get("Content-Type")
+	}
+	return ""
+}
+
 type TestStorageResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
@@ -23311,7 +23488,7 @@ func (c *ClientWithResponses) CreateLimitedUserWithResponse(ctx context.Context,
 
 // ListLogicalBackupsWithResponse List the logical backups of a database
 //
-// Ordered newest first by creation time, then by ID. `status` and `createdBefore` filter the list. A user who is not a member of the database's workspace gets 404 `not_found`. A cursor this list did not issue gets 400 `invalid_request`.
+// Ordered newest first by creation time, then by ID. `status` and `createdBefore` filter the list. A user who is not a member of the database's workspace gets 404 `not_found`. A cursor this list did not issue gets 400 `invalid_request`. `totalUsageMb` sums the recorded stored sizes of every retained completed backup of the database independently of filters and pages, without contacting its source or storage provider.
 //
 // Returns a wrapper object for the known response body format(s).
 //
@@ -23926,7 +24103,7 @@ func (c *ClientWithResponses) CancelRestoreWithResponse(ctx context.Context, res
 
 // SignInWithBodyWithResponse Sign in with an email address and a password
 //
-// Public, because it creates the session the caller does not have yet. A wrong password, an unknown address, a user who has not finished sign-up and a user without a password all get 401 `invalid_credentials`. A deactivated user gets 403 `user_deactivated` only after the correct password. When the instance requires the second factor, the answer names a pending sign-in and the code goes to the user's address.
+// Public, because it creates the session the caller does not have yet. Refusals answer 401 with `email_not_found`, `password_incorrect`, `registration_incomplete` or `password_not_set`. Accounts without a password recommend linked, configured providers through `password_not_set_google`, `password_not_set_github` or `password_not_set_google_github`. A deactivated user gets 403 `user_deactivated` only after the correct password; otherwise its refusal matches an equivalent active account. Human verification and the per-address rate limit run before these refusals. When the instance requires the second factor, a successful password step names a pending sign-in and sends its code. A refused step sends no code, creates no new pending sign-in and leaves existing pending sign-ins unchanged.
 //
 // Takes any type of body and a specified content type, and returns a wrapper object for the known response body format(s).
 //
@@ -23941,7 +24118,7 @@ func (c *ClientWithResponses) SignInWithBodyWithResponse(ctx context.Context, co
 
 // SignInWithResponse Sign in with an email address and a password
 //
-// Public, because it creates the session the caller does not have yet. A wrong password, an unknown address, a user who has not finished sign-up and a user without a password all get 401 `invalid_credentials`. A deactivated user gets 403 `user_deactivated` only after the correct password. When the instance requires the second factor, the answer names a pending sign-in and the code goes to the user's address.
+// Public, because it creates the session the caller does not have yet. Refusals answer 401 with `email_not_found`, `password_incorrect`, `registration_incomplete` or `password_not_set`. Accounts without a password recommend linked, configured providers through `password_not_set_google`, `password_not_set_github` or `password_not_set_google_github`. A deactivated user gets 403 `user_deactivated` only after the correct password; otherwise its refusal matches an equivalent active account. Human verification and the per-address rate limit run before these refusals. When the instance requires the second factor, a successful password step names a pending sign-in and sends its code. A refused step sends no code, creates no new pending sign-in and leaves existing pending sign-ins unchanged.
 //
 // Takes a body of the `application/json` content type, and returns a wrapper object for the known response body format(s).
 //
@@ -24102,6 +24279,21 @@ func (c *ClientWithResponses) UpdateStorageWithResponse(ctx context.Context, sto
 		return nil, err
 	}
 	return ParseUpdateStorageResponse(rsp)
+}
+
+// GetStorageBackupUsageWithResponse Get the recorded backup usage of a storage
+//
+// Needs WORKSPACE_VIEWER. Sums retained completed logical and physical backup stored sizes and committed archived WAL sizes recorded for this storage, counting each WAL segment once. This is catalog usage, not actual provider consumption; unfinished uploads, metadata sidecars and pending file deletions are excluded. No provider or source database is contacted. An outsider or missing storage gets 404 not_found; insufficient viewing permission gets 403 permission_denied. Existing administrator workspace privileges apply.
+//
+// Returns a wrapper object for the known response body format(s).
+//
+// Corresponds with GET /storages/{storageId}/backup-usage (the `GetStorageBackupUsage` operationId).
+func (c *ClientWithResponses) GetStorageBackupUsageWithResponse(ctx context.Context, storageId StorageId, reqEditors ...RequestEditorFn) (*GetStorageBackupUsageResponse, error) {
+	rsp, err := c.GetStorageBackupUsage(ctx, storageId, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetStorageBackupUsageResponse(rsp)
 }
 
 // TestStorageWithResponse Test the connection of a saved storage
@@ -28326,6 +28518,74 @@ func ParseUpdateStorageResponse(rsp *http.Response) (*UpdateStorageResponse, err
 			return nil, err
 		}
 		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
+		var dest Problem
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSONDefault = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParseGetStorageBackupUsageResponse parses an HTTP response from a GetStorageBackupUsageWithResponse call
+func ParseGetStorageBackupUsageResponse(rsp *http.Response) (*GetStorageBackupUsageResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetStorageBackupUsageResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest StorageBackupUsage
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest Problem
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 401:
+		var dest Problem
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON401 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 403:
+		var dest Problem
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON403 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest Problem
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest Problem
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.ApplicationproblemJSON500 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && true:
 		var dest Problem
