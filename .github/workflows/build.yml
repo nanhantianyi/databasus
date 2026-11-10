@@ -28,10 +28,10 @@ jobs:
 
       - name: Export image to tar.gz
         run: |
-          docker save databasus:latest | gzip > databasus-offline.tar.gz
+          docker save databasus:latest | gzip > databasus-${{ github.event.inputs.app_version }}.tar.gz
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: databasus-offline
-          path: databasus-offline.tar.gz
+          name: databasus-${{ github.event.inputs.app_version }}
+          path: databasus-${{ github.event.inputs.app_version }}.tar.gz
