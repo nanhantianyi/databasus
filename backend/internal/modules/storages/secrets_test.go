@@ -178,11 +178,10 @@ func TestStorageSecretsLifecycle(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
-		name            string
-		isAdminRequired bool
-		createSettings  func(t *testing.T) apiclient.StorageSettings
-		updateSettings  func(t *testing.T) apiclient.StorageSettings
-		secretColumns   []storedSecretColumn
+		name           string
+		createSettings func(t *testing.T) apiclient.StorageSettings
+		updateSettings func(t *testing.T) apiclient.StorageSettings
+		secretColumns  []storedSecretColumn
 	}{
 		{
 			name: "S3",
@@ -209,31 +208,6 @@ func TestStorageSecretsLifecycle(t *testing.T) {
 			secretColumns: []storedSecretColumn{
 				{table: "storages_s3", column: "s3_access_key", plaintext: "original-access-key"},
 				{table: "storages_s3", column: "s3_secret_key", plaintext: "original-secret-key"},
-			},
-		},
-		{
-			name: "Google Drive",
-			createSettings: func(t *testing.T) apiclient.StorageSettings {
-				t.Helper()
-
-				return newGoogleDriveSettings(t, apiclient.GoogleDriveStorageSettings{
-					ClientId:     "client-id",
-					ClientSecret: new("original-client-secret"),
-					TokenJson:    new(`{"access_token":"access","refresh_token":"original-refresh"}`),
-				})
-			},
-			updateSettings: func(t *testing.T) apiclient.StorageSettings {
-				t.Helper()
-
-				return newGoogleDriveSettings(t, apiclient.GoogleDriveStorageSettings{ClientId: "updated-client-id"})
-			},
-			secretColumns: []storedSecretColumn{
-				{table: "storages_google_drive", column: "client_secret", plaintext: "original-client-secret"},
-				{
-					table:     "storages_google_drive",
-					column:    "token_json",
-					plaintext: `{"access_token":"access","refresh_token":"original-refresh"}`,
-				},
 			},
 		},
 		{
@@ -382,26 +356,6 @@ func TestStorageSecretsLifecycle(t *testing.T) {
 				{table: "storages_sftp", column: "private_key", plaintext: sftpPrivateKey},
 			},
 		},
-		{
-			name:            "rclone",
-			isAdminRequired: true,
-			createSettings: func(t *testing.T) apiclient.StorageSettings {
-				t.Helper()
-
-				return newRcloneSettings(t, apiclient.RcloneStorageSettings{
-					ConfigContent: new(rcloneConfig),
-					RemotePath:    new("/backups"),
-				})
-			},
-			updateSettings: func(t *testing.T) apiclient.StorageSettings {
-				t.Helper()
-
-				return newRcloneSettings(t, apiclient.RcloneStorageSettings{RemotePath: new("/backups2")})
-			},
-			secretColumns: []storedSecretColumn{
-				{table: "storages_rclone", column: "config_content", plaintext: rcloneConfig},
-			},
-		},
 	}
 
 	for _, testCase := range testCases {
@@ -411,9 +365,6 @@ func TestStorageSecretsLifecycle(t *testing.T) {
 
 				tm := newTeam(t)
 				author := tm.owner
-				if testCase.isAdminRequired {
-					author = tm.admin
-				}
 
 				createResponse, err := author.Client.CreateStorageWithResponse(t.Context(), apiclient.StorageCreate{
 					WorkspaceId: tm.workspace.Id,

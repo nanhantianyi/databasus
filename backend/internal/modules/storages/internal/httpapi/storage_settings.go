@@ -6,10 +6,8 @@ import (
 	"databasus-backend/internal/modules/storages/internal/providers"
 	"databasus-backend/internal/modules/storages/internal/providers/azureblob"
 	"databasus-backend/internal/modules/storages/internal/providers/ftp"
-	"databasus-backend/internal/modules/storages/internal/providers/googledrive"
 	"databasus-backend/internal/modules/storages/internal/providers/local"
 	"databasus-backend/internal/modules/storages/internal/providers/nas"
-	"databasus-backend/internal/modules/storages/internal/providers/rclone"
 	"databasus-backend/internal/modules/storages/internal/providers/s3"
 	"databasus-backend/internal/modules/storages/internal/providers/sftp"
 )
@@ -27,8 +25,6 @@ func toProviderSettings(body StorageSettings) (providers.Settings, error) {
 		return local.Settings{}, nil
 	case S3StorageSettings:
 		return toS3Settings(typedBody), nil
-	case GoogleDriveStorageSettings:
-		return toGoogleDriveSettings(typedBody), nil
 	case NasStorageSettings:
 		return toNasSettings(typedBody), nil
 	case AzureBlobStorageSettings:
@@ -37,8 +33,6 @@ func toProviderSettings(body StorageSettings) (providers.Settings, error) {
 		return toFtpSettings(typedBody), nil
 	case SftpStorageSettings:
 		return toSftpSettings(typedBody), nil
-	case RcloneStorageSettings:
-		return toRcloneSettings(typedBody), nil
 	}
 
 	return nil, errUnknownSettingsValue
@@ -55,8 +49,6 @@ func fromProviderSettings(settings providers.Settings) (StorageSettings, error) 
 		err = body.FromLocalStorageSettings(LocalStorageSettings{Type: LocalStorageSettingsTypeLOCAL})
 	case s3.Settings:
 		err = body.FromS3StorageSettings(fromS3Settings(typedSettings))
-	case googledrive.Settings:
-		err = body.FromGoogleDriveStorageSettings(fromGoogleDriveSettings(typedSettings))
 	case nas.Settings:
 		err = body.FromNasStorageSettings(fromNasSettings(typedSettings))
 	case azureblob.Settings:
@@ -65,8 +57,6 @@ func fromProviderSettings(settings providers.Settings) (StorageSettings, error) 
 		err = body.FromFtpStorageSettings(fromFtpSettings(typedSettings))
 	case sftp.Settings:
 		err = body.FromSftpStorageSettings(fromSftpSettings(typedSettings))
-	case rclone.Settings:
-		err = body.FromRcloneStorageSettings(fromRcloneSettings(typedSettings))
 	default:
 		return StorageSettings{}, fmt.Errorf("%w: %T", errUnknownSettingsType, settings)
 	}

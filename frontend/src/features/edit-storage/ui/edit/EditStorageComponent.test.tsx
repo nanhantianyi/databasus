@@ -171,34 +171,6 @@ describe('EditStorageComponent', () => {
   });
 });
 
-it('keeps credentials and the draft out of Google authorization navigation', () => {
-  const popup = vi.spyOn(window, 'open').mockReturnValue({} as Window);
-  renderScreen(
-    <EditStorageComponent
-      workspaceId="workspace-id"
-      isShowClose={false}
-      onClose={() => {}}
-      isShowName
-      onChanged={() => {}}
-      draft={{
-        name: 'Private draft',
-        settings: {
-          type: 'GOOGLE_DRIVE',
-          clientId: 'public-client',
-          clientSecret: 'synthetic-client-secret',
-        },
-      }}
-    />,
-  );
-
-  fireEvent.click(screen.getByRole('button', { name: 'Authorize' }));
-  const authorizationUrl = new URL(String(popup.mock.calls[0][0]));
-
-  expect(authorizationUrl.searchParams.get('state')).toMatch(/^[a-f0-9]{64}$/);
-  expect(decodeURIComponent(authorizationUrl.href)).not.toContain('synthetic-client-secret');
-  expect(decodeURIComponent(authorizationUrl.href)).not.toContain('Private draft');
-});
-
 it.each(
   ['settings', 'workspace', 'storage', 'session', 'unmount'].flatMap((changedContext) =>
     ['success', 'network failure'].map((outcome) => ({ changedContext, outcome })),
@@ -813,18 +785,6 @@ const providerStorages: {
       isSkipTlsVerify: false,
     },
   },
-  {
-    provider: 'rclone',
-    typeLabel: 'Rclone',
-    entered: { Config: '[remote]\ntype = sftp', 'Remote path': '/backups' },
-    secretLabels: { configContent: 'Config' },
-    sentOnCreate: {
-      type: 'RCLONE',
-      configContent: '[remote]\ntype = sftp',
-      remotePath: '/backups',
-    },
-    saved: { type: 'RCLONE', remotePath: '/backups' },
-  },
 ];
 
 // Their rename and secret rules belong to the provider tests above, so only creation is listed here.
@@ -998,38 +958,6 @@ describe('EditStorageComponent providers', () => {
       password: 'sftp-password',
       privateKey: 'sftp-private-key',
       isSkipHostKeyVerify: false,
-    });
-  });
-
-  it('sends the entered client settings with the token when a Google Drive storage is created', async () => {
-    const sentStorages = mockCreation();
-    const tokenJson = JSON.stringify({ access_token: 'access', refresh_token: 'refresh' });
-    renderScreen(
-      <EditStorageComponent
-        workspaceId="workspace-id"
-        isShowClose={false}
-        onClose={() => {}}
-        isShowName
-        onChanged={() => {}}
-        draft={{
-          name: 'New storage',
-          settings: { type: 'GOOGLE_DRIVE', clientId: 'draft-client', tokenJson },
-        }}
-      />,
-    );
-
-    fireEvent.change(getProviderField('Client ID'), { target: { value: 'entered-client' } });
-    fireEvent.change(getProviderField('Client Secret'), { target: { value: 'entered-secret' } });
-    fireEvent.click(screen.getByRole('button', { name: /Test connection/ }));
-    fireEvent.click(await screen.findByRole('button', { name: 'Save' }));
-
-    await waitFor(() => expect(sentStorages).toHaveLength(1));
-    expect(sentStorages[0]).toMatchObject({ name: 'New storage' });
-    expect(sentStorages[0].settings).toEqual({
-      type: 'GOOGLE_DRIVE',
-      clientId: 'entered-client',
-      clientSecret: 'entered-secret',
-      tokenJson,
     });
   });
 

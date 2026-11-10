@@ -16,10 +16,8 @@ import type { StorageDraft } from '@/features/edit-storage/lib/StorageDraft';
 import { useStorageDraft } from '@/features/edit-storage/model/useStorageDraft';
 import { EditAzureBlobStorageComponent } from '@/features/edit-storage/ui/edit/storages/EditAzureBlobStorageComponent';
 import { EditFTPStorageComponent } from '@/features/edit-storage/ui/edit/storages/EditFTPStorageComponent';
-import { EditGoogleDriveStorageComponent } from '@/features/edit-storage/ui/edit/storages/EditGoogleDriveStorageComponent';
 import { EditLocalStorageComponent } from '@/features/edit-storage/ui/edit/storages/EditLocalStorageComponent';
 import { EditNASStorageComponent } from '@/features/edit-storage/ui/edit/storages/EditNASStorageComponent';
-import { EditRcloneStorageComponent } from '@/features/edit-storage/ui/edit/storages/EditRcloneStorageComponent';
 import { EditS3StorageComponent } from '@/features/edit-storage/ui/edit/storages/EditS3StorageComponent';
 import { EditSFTPStorageComponent } from '@/features/edit-storage/ui/edit/storages/EditSFTPStorageComponent';
 import { translateApiError } from '@/shared/i18n';
@@ -176,15 +174,6 @@ export function EditStorageComponent({
           />
         )}
 
-        {settings.type === StorageType.GOOGLE_DRIVE && (
-          <EditGoogleDriveStorageComponent
-            settings={settings}
-            onChange={changeSettings}
-            workspaceId={workspaceId}
-            storageId={storageId}
-          />
-        )}
-
         {settings.type === StorageType.NAS && (
           <EditNASStorageComponent
             settings={settings}
@@ -217,14 +206,6 @@ export function EditStorageComponent({
               savedSettings?.type === StorageType.SFTP ? savedSettings.authMethods : []
             }
             isAddressChanged={isAddressChanged}
-            onChange={changeSettings}
-          />
-        )}
-
-        {settings.type === StorageType.RCLONE && (
-          <EditRcloneStorageComponent
-            settings={settings}
-            isSaved={isSaved}
             onChange={changeSettings}
           />
         )}

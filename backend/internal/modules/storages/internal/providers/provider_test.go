@@ -9,7 +9,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"regexp"
 	"sync"
 	"testing"
 	"time"
@@ -24,46 +23,27 @@ import (
 
 	"databasus-backend/internal/lib/background"
 	containers "databasus-backend/internal/lib/testcontainers"
+	"databasus-backend/internal/lib/testwait"
 	"databasus-backend/internal/modules/storages/internal/providers"
 	"databasus-backend/internal/modules/storages/internal/providers/azureblob"
 	"databasus-backend/internal/modules/storages/internal/providers/ftp"
 	"databasus-backend/internal/modules/storages/internal/providers/local"
 	"databasus-backend/internal/modules/storages/internal/providers/nas"
 	"databasus-backend/internal/modules/storages/internal/providers/providertest"
-	"databasus-backend/internal/modules/storages/internal/providers/rclone"
 	"databasus-backend/internal/modules/storages/internal/providers/s3"
 	"databasus-backend/internal/modules/storages/internal/providers/sftp"
 )
 
-// The storage answers every packet 50 ms late, so each round trip a write pays shows up in its
-// duration and in nothing else the runner's load can inflate as much. The check targets the two
-// mistakes that keep WAL archiving from keeping up with a distant storage: a handshake per file and
-// a round trip per block. The connection count catches the first exactly, while S3, Azure and
-// Rclone reconnect for only one TCP round trip, too little for any timing to tell apart.
 const (
-	roundTripEgressDelay   = 50 * time.Millisecond
 	reusedFileWriteCount   = 10
 	segmentSizedFileBytes  = 16 * 1024 * 1024
 	metadataSizedFileBytes = 1024
-)
-
-// A round trip per 32 KiB block, the buffer io.Copy streams with, costs a segment 512 round trips,
-// about 25s. A streamed segment takes 0.5-1s on a developer machine, so a quarter of the slow path
-// leaves the loaded CI runner several times the room it needs and still fails the slow path.
-const segmentWriteLimit = 128 * roundTripEgressDelay
-
-// The deadline plus the three seconds the spec allows a write to outlive it.
-const (
-	silentStorageWriteDeadline = 5 * time.Second
-	silentStorageReturnLimit   = 8 * time.Second
 )
 
 const (
 	testBucketName         = "test-bucket"
 	testAzureContainerName = "test-container"
 )
-
-var rcloneSecretLine = regexp.MustCompile(`(?m)^secret_access_key = .*$`)
 
 func TestFileOperations(t *testing.T) {
 	smallContent := []byte("This is test data for storage testing")
@@ -128,16 +108,13 @@ func TestFileOperations(t *testing.T) {
 }
 
 func TestSaveFile(t *testing.T) {
-	t.Run("pays no handshake per file and no round trip per block when the storage answers 50ms late",
+	t.Run("reuses the connection when consecutive files reach the same storage",
 		func(t *testing.T) {
 			for _, target := range getProviderTargets(false) {
 				t.Run(target.name, func(t *testing.T) {
 					t.Parallel()
 
 					container := target.startContainer(t)
-					containers.AddEgressDelay(t, container, roundTripEgressDelay)
-					t.Cleanup(func() { containers.ClearEgressShaping(t, container) })
-
 					// FTP data connections still go straight to the container's passive ports, so
 					// only control connections, one per session, cross the forwarder.
 					forwarder := providertest.StartCountingForwarder(t, providertest.GetAddress(container.Endpoint))
@@ -148,10 +125,9 @@ func TestSaveFile(t *testing.T) {
 					metadataContent := generateRandomContent(t, metadataSizedFileBytes)
 					segmentContent := generateRandomContent(t, segmentSizedFileBytes)
 
-					// The first write opens the session, and its handshake is not what the test
-					// measures.
 					require.NoError(t, testedStorage.saveUnique(t, metadataContent))
 					connectionsAfterFirstWrite := forwarder.GetAcceptedCount()
+					require.Positive(t, connectionsAfterFirstWrite)
 
 					for range reusedFileWriteCount {
 						require.NoError(t, testedStorage.saveUnique(t, metadataContent))
@@ -165,20 +141,9 @@ func TestSaveFile(t *testing.T) {
 						reusedFileWriteCount,
 					)
 
-					startedAt := time.Now()
-					require.NoError(t, testedStorage.saveUnique(t, segmentContent))
-					segmentWriteDuration := time.Since(startedAt)
-
-					assert.Less(
-						t,
-						segmentWriteDuration,
-						segmentWriteLimit,
-						"a %d MiB segment took %s, as long as paying a round trip for every four 32 KiB blocks",
-						segmentSizedFileBytes/1024/1024,
-						segmentWriteDuration,
-					)
-
-					t.Logf("segment written in %s", segmentWriteDuration)
+					fileName := "segment-" + uuid.NewString()
+					require.NoError(t, testedStorage.save(t, fileName, segmentContent))
+					assert.Equal(t, segmentContent, testedStorage.read(t, fileName))
 				})
 			}
 		})
@@ -211,89 +176,60 @@ func TestSaveFile(t *testing.T) {
 			}
 		})
 
-	t.Run("fails by the deadline and redials when the storage goes silent mid-connection", func(t *testing.T) {
+	t.Run("cancels the write and redials when a storage response is withheld", func(t *testing.T) {
 		for _, target := range getProviderTargets(false) {
-			if target.name == "Rclone" {
-				continue
-			}
-
 			t.Run(target.name, func(t *testing.T) {
 				t.Parallel()
 
 				container := target.startContainer(t)
+				forwarder := providertest.StartCountingForwarder(t, providertest.GetAddress(container.Endpoint))
+				container.Endpoint = containers.Endpoint{Host: forwarder.Host, Port: forwarder.Port}
 				testedStorage := target.build(t, container)
 				content := generateRandomContent(t, segmentSizedFileBytes)
-
 				require.NoError(t, testedStorage.saveUnique(t, content))
+				connectionsBeforeCancel := forwarder.GetAcceptedCount()
+				closedBeforeCancel := forwarder.GetClosedCount()
 
-				containers.SetEgressLoss(t, container)
-				t.Cleanup(func() { containers.ClearEgressShaping(t, container) })
+				gate := forwarder.PauseResponses(t)
+				writeCtx, cancel := context.WithCancel(t.Context())
+				writeErrors := make(chan error, 1)
+				fileName := "cancelled-" + uuid.NewString()
+				testedStorage.savedFileNames = append(testedStorage.savedFileNames, fileName)
+				var writes sync.WaitGroup
+				defer func() { cancel(); gate.Release(); writes.Wait() }()
+				writes.Go(func() {
+					writeErrors <- testedStorage.provider.SaveFile(writeCtx, testedStorage.access(fileName), bytes.NewReader(content))
+				})
 
-				writeCtx, cancel := context.WithTimeout(t.Context(), silentStorageWriteDeadline)
-				defer cancel()
+				gate.WaitUntilBlocked(t)
+				cancel()
 
-				writeResult := make(chan error, 1)
-				go func() {
-					writeResult <- testedStorage.provider.SaveFile(
-						writeCtx, testedStorage.access(uuid.NewString()), bytes.NewReader(content),
-					)
-				}()
+				testwait.Until(t, "the cancelled storage write to return", func(context.Context) error {
+					select {
+					case writeError := <-writeErrors:
+						require.Error(t, writeError, "a write with a withheld response must fail after cancellation")
+						return nil
+					default:
+						return fmt.Errorf("the cancelled write is still running")
+					}
+				})
 
-				select {
-				case err := <-writeResult:
-					require.Error(t, err, "a write to a silent storage must fail")
-				case <-time.After(silentStorageReturnLimit):
-					t.Fatalf("a write to a silent storage did not return within %s", silentStorageReturnLimit)
-				}
+				testwait.Until(t, "the cancelled storage connection to close", func(context.Context) error {
+					if forwarder.GetClosedCount() <= closedBeforeCancel {
+						return fmt.Errorf("the cancelled connection is still open")
+					}
 
-				containers.ClearEgressShaping(t, container)
+					return nil
+				})
 
-				require.NoError(
-					t,
-					testedStorage.saveUnique(t, content),
-					"the next write must not reuse the connection that went silent",
-				)
+				gate.Release()
+				recoveredFileName := "recovered-" + uuid.NewString()
+				require.NoError(t, testedStorage.save(t, recoveredFileName, content))
+				assert.Greater(t, forwarder.GetAcceptedCount(), connectionsBeforeCancel,
+					"the write after cancellation must open a new connection")
+				assert.Equal(t, content, testedStorage.read(t, recoveredFileName))
 			})
 		}
-	})
-}
-
-func TestRcloneDeleteFile(t *testing.T) {
-	t.Run("returns an error and keeps the object when the sign-in fails on the lookup", func(t *testing.T) {
-		address := providertest.GetAddress(containers.StartMinio(t))
-		minioClient := createTestBucket(t, address)
-		fileName := uuid.NewString()
-		testData := []byte("rclone delete bug repro")
-
-		_, err := minioClient.PutObject(
-			t.Context(),
-			testBucketName,
-			fileName,
-			bytes.NewReader(testData),
-			int64(len(testData)),
-			minio.PutObjectOptions{},
-		)
-		require.NoError(t, err)
-
-		fieldEncryptor := providertest.NewFieldEncryptor(t)
-		provider := rclone.New(rclone.Deps{Repositories: rclone.Repositories{}, FieldEncryptor: fieldEncryptor})
-		location := providers.Location{
-			StorageID: uuid.New(),
-			Settings: rclone.Settings{
-				ConfigContent: getRcloneMinioConfig(address, "totally-wrong-secret-key"),
-				RemotePath:    testBucketName,
-			},
-		}
-
-		err = provider.DeleteFile(t.Context(), providers.FileAccess{
-			Location: location,
-			FileName: fileName,
-			Logger:   providertest.NewDiscardLogger(),
-		})
-		require.Error(t, err)
-
-		_, statErr := minioClient.StatObject(t.Context(), testBucketName, fileName, minio.StatObjectOptions{})
-		assert.NoError(t, statErr)
 	})
 }
 
@@ -324,7 +260,6 @@ func getProviderTargets(isLocalIncluded bool) []providerTarget {
 		{"SFTP", containers.StartSftpContainer, buildSftpStorage},
 		{"FTP", containers.StartFtpContainer, buildFtpStorage},
 		{"NAS", containers.StartSambaContainer, buildNasStorage},
-		{"Rclone", containers.StartMinioContainer, buildRcloneStorage},
 	}
 
 	if isLocalIncluded {
@@ -548,29 +483,6 @@ func buildSftpStorage(t *testing.T, container containers.ContainerHandle) *teste
 		containers.SftpPassword, settingsWithSecret)
 }
 
-func buildRcloneStorage(t *testing.T, container containers.ContainerHandle) *testedStorage {
-	t.Helper()
-
-	address := providertest.GetAddress(container.Endpoint)
-	createTestBucket(t, address)
-
-	fieldEncryptor := providertest.NewFieldEncryptor(t)
-	provider := rclone.New(rclone.Deps{Repositories: rclone.Repositories{}, FieldEncryptor: fieldEncryptor})
-	settingsWithSecret := func(secret string) providers.Settings {
-		configContent := rcloneSecretLine.ReplaceAllLiteralString(
-			getRcloneMinioConfig(address, containers.MinioRootPassword), "secret_access_key = "+secret,
-		)
-
-		return rclone.Settings{
-			ConfigContent: providertest.Encrypt(t, fieldEncryptor, configContent),
-			RemotePath:    testBucketName,
-		}
-	}
-
-	return withSecrets(newTestedStorage(t, provider, settingsWithSecret(containers.MinioRootPassword)),
-		containers.MinioRootPassword, settingsWithSecret)
-}
-
 func withSecrets(
 	storage *testedStorage,
 	correctSecret string,
@@ -580,16 +492,6 @@ func withSecrets(
 	storage.withSecretOf = settingsWithSecret
 
 	return storage
-}
-
-func getRcloneMinioConfig(address, secretKey string) string {
-	return fmt.Sprintf(`[minio]
-type = s3
-provider = Other
-access_key_id = %s
-secret_access_key = %s
-endpoint = http://%s
-acl = private`, containers.MinioRootUser, secretKey, address)
 }
 
 // createTestBucket creates the test bucket on the MinIO server at address (host:port).

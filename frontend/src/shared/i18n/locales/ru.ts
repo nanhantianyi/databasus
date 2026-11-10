@@ -113,12 +113,6 @@ export const ru: typeof en = {
       returnToSignIn: 'Вернуться ко входу',
       completing: 'Завершаем вход...',
     },
-    oauthStorage: {
-      waiting: 'Завершаем авторизацию хранилища...',
-      complete: 'Ответ получен. Вернитесь в редактор хранилища.',
-      restart:
-        'Не удалось связаться с исходным редактором. Закройте это окно и запустите авторизацию заново из редактора.',
-    },
   },
   errors: {
     cleanupPending:
@@ -606,8 +600,7 @@ export const ru: typeof en = {
         selectPlaceholder: 'Выберите хранилище',
         createNew: 'Создать хранилище',
         addTitle: 'Добавить хранилище',
-        description:
-          'Хранилище — это место, где хранятся бекапы (локальный диск, S3, Google Drive и т. д.)',
+        description: 'Хранилище — это место, где хранятся бекапы (локальный диск, S3 и т. д.)',
       },
       notifiers: {
         title: 'Каналы уведомлений (необязательно)',
@@ -817,7 +810,7 @@ export const ru: typeof en = {
       submit: 'Создать рабочее пространство',
       defaultName: 'Мое рабочее пространство',
       description:
-        'Рабочее пространство объединяет:<lineBreak/>- ваши базы данных;<lineBreak/>- хранилища (локальный диск, S3, Google Drive и т. д.);<lineBreak/>- каналы уведомлений (email, Slack, Telegram и т. д.);<lineBreak/>- управление доступом (если вы работаете в команде).',
+        'Рабочее пространство объединяет:<lineBreak/>- ваши базы данных;<lineBreak/>- хранилища (локальный диск, S3 и т. д.);<lineBreak/>- каналы уведомлений (email, Slack, Telegram и т. д.);<lineBreak/>- управление доступом (если вы работаете в команде).',
       nameRequired: 'Введите название рабочего пространства',
       created: 'Рабочее пространство создано',
       permissionDenied: {
@@ -1455,8 +1448,7 @@ export const ru: typeof en = {
       selectStorage: 'Выберите хранилище',
       createNewStorage: 'Создать хранилище',
       addStorageTitle: 'Добавить хранилище',
-      storageDescription:
-        'Хранилище — это место, где хранятся бекапы (локальный диск, S3, Google Drive и т. д.)',
+      storageDescription: 'Хранилище — это место, где хранятся бекапы (локальный диск, S3 и т. д.)',
       encryption: 'Шифрование',
       notifications: 'Уведомления',
       noNotifications: 'Нет',
@@ -1497,7 +1489,7 @@ export const ru: typeof en = {
         makeBackupNow: 'Сделать бекап сейчас',
         encrypted: 'Зашифрован',
         sizeTooltip:
-          'Сверху — размер сжатого файла бекапа, который лежит в хранилище (локальном, S3, Google Drive и т. д.). Снизу серым — исходный размер базы данных без сжатия на момент бекапа. Обычно бекапы сжимаются примерно в 5 раз.',
+          'Сверху — размер сжатого файла бекапа, который лежит в хранилище (локальном, S3 и т. д.). Снизу серым — исходный размер базы данных без сжатия на момент бекапа. Обычно бекапы сжимаются примерно в 5 раз.',
         databaseSize: '{{size}} (размер БД)',
         deleteConfirmation: 'Удалить этот бекап?',
         actions: {
@@ -2033,12 +2025,10 @@ export const ru: typeof en = {
     types: {
       local: 'Локальное хранилище',
       s3: 'S3',
-      googleDrive: 'Google Drive',
       nas: 'NAS',
       azureBlob: 'Azure Blob Storage',
       ftp: 'FTP',
       sftp: 'SFTP',
-      rclone: 'Rclone',
     },
     s3StorageClasses: {
       default: 'По умолчанию (Standard)',
@@ -2069,12 +2059,10 @@ export const ru: typeof en = {
       type: {
         local: 'Тип: локальное хранилище',
         s3: 'Тип: S3',
-        googleDrive: 'Тип: Google Drive',
         nas: 'Тип: NAS',
         azureBlob: 'Тип: Azure Blob Storage',
         ftp: 'Тип: FTP',
         sftp: 'Тип: SFTP',
-        rclone: 'Тип: Rclone',
       },
     },
     config: {
@@ -2103,7 +2091,6 @@ export const ru: typeof en = {
     },
     fields: {
       path: 'Путь',
-      remotePath: 'Удаленный путь',
       share: 'Общая папка',
       domain: 'Домен',
       useSsl: 'Использовать SSL',
@@ -2129,10 +2116,7 @@ export const ru: typeof en = {
       accountName: 'Имя учетной записи',
       accountKey: 'Ключ учетной записи',
       containerName: 'Имя контейнера',
-      clientId: 'ID клиента',
-      clientSecret: 'Секрет клиента',
       userToken: 'Токен пользователя',
-      config: 'Конфигурация',
     },
     edit: {
       namePlaceholder: 'Мое хранилище',
@@ -2159,27 +2143,6 @@ export const ru: typeof en = {
           'Не проверять TLS-сертификат. Включите, если S3-совместимое хранилище использует самоподписанный сертификат. Внимание: это снижает безопасность.',
         storageClassTooltip:
           'Класс хранения S3 для загружаемых объектов. Для Standard оставьте значение по умолчанию. Некоторые провайдеры предлагают классы дешевле, например One Zone IA. Не используйте Glacier/Deep Archive: для восстановления файлы должны быть доступны сразу.',
-      },
-      googleDrive: {
-        guideLink: 'Как подключить Google Drive?',
-        authorize: 'Авторизоваться',
-        authorized: 'Авторизовано',
-        waiting: 'Ожидаем авторизацию Google...',
-        exchanging: 'Обмениваем код авторизации...',
-        cancel: 'Отменить авторизацию',
-        restart: 'Начать авторизацию заново',
-        reconnect: 'Подключить заново',
-        reconnectHelp:
-          'Для повторного подключения введите секрет клиента. При ошибке сохранённые учётные данные останутся прежними.',
-        expired: 'Срок авторизации истёк. Начните заново.',
-        refused: 'В авторизации Google отказано. Можно попробовать снова.',
-        exchangeFailed: 'Не удалось обменять код авторизации. Начните заново.',
-        missingRefreshToken:
-          'Google не вернул refresh token. Повторите авторизацию и разрешите доступ в автономном режиме.',
-        popupBlocked:
-          'Окно авторизации заблокировано. Разрешите всплывающие окна и попробуйте снова.',
-        unavailable:
-          'Авторизация недоступна в этом браузере. Проверьте поддержку BroadcastChannel и попробуйте снова.',
       },
       nas: {
         shareWithSlashWarning:
@@ -2213,15 +2176,6 @@ export const ru: typeof en = {
         skipHostKeyVerification: 'Не проверять ключ хоста',
         skipHostKeyTooltip:
           'Не проверять SSH-ключ хоста. Включите, если доверяете серверу. Внимание: это снижает безопасность.',
-      },
-      rclone: {
-        configTooltip:
-          "Вставьте сюда содержимое rclone.conf. Его можно получить командой 'rclone config file' и скопировать. Такая конфигурация поддерживает более 70 облачных хранилищ.",
-        configHiddenNote:
-          '*содержимое скрыто, чтобы не раскрывать конфиденциальные данные. Чтобы обновить конфигурацию, вставьте сюда новую',
-        docsLink: 'Документация Rclone',
-        remotePathTooltip:
-          "Необязательный префикс пути в удаленном хранилище, куда будут сохраняться бекапы (например, '/backups' или 'my-folder/backups')",
       },
     },
   },

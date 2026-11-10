@@ -4,15 +4,53 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
+	"github.com/pressly/goose/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gorm.io/gorm"
+
+	"databasus-backend/migrations"
 )
 
 const storagesMigrationName = "20261026120000_move_storages_into_module.sql"
 
 func TestStoragesMigration(t *testing.T) {
 	t.Parallel()
+
+	t.Run("preserves encrypted rclone settings when the historical table is renamed", func(t *testing.T) {
+		t.Parallel()
+		db := openDatabaseMigratedBefore(t, storagesMigrationName)
+		workspaceID := insertWorkspace(t, db)
+		storageID := insertOldStorage(t, db, "RCLONE", &workspaceID)
+		execute(
+			t,
+			db,
+			"INSERT INTO rclone_storages (storage_id, config_content) VALUES (?, 'enc:synthetic-config')",
+			storageID,
+		)
+		sqlDB, err := db.DB()
+		require.NoError(t, err)
+		provider, err := goose.NewProvider(
+			goose.DialectPostgres,
+			sqlDB,
+			migrations.Files,
+			goose.WithDisableGlobalRegistry(true),
+		)
+		require.NoError(t, err)
+
+		_, err = provider.UpTo(t.Context(), 20261026120000)
+		require.NoError(t, err)
+
+		var hasUnchangedConfig bool
+		require.NoError(
+			t,
+			db.WithContext(t.Context()).
+				Raw("SELECT config_content = 'enc:synthetic-config' FROM storages_rclone WHERE storage_id = ?", storageID).
+				Scan(&hasUnchangedConfig).
+				Error,
+		)
+		assert.True(t, hasUnchangedConfig)
+	})
 
 	for _, storageClass := range []string{"COLD", "DEEP_ARCHIVE"} {
 		t.Run("preserves the provider class when it is "+storageClass, func(t *testing.T) {
@@ -175,10 +213,6 @@ func insertOldStorageOfEveryTypeWithSecrets(
 	execute(t, db, `INSERT INTO s3_storages (storage_id, s3_bucket, s3_region, s3_access_key, s3_secret_key)
 		VALUES (?, 'backups', 'us-east-1', 'enc:s3-access', 'enc:s3-secret')`, s3StorageID)
 
-	googleDriveStorageID := insertOldStorage(t, db, "GOOGLE_DRIVE", &workspaceID)
-	execute(t, db, `INSERT INTO google_drive_storages (storage_id, client_id, client_secret, token_json)
-		VALUES (?, 'client', 'enc:drive-secret', 'enc:drive-token')`, googleDriveStorageID)
-
 	nasStorageID := insertOldStorage(t, db, "NAS", &workspaceID)
 	execute(t, db, `INSERT INTO nas_storages (storage_id, host, port, share, username, password)
 		VALUES (?, 'nas.example.com', 445, 'backups', 'ops', 'enc:nas-password')`, nasStorageID)
@@ -197,21 +231,9 @@ func insertOldStorageOfEveryTypeWithSecrets(
 	execute(t, db, `INSERT INTO sftp_storages (storage_id, host, port, username, password, private_key)
 		VALUES (?, 'sftp.example.com', 22, 'ops', 'enc:sftp-password', 'enc:sftp-key')`, sftpStorageID)
 
-	rcloneStorageID := insertOldStorage(t, db, "RCLONE", &workspaceID)
-	execute(t, db, "INSERT INTO rclone_storages (storage_id, config_content) VALUES (?, 'enc:rclone-config')",
-		rcloneStorageID)
-
 	return []storedStorageSecret{
 		{storageID: s3StorageID, table: "storages_s3", column: "s3_access_key", value: "enc:s3-access"},
 		{storageID: s3StorageID, table: "storages_s3", column: "s3_secret_key", value: "enc:s3-secret"},
-		{
-			storageID: googleDriveStorageID, table: "storages_google_drive", column: "client_secret",
-			value: "enc:drive-secret",
-		},
-		{
-			storageID: googleDriveStorageID, table: "storages_google_drive", column: "token_json",
-			value: "enc:drive-token",
-		},
 		{storageID: nasStorageID, table: "storages_nas", column: "password", value: "enc:nas-password"},
 		{
 			storageID: azureBlobStorageID, table: "storages_azure_blob", column: "connection_string",
@@ -221,7 +243,6 @@ func insertOldStorageOfEveryTypeWithSecrets(
 		{storageID: ftpStorageID, table: "storages_ftp", column: "password", value: "enc:ftp-password"},
 		{storageID: sftpStorageID, table: "storages_sftp", column: "password", value: "enc:sftp-password"},
 		{storageID: sftpStorageID, table: "storages_sftp", column: "private_key", value: "enc:sftp-key"},
-		{storageID: rcloneStorageID, table: "storages_rclone", column: "config_content", value: "enc:rclone-config"},
 	}
 }
 

@@ -33,13 +33,6 @@ type previousS3Request struct {
 	S3StorageClass          string `json:"s3StorageClass"`
 }
 
-type previousGoogleDriveRequest struct {
-	Type         string `json:"type"`
-	ClientID     string `json:"clientId"`
-	ClientSecret string `json:"clientSecret"`
-	TokenJSON    string `json:"tokenJson"`
-}
-
 type previousNASRequest struct {
 	Type     string `json:"type"`
 	Host     string `json:"host"`
@@ -85,12 +78,6 @@ type previousSFTPRequest struct {
 	SkipHostKeyVerify bool     `json:"isSkipHostKeyVerify"`
 }
 
-type previousRcloneRequest struct {
-	Type          string `json:"type"`
-	ConfigContent string `json:"configContent"`
-	RemotePath    string `json:"remotePath"`
-}
-
 // writtenStorage is a storage the previous release saved: its request and the values the current
 // code is expected to list for it. Secrets are not among the values, because the current code never
 // returns them.
@@ -131,21 +118,6 @@ func newWrittenStorages(workspaceID string) []writtenStorage {
 				"isVirtualHostedStyle": "true",
 				"isSkipTlsVerify":      "true",
 				"s3StorageClass":       "STANDARD_IA",
-			},
-		},
-		{
-			request: previousStorageRequest{
-				WorkspaceID: workspaceID, Name: "upgrade google drive", Settings: &previousGoogleDriveRequest{
-					Type:         "GOOGLE_DRIVE",
-					ClientID:     "upgrade-client-id.apps.googleusercontent.com",
-					ClientSecret: "upgrade-client-secret",
-					TokenJSON: `{"access_token":"upgrade-access-token","token_type":"Bearer",` +
-						`"refresh_token":"upgrade-refresh-token","expiry":"2030-01-01T00:00:00Z"}`,
-				},
-			},
-			expectedValues: map[string]string{
-				"type":     "GOOGLE_DRIVE",
-				"clientId": "upgrade-client-id.apps.googleusercontent.com",
 			},
 		},
 		{
@@ -237,20 +209,6 @@ func newWrittenStorages(workspaceID string) []writtenStorage {
 				"username":            "upgrade-sftp-user",
 				"path":                "/upgrade/sftp",
 				"isSkipHostKeyVerify": "true",
-			},
-		},
-		{
-			request: previousStorageRequest{
-				WorkspaceID: workspaceID, Name: "upgrade rclone", Settings: &previousRcloneRequest{
-					Type: "RCLONE",
-					ConfigContent: "[upgrade]\ntype = s3\nprovider = Minio\naccess_key_id = upgrade\n" +
-						"secret_access_key = upgrade-secret\nendpoint = https://minio.upgrade.invalid\n",
-					RemotePath: "upgrade-bucket/rclone",
-				},
-			},
-			expectedValues: map[string]string{
-				"type":       "RCLONE",
-				"remotePath": "upgrade-bucket/rclone",
 			},
 		},
 	}

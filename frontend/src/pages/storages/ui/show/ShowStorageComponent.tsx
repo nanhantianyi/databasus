@@ -8,9 +8,7 @@ import {
 } from '@/entities/storages';
 import { ShowAzureBlobStorageComponent } from '@/pages/storages/ui/show/storages/ShowAzureBlobStorageComponent';
 import { ShowFTPStorageComponent } from '@/pages/storages/ui/show/storages/ShowFTPStorageComponent';
-import { ShowGoogleDriveStorageComponent } from '@/pages/storages/ui/show/storages/ShowGoogleDriveStorageComponent';
 import { ShowNASStorageComponent } from '@/pages/storages/ui/show/storages/ShowNASStorageComponent';
-import { ShowRcloneStorageComponent } from '@/pages/storages/ui/show/storages/ShowRcloneStorageComponent';
 import { ShowS3StorageComponent } from '@/pages/storages/ui/show/storages/ShowS3StorageComponent';
 import { ShowSFTPStorageComponent } from '@/pages/storages/ui/show/storages/ShowSFTPStorageComponent';
 
@@ -38,10 +36,6 @@ export function ShowStorageComponent({ storage }: Props) {
       <div>
         {settings.type === StorageType.S3 && <ShowS3StorageComponent settings={settings} />}
 
-        {settings.type === StorageType.GOOGLE_DRIVE && (
-          <ShowGoogleDriveStorageComponent settings={settings} />
-        )}
-
         {settings.type === StorageType.NAS && <ShowNASStorageComponent settings={settings} />}
 
         {settings.type === StorageType.AZURE_BLOB && (
@@ -51,8 +45,6 @@ export function ShowStorageComponent({ storage }: Props) {
         {settings.type === StorageType.FTP && <ShowFTPStorageComponent settings={settings} />}
 
         {settings.type === StorageType.SFTP && <ShowSFTPStorageComponent settings={settings} />}
-
-        {settings.type === StorageType.RCLONE && <ShowRcloneStorageComponent settings={settings} />}
       </div>
     </div>
   );

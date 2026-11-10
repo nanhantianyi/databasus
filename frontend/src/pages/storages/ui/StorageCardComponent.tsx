@@ -14,12 +14,10 @@ interface Props {
 const STORAGE_CARD_TYPE_KEYS: Record<StorageType, TranslationKey> = {
   [StorageType.LOCAL]: 'storages.card.type.local',
   [StorageType.S3]: 'storages.card.type.s3',
-  [StorageType.GOOGLE_DRIVE]: 'storages.card.type.googleDrive',
   [StorageType.NAS]: 'storages.card.type.nas',
   [StorageType.AZURE_BLOB]: 'storages.card.type.azureBlob',
   [StorageType.FTP]: 'storages.card.type.ftp',
   [StorageType.SFTP]: 'storages.card.type.sftp',
-  [StorageType.RCLONE]: 'storages.card.type.rclone',
 };
 
 export const StorageCardComponent = ({

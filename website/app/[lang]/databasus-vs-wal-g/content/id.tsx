@@ -559,11 +559,10 @@ export default function DatabasusVsWalGPage() {
               <ul>
                 <li>Penyimpanan lokal</li>
                 <li>Amazon S3 dan layanan kompatibel S3</li>
-                <li>Google Drive</li>
                 <li>Cloudflare R2</li>
                 <li>Azure Blob Storage</li>
                 <li>NAS (Network-attached storage)</li>
-                <li>Dropbox</li>
+                <li>FTP</li>
               </ul>
               <h3 id="storage-wal-g">Penyimpanan WAL-G</h3>
               <p>Opsi penyimpanan cloud-native:</p>

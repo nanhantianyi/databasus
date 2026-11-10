@@ -2,7 +2,7 @@
   <img src="../logo.svg" alt="Databasus Logo" width="250"/>
 
   <h3>Alat backup PostgreSQL</h3>
-  <p>Databasus adalah alat gratis, open source, dan self-hosted untuk backup PostgreSQL. Buat backup ke berbagai penyimpanan (S3, Google Drive, FTP, dan lain-lain) dan dapatkan notifikasi progresnya (Slack, Discord, Telegram, dan lain-lain). Fokusnya Point-in-Time Recovery dengan RPO/RTO rendah</p>
+  <p>Databasus adalah alat gratis, open source, dan self-hosted untuk backup PostgreSQL. Buat backup ke berbagai penyimpanan (S3, Azure Blob Storage, FTP, dan lain-lain) dan dapatkan notifikasi progresnya (Slack, Discord, Telegram, dan lain-lain). Fokusnya Point-in-Time Recovery dengan RPO/RTO rendah</p>
 
   <!-- Badges -->
 
@@ -80,7 +80,7 @@ Databasus melakukan restore sungguhan untuk memastikan backup bisa dipakai, buka
 ### 🗄️ **Berbagai tujuan penyimpanan** <a href="https://databasus.com/id/storages/">(lihat penyimpanan yang didukung)</a>
 
 - **Penyimpanan lokal**: simpan backup di VPS/server kamu
-- **Penyimpanan cloud**: S3, Cloudflare R2, Google Drive, NAS, Dropbox, SFTP, Rclone, dan lainnya
+- **Penyimpanan cloud**: S3, Cloudflare R2, Azure Blob Storage, NAS, FTP, SFTP, dan lainnya
 - **Aman**: semua data tetap dalam kendali kamu
 
 ### 📱 **Notifikasi** <a href="https://databasus.com/id/notifiers/">(lihat kanal yang didukung)</a>
@@ -255,7 +255,7 @@ Untuk opsi lain (NodePort, TLS, HTTPRoute untuk Gateway API), lihat [README char
 2. **Tambahkan database pertama untuk backup**: klik "New Database" dan ikuti wizard setup
 3. **Atur jadwal**: pilih interval per jam, harian, mingguan, bulanan, atau cron
 4. **Isi koneksi database**: masukkan kredensial dan detail koneksi database kamu
-5. **Pilih penyimpanan**: tentukan tempat menyimpan backup (lokal, S3, Google Drive, dan lain-lain)
+5. **Pilih penyimpanan**: tentukan tempat menyimpan backup (lokal, S3, Azure Blob Storage, dan lain-lain)
 6. **Atur kebijakan retensi**: pilih periode waktu, jumlah, atau GFS untuk mengatur berapa lama backup disimpan
 7. **Tambahkan notifikasi** (opsional): atur notifikasi email, Telegram, Slack, Mattermost, atau webhook
 8. **Simpan dan mulai**: Databasus akan memvalidasi pengaturan dan memulai jadwal backup
@@ -294,17 +294,15 @@ Setelah instalasi, sebaiknya kamu juga <a href="https://databasus.com/id/faq/#ba
 
 ## 🛡️ Rekayasa keamanan dan keandalan
 
-Databasus bekerja dengan data sensitif, jadi mencegah kerentanan, akses tidak sah, dan kebocoran data menjadi prioritas utama. Kami berinvestasi di kedua sisi sistem: di kode itu sendiri (pemeriksaan izin, enkripsi, penanganan secret yang hati-hati) dan di infrastruktur sekitarnya (analisis dependensi, respons CVE, praktik terbaik DevSecOps). Pipeline di bawah berjalan otomatis sebelum setiap rilis. Tidak ada satu lapisan pun yang cukup sendirian, tetapi bersama-sama lapisan ini mengurangi peluang kode rentan, dependensi tidak aman, image rusak, atau backup yang tidak bisa di-restore masuk ke rilis.
+Lihat [proses keamanan dan keandalan selengkapnya](https://databasus.com/id/security/#security-and-reliability-engineering).
 
-Untuk analisis statis, kami menggabungkan beberapa pemeriksaan independen. CodeQL memindai seluruh codebase untuk masalah keamanan. Sebelum setiap rilis, gitleaks memindai secret yang bocor dan semgrep memeriksa kode terhadap aturan keamanan. Dockerfile dan workflow CI mendapat aturan tambahan sendiri (referensi action yang di-pin, izin least-privilege, image dasar yang mencurigakan), sehingga pola tidak aman ditandai sebelum rilis. Selain pemeriksaan sebelum rilis itu, Codex Security dari OpenAI menjalankan audit berkala yang lebih dalam pada seluruh codebase. Ini program terpisah yang menangkap masalah arsitektural dan lintas area yang bisa terlewat oleh pemindaian otomatis yang lebih sempit.
+Sebelum setiap rilis, Databasus menjalankan pemeriksaan otomatis untuk mengurangi risiko kerentanan, kebocoran data, dan backup yang tidak bisa di-restore:
 
-Di sisi dependensi, Dependabot memantau semua dependensi kami terhadap GitHub Advisory Database dan memunculkan CVE dalam hitungan menit setelah dipublikasikan. Update berjalan dengan masa tunggu supaya versi yang baru terbit punya kesempatan matang sebelum kami adopsi. Ini pertahanan yang disengaja terhadap insiden paket yang dikompromikan, seperti serangan supply chain. Dependency Review Action memblokir rilis yang memasukkan CVE HIGH atau CRITICAL baru. Untuk kode Go, govulncheck memblokir rilis jika kode kami memanggil fungsi dengan kerentanan yang diketahui, dan `go mod verify` memeriksa setiap modul yang diunduh terhadap checksum yang tercatat.
+- **Pemindaian keamanan** mencari kerentanan yang diketahui pada kode, dependency, dan image container, serta secret yang bocor.
+- **Pengujian restore** menjalankan siklus backup dan restore lengkap pada container database sungguhan untuk setiap engine dan versi mayor yang didukung.
+- **Syarat rilis** mewajibkan pengujian, build, dan pemeriksaan keamanan lolos. Temuan CodeQL kritis yang masih terbuka pada analisis rilis memblokir publikasi.
 
-Sebelum rilis, Trivy memindai image aplikasi pada kedua arsitektur. Pemeriksaan Trivy terpisah pada Dockerfile menangkap kesalahan konfigurasi sebelum masuk ke image. Semua GitHub Actions di-pin ke SHA commit lengkap, bukan tag mengambang seperti `@v4` atau `@main`, yang menjadi vektor serangan aktif pada 2025. Workflow secara default memakai izin least-privilege dan hanya menaikkannya per job saat benar-benar perlu.
-
-Jalur kritis dicakup oleh unit test dan integration test, dijalankan terhadap container database sungguhan untuk setiap engine dan versi mayor yang didukung. Restore adalah jalur yang paling penting bagi alat backup, jadi kami mengujinya secara eksplisit: sebelum setiap rilis, kami menjalankan siklus backup lalu restore penuh terhadap container nyata yang sama, memastikan backup benar-benar bisa di-restore end-to-end, bukan hanya berhasil ditulis. Sisa pipeline CI/CD menjalankan lint, type-check, seluruh test suite, smoke test image, dan build multi-arsitektur sebelum setiap rilis. Rilis hanya terbit setelah semua pemeriksaan itu dan pemindaian keamanan lolos, tanpa alert CodeQL critical yang masih terbuka.
-
-Menemukan kerentanan? Laporkan lewat tab Security di GitHub. Lihat [SECURITY.md](https://github.com/databasus/databasus?tab=security-ov-file). Laporan keamanan adalah antrean kerja dengan prioritas tertinggi. Untuk keamanan aplikasi saat berjalan (AES-256-GCM saat disimpan, penyimpanan zero-trust, secret terenkripsi, pengguna database read-only secara default), lihat [Keamanan kelas enterprise](#-keamanan-kelas-enterprise-dokumentasi) di bagian Fitur di atas.
+Audit berkala Codex Security dari OpenAI melengkapi pemeriksaan ini. Laporkan kerentanan secara privat melalui [SECURITY.md](https://github.com/databasus/databasus?tab=security-ov-file#readme); laporan keamanan ditangani lebih dahulu.
 
 ---
 

@@ -113,12 +113,6 @@ export const pt: typeof en = {
       returnToSignIn: 'Voltar para o login',
       completing: 'Concluindo a autenticação...',
     },
-    oauthStorage: {
-      waiting: 'Concluindo a autorização do armazenamento...',
-      complete: 'Autorização recebida. Volte ao editor do armazenamento.',
-      restart:
-        'Não foi possível contatar o editor original. Feche esta janela e inicie a autorização novamente pelo editor.',
-    },
   },
   errors: {
     cleanupPending:
@@ -615,7 +609,7 @@ export const pt: typeof en = {
         createNew: 'Criar armazenamento',
         addTitle: 'Adicionar armazenamento',
         description:
-          'Armazenamento é o lugar onde os backups ficam guardados (disco local, S3, Google Drive, etc.)',
+          'Armazenamento é o lugar onde os backups ficam guardados (disco local, S3, etc.)',
       },
       notifiers: {
         title: 'Canais de notificação (opcional)',
@@ -832,7 +826,7 @@ export const pt: typeof en = {
       submit: 'Criar espaço de trabalho',
       defaultName: 'Meu espaço de trabalho',
       description:
-        'O espaço de trabalho é onde você agrupa:<lineBreak/>- seus bancos de dados;<lineBreak/>- armazenamentos (disco local, S3, Google Drive, etc.);<lineBreak/>- canais de notificação (e-mail, Slack, Telegram, etc.);<lineBreak/>- controle de acesso (se você trabalha em equipe).',
+        'O espaço de trabalho é onde você agrupa:<lineBreak/>- seus bancos de dados;<lineBreak/>- armazenamentos (disco local, S3, etc.);<lineBreak/>- canais de notificação (e-mail, Slack, Telegram, etc.);<lineBreak/>- controle de acesso (se você trabalha em equipe).',
       nameRequired: 'Digite o nome do espaço de trabalho',
       created: 'Espaço de trabalho criado',
       permissionDenied: {
@@ -1472,7 +1466,7 @@ export const pt: typeof en = {
       createNewStorage: 'Criar armazenamento',
       addStorageTitle: 'Adicionar armazenamento',
       storageDescription:
-        'Armazenamento é o lugar onde os backups ficam guardados (disco local, S3, Google Drive, etc.)',
+        'Armazenamento é o lugar onde os backups ficam guardados (disco local, S3, etc.)',
       encryption: 'Criptografia',
       notifications: 'Notificações',
       noNotifications: 'Nenhuma',
@@ -1513,7 +1507,7 @@ export const pt: typeof en = {
         makeBackupNow: 'Fazer backup agora',
         encrypted: 'Criptografado',
         sizeTooltip:
-          'Em cima: o tamanho do arquivo de backup compactado que de fato fica no armazenamento (local, S3, Google Drive, etc.). Embaixo, em cinza: o tamanho original do banco de dados, sem compactação, no momento do backup. Os backups costumam ficar cerca de 5 vezes menores.',
+          'Em cima: o tamanho do arquivo de backup compactado que de fato fica no armazenamento (local, S3, etc.). Embaixo, em cinza: o tamanho original do banco de dados, sem compactação, no momento do backup. Os backups costumam ficar cerca de 5 vezes menores.',
         databaseSize: '{{size}} (tamanho do BD)',
         deleteConfirmation: 'Tem certeza de que deseja excluir este backup?',
         actions: {
@@ -2061,12 +2055,10 @@ export const pt: typeof en = {
     types: {
       local: 'Armazenamento local',
       s3: 'S3',
-      googleDrive: 'Google Drive',
       nas: 'NAS',
       azureBlob: 'Azure Blob Storage',
       ftp: 'FTP',
       sftp: 'SFTP',
-      rclone: 'Rclone',
     },
     s3StorageClasses: {
       default: 'Padrão (Standard)',
@@ -2098,12 +2090,10 @@ export const pt: typeof en = {
       type: {
         local: 'Tipo: armazenamento local',
         s3: 'Tipo: S3',
-        googleDrive: 'Tipo: Google Drive',
         nas: 'Tipo: NAS',
         azureBlob: 'Tipo: Azure Blob Storage',
         ftp: 'Tipo: FTP',
         sftp: 'Tipo: SFTP',
-        rclone: 'Tipo: Rclone',
       },
     },
     config: {
@@ -2132,7 +2122,6 @@ export const pt: typeof en = {
     },
     fields: {
       path: 'Caminho',
-      remotePath: 'Caminho remoto',
       share: 'Compartilhamento',
       domain: 'Domínio',
       useSsl: 'Usar SSL',
@@ -2158,10 +2147,7 @@ export const pt: typeof en = {
       accountName: 'Nome da conta',
       accountKey: 'Chave da conta',
       containerName: 'Nome do container',
-      clientId: 'ID do cliente',
-      clientSecret: 'Chave secreta do cliente',
       userToken: 'Token do usuário',
-      config: 'Configuração',
     },
     edit: {
       namePlaceholder: 'Meu armazenamento',
@@ -2188,26 +2174,6 @@ export const pt: typeof en = {
           'Não verifica o certificado TLS. Ative se o seu armazenamento compatível com S3 usa um certificado autoassinado. Atenção: isso reduz a segurança.',
         storageClassTooltip:
           'Classe de armazenamento S3 para os objetos enviados. Deixe o padrão para usar Standard. Alguns provedores oferecem classes mais baratas, como One Zone IA. Não use Glacier/Deep Archive: os arquivos precisam estar disponíveis na hora para as restaurações.',
-      },
-      googleDrive: {
-        guideLink: 'Como conectar o Google Drive?',
-        authorize: 'Autorizar',
-        authorized: 'Autorizado',
-        waiting: 'Aguardando autorização do Google...',
-        exchanging: 'Trocando o código de autorização...',
-        cancel: 'Cancelar autorização',
-        restart: 'Reiniciar autorização',
-        reconnect: 'Reconectar',
-        reconnectHelp:
-          'Informe o segredo do cliente novamente para reconectar. As credenciais salvas são mantidas se a reconexão falhar.',
-        expired: 'A autorização expirou. Comece novamente.',
-        refused: 'A autorização do Google foi recusada. Você pode tentar novamente.',
-        exchangeFailed: 'Não foi possível trocar o código de autorização. Comece novamente.',
-        missingRefreshToken:
-          'O Google não retornou um token de atualização. Autorize novamente e permita o acesso off-line.',
-        popupBlocked: 'A janela de autorização foi bloqueada. Permita pop-ups e tente novamente.',
-        unavailable:
-          'A autorização não está disponível neste navegador. Verifique o suporte a BroadcastChannel e tente novamente.',
       },
       nas: {
         shareWithSlashWarning:
@@ -2243,15 +2209,6 @@ export const pt: typeof en = {
         skipHostKeyVerification: 'Não verificar a chave do host',
         skipHostKeyTooltip:
           'Não verifica a chave SSH do host. Ative se você confia no servidor. Atenção: isso reduz a segurança.',
-      },
-      rclone: {
-        configTooltip:
-          "Cole aqui o conteúdo do rclone.conf. Você pode obtê-lo executando 'rclone config file' e copiando o resultado. Essa configuração aceita mais de 70 provedores de armazenamento na nuvem.",
-        configHiddenNote:
-          '*o conteúdo fica oculto para não expor dados sensíveis. Se quiser atualizar a configuração existente, cole uma nova aqui',
-        docsLink: 'Documentação do Rclone',
-        remotePathTooltip:
-          "Prefixo de caminho opcional no remote do rclone onde os backups serão guardados (por exemplo, '/backups' ou 'my-folder/backups')",
       },
     },
   },

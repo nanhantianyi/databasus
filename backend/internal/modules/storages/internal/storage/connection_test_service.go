@@ -24,9 +24,6 @@ type SettingsTest struct {
 	Settings    providers.Settings
 }
 
-// ConnectionTestService tests whether a storage can be reached and written. It writes nothing, so a
-// credential a provider refreshes in memory during a test, such as a Google Drive token, is never
-// stored.
 type ConnectionTestService struct {
 	storages   *Service
 	registry   *providers.Registry
@@ -66,11 +63,6 @@ func (s *ConnectionTestService) TestSettings(
 	settingsTest SettingsTest,
 ) (TestResult, error) {
 	err := s.workspaces.Authorize(ctx, actor, settingsTest.WorkspaceID, workspaces.ActionEditContent)
-	if err != nil {
-		return TestResult{}, err
-	}
-
-	err = checkRcloneAllowed(actor, settingsTest.Settings.GetType())
 	if err != nil {
 		return TestResult{}, err
 	}

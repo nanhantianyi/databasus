@@ -760,7 +760,6 @@ describe('StorageComponent usage', () => {
   it.each([
     { type: 'LOCAL' },
     { type: 'S3', s3Bucket: 'archive', isVirtualHostedStyle: false, isSkipTlsVerify: false },
-    { type: 'GOOGLE_DRIVE', clientId: 'saved-client' },
     {
       type: 'NAS',
       host: 'nas.example.com',
@@ -791,7 +790,6 @@ describe('StorageComponent usage', () => {
       authMethods: ['PASSWORD'],
       isSkipHostKeyVerify: false,
     },
-    { type: 'RCLONE', remotePath: 'backups' },
   ] satisfies Storage['settings'][])(
     'shows catalog usage when a viewer opens $type storage',
     async (settings) => {

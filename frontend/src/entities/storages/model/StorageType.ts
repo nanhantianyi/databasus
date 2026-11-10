@@ -7,10 +7,8 @@ export const StorageType = {
   LOCAL: 'LOCAL',
   // eslint-disable-next-line i18next/no-literal-string -- enum value, not copy
   S3: 'S3',
-  GOOGLE_DRIVE: 'GOOGLE_DRIVE',
   NAS: 'NAS',
   AZURE_BLOB: 'AZURE_BLOB',
   FTP: 'FTP',
   SFTP: 'SFTP',
-  RCLONE: 'RCLONE',
 } as const satisfies Record<string, StorageType>;

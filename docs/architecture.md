@@ -172,7 +172,7 @@ Engines live in `internal/engines/<engine>`: `postgresql`, `mysql`, `mariadb` an
 
 ## Shared code
 
-`internal/lib` holds code without domain logic, one concept per package, so the directory listing tells what is available. Test support may live there too, but neither production binary may depend on it or on test libraries. The only exceptions are third-party dependencies required for rclone providers; the architecture linter's [explicit allowlist](../backend/tools/archlint/production_dependencies.go) records their reasons and rejects any other importer.
+`internal/lib` holds code without domain logic, one concept per package, so the directory listing tells what is available. Test support may live there too, but neither production binary may depend on it or on test libraries. This restriction also applies to third-party dependencies.
 
 ### Audit events
 
@@ -382,7 +382,6 @@ Root `ui` owns the page, list and tab composition and presentation shared by the
 - **Account transitions reset account-owned state.** Logout, password-change logout and an active-session 401 replace the address with `/` and clear the previous sign-in destination. Session replacement resets the address, screens and workspace selection, close account-owned confirmations and reject obsolete destructive callbacks. Language, theme and version-reload cooldown survive. The app-owned query client synchronously cancels reads and clears query and mutation stores when the session changes. Other providers remain mounted, so password-change feedback survives the transition to sign-in.
 - **Startup and shell have separate owners.** App accepts essential user, settings and workspace data together, derives capabilities and owns workspace selection and version polling. The shell widget receives slots and owns viewport and drawer presentation.
 - **A sign-in attempt stays in its tab** and is consumed before code exchange. A signed-out screen link remains the destination through password and two-factor sign-in. OAuth binds a validated local screen path to the attempt and consumes it once; callback, external, query-bearing and malformed destinations are rejected. New authentication intent, unmount or session replacement prevents an older completion from activating a session.
-- **Storage authorization stays with its editor.** The editing feature owns the attempt in memory, and a callback page returns control to it. Entered secrets and tokens stay in browser memory, which cannot protect them from same-origin code or extensions. [Google Drive storage authorization](google-drive-storage-authorization.md) describes the flow.
 - **Theme infrastructure stays in shared.** Application tokens own semantic CSS roles and feed both the library configuration and Tailwind utilities. [Frontend design](frontend-design.md) explains presentation and its checks.
 
 ### Addressed navigation

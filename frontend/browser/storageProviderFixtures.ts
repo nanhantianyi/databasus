@@ -71,6 +71,4 @@ export const storageProviders: {
       path: '/nightly',
     },
   },
-  { settings: { type: 'GOOGLE_DRIVE', clientId: 'synthetic-client-id' } },
-  { settings: { type: 'RCLONE', remotePath: '/archives' } },
 ];

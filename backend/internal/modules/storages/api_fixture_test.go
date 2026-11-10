@@ -178,16 +178,6 @@ func newS3Settings(t *testing.T, s3 apiclient.S3StorageSettings) apiclient.Stora
 	})
 }
 
-func newGoogleDriveSettings(t *testing.T, googleDrive apiclient.GoogleDriveStorageSettings) apiclient.StorageSettings {
-	t.Helper()
-
-	googleDrive.Type = apiclient.GoogleDriveStorageSettingsTypeGOOGLEDRIVE
-
-	return toSettings(t, func(settings *apiclient.StorageSettings) error {
-		return settings.FromGoogleDriveStorageSettings(googleDrive)
-	})
-}
-
 func newNasSettings(t *testing.T, nas apiclient.NasStorageSettings) apiclient.StorageSettings {
 	t.Helper()
 
@@ -225,15 +215,5 @@ func newSftpSettings(t *testing.T, sftp apiclient.SftpStorageSettings) apiclient
 
 	return toSettings(t, func(settings *apiclient.StorageSettings) error {
 		return settings.FromSftpStorageSettings(sftp)
-	})
-}
-
-func newRcloneSettings(t *testing.T, rclone apiclient.RcloneStorageSettings) apiclient.StorageSettings {
-	t.Helper()
-
-	rclone.Type = apiclient.RcloneStorageSettingsTypeRCLONE
-
-	return toSettings(t, func(settings *apiclient.StorageSettings) error {
-		return settings.FromRcloneStorageSettings(rclone)
 	})
 }
